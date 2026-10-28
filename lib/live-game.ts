@@ -24,7 +24,7 @@ import { resetBootsSlot, slottedBoots, type BootsItem } from "@/lib/boots-slot";
 import { aliveSampleAt, historyKey, recordSample, type HistorySample } from "@/lib/live-history";
 import { evidencePick, isMetaItem, metaBuildFor, metaOption, metaOriginLabel, metaPatchNote, optionEvidence, roleName, type MetaBuild } from "@/lib/meta-builds";
 import {
-  counterLevel, counterSignalFor, enemyThreatProfile, loadEnemyStatsData, parseItemStats, signalHeavy, signalReason, summarizeProfile, THREAT_THRESHOLDS,
+  championBase, counterLevel, counterSignalFor, enemyThreatProfile, loadEnemyStatsData, parseItemStats, signalHeavy, signalReason, summarizeProfile, THREAT_THRESHOLDS,
   type CounterSignal, type EnemyProfile,
 } from "@/lib/enemy-stats";
 
@@ -129,8 +129,11 @@ type CatalogItem = {
   /** Data Dragon movement speed: flat bonus and percent (0.04 = 4%); absent when the item gives none. */
   moveSpeed?: { flat: number; percent: number };
 };
-/** `fallback` = Data Dragon was unreachable and the small hard-coded FALLBACK_ITEMS list is in use. */
-type Catalog = { version: string; byName: Map<string, CatalogItem>; byId: Map<number, CatalogItem>; fallback?: boolean };
+/**
+ * `fallback` = Data Dragon was unreachable and the small hard-coded FALLBACK_ITEMS list is in use. `aliases` = item id →
+ * the catalog item it counts as (free rune boots → Boots).
+ */
+type Catalog = { version: string; byName: Map<string, CatalogItem>; byId: Map<number, CatalogItem>; fallback?: boolean; aliases?: Map<number, number> };
 
 /**
  * Patch the FALLBACK_ITEMS prices were last checked against. Only used when Data Dragon is unreachable; it is NOT the
@@ -434,6 +437,7 @@ async function fetchCatalog(): Promise<Catalog> {
     name?: string;
     description?: string;
     from?: string[];
+    into?: string[];
     tags?: string[];
     stats?: Record<string, number>;
     maps?: Record<string, boolean>;
@@ -472,9 +476,17 @@ async function fetchCatalog(): Promise<Catalog> {
   const byName = new Map<string, CatalogItem>();
   for (const item of [...items].sort((a, b) => a.id - b.id)) if (!byName.has(key(item.name))) byName.set(key(item.name), item);
   if (!byId.size) throw new Error("Data Dragon item data was empty");
+  // Free boots no shop sells (Slightly Magical Footwear's) build into the same upgrades as a purchasable boots item: they
+  // count as that item, so the build path, upgrades and the boots slot see boots.
+  const aliases = new Map<number, number>();
+  for (const [id, item] of Object.entries(payload.data || {})) {
+    if (byId.has(Number(id)) || !item.tags?.includes("Boots") || !item.into?.length) continue;
+    const base = byId.get(Number(item.into[0]))?.from?.find((from) => byId.get(from)?.tags?.includes("Boots"));
+    if (base) aliases.set(Number(id), base);
+  }
   // This patch's item tips for every getItemUsageTip caller on the server (lib/item-synergy.ts).
   registerItemTips(version, [...byName.values()]);
-  return { version, byName, byId, fallback: false };
+  return { version, byName, byId, fallback: false, aliases };
 }
 
 async function loadChampionContext(version: string, champion: string, index: ChampionIndex): Promise<LiveGameSnapshot["championContext"]> {
@@ -2450,22 +2462,24 @@ export function resetGameMemory() {
 }
 
 /** The boots in the role-quest boots slot this sample, as an owned item, or null (lib/boots-slot.ts). */
-function bootsSlotItem(gameId: string, time: number, active: LiveGameSnapshot["activePlayer"], stats: RawChampionStats, catalog: Catalog): LiveItem | null {
+function bootsSlotItem(gameId: string, time: number, active: LiveGameSnapshot["activePlayer"], stats: RawChampionStats, catalog: Catalog, baseMoveSpeed: number | null, roleQuests: boolean): LiveItem | null {
   const asBoots = (item: CatalogItem): BootsItem => ({ id: item.id, name: item.name, price: item.cost, description: item.description, flat: item.moveSpeed?.flat || 0, from: item.from });
   const listed = active.items.flatMap((item) => catalog.byId.get(item.id) || []);
   const visible = listed.find((item) => isBootsItem(item));
   const percent = listed.reduce((sum, item) => sum + (isBootsItem(item) ? 0 : item.moveSpeed?.percent || 0), 0);
-  const upgrades = [...catalog.byId.values()].filter((item) => isUpgradedBootsItem(item) && (item.moveSpeed?.flat || 0) > 0).map(asBoots);
+  const allBoots = [...catalog.byId.values()].filter((item) => (isBootsItem(item) || isUpgradedBootsItem(item)) && (item.moveSpeed?.flat || 0) > 0).map(asBoots);
   const boots = slottedBoots(gameId, {
     time,
-    alive: !active.isDead,
+    dead: active.isDead,
     stats: {
       moveSpeed: num(stats.moveSpeed), attackSpeed: num(stats.attackSpeed), armor: num(stats.armor), magicResist: num(stats.magicResist),
       magicPenetrationFlat: num(stats.magicPenetrationFlat), abilityHaste: num(stats.abilityHaste), abilityPower: num(stats.abilityPower), attackDamage: num(stats.attackDamage),
     },
     visible: visible ? asBoots(visible) : null,
     percent,
-    upgrades,
+    boots: allBoots,
+    baseMoveSpeed,
+    roleQuests,
   });
   return boots ? { id: boots.id, name: boots.name, count: 1, price: boots.price, description: boots.description || "", bootsSlot: true } : null;
 }
@@ -2549,6 +2563,8 @@ export async function normalizeLiveData(raw: RawLiveData, options: NormalizeOpti
     for (const item of player.items || []) {
       const id = num(item.itemID);
       if (!id || catalog.byId.has(id)) continue;
+      const alias = catalog.aliases?.get(id);
+      if (alias) { item.itemID = alias; continue; }
       const base = id >= 100000 ? catalog.byId.get(id % 10000) : undefined;
       const named = item.displayName ? catalog.byName.get(key(item.displayName)) : undefined;
       const match = base && (!named || named.id === base.id) ? base : named;
@@ -2589,9 +2605,6 @@ export async function normalizeLiveData(raw: RawLiveData, options: NormalizeOpti
       secondaryTree: rawActive.fullRunes?.secondaryRuneTree?.displayName || activeRaw.runes?.secondaryRuneTree?.displayName || null,
     },
   };
-  // Boots a role quest moved into the boots slot are no longer listed (lib/boots-slot.ts): they still count as owned.
-  const hiddenBoots = bootsSlotItem(liveGameId(raw), num(raw.gameData?.gameTime), activePlayer, stats, catalog);
-  if (hiddenBoots) activePlayer.items.push(hiddenBoots);
   const positionOpponent = enemies.find((enemy) => STANDARD_POSITIONS.includes(activePlayer.position) && enemy.position === activePlayer.position);
   const laneOpponent = positionOpponent || enemies[0] || null;
   const matchup = positionOpponent
@@ -2606,6 +2619,11 @@ export async function normalizeLiveData(raw: RawLiveData, options: NormalizeOpti
       new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000)),
     ]),
   ]);
+  // Boots in the role-quest boots slot are not listed (lib/boots-slot.ts): they still count as owned. Before anything reads
+  // the inventory (enemy profile's item gold, recommendations, death shop, recorder).
+  const baseMoveSpeed = enemyStatsData ? championBase(enemyStatsData, activePlayer.champion)?.moveSpeed ?? null : null;
+  const hiddenBoots = bootsSlotItem(liveGameId(raw), num(raw.gameData?.gameTime), activePlayer, stats, catalog, baseMoveSpeed, rulesetFor(raw.gameData) === "sr");
+  if (hiddenBoots) activePlayer.items.push(hiddenBoots);
   // Estimated enemy stats + team counter-build signals (lib/enemy-stats.ts). Cheap once Data Dragon data is cached.
   const enemyProfile: EnemyProfile | null = enemyStatsData
     ? steadyProfile(liveGameId(raw), num(raw.gameData?.gameTime), enemyThreatProfile(

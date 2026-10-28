@@ -3,10 +3,12 @@
  * listing them: in a 2026 draft game Boots vanished from the item list at 13:07 while move speed kept their +25, and an
  * upgrade to Berserker's Greaves later only showed as +45 move speed.
  *
- * Per game (process-local, like lib/live-history.ts): the last boots seen stay owned. The player's resting move speed (the
- * most common value over the last minute alive, which skips buffs, slows and fountain speed) is calibrated while the boots
- * are listed; once they are hidden, a bonus that grew past the hidden boots' own means they were upgraded, and one that
- * dropped to nothing means they were sold.
+ * Boots can also go straight into the slot without ever being listed (a dead-shop Berserker's: move speed 325 → 370).
+ *
+ * Per game (process-local, like lib/live-history.ts): the last boots seen stay owned. The player's plain move speed (see
+ * `resting`) minus the champion's base (calibrated while boots are listed, else Data Dragon's) is the boots bonus: one that
+ * fits a boots item while none is listed means boots in the slot, one that grew past the hidden boots' own means they were
+ * upgraded, and one that dropped to nothing means they were sold.
  */
 
 export type BootsItem = {
@@ -19,15 +21,15 @@ export type BootsItem = {
   from?: number[];
 };
 export type MoveStats = { moveSpeed: number; attackSpeed: number; armor: number; magicResist: number; magicPenetrationFlat: number; abilityHaste: number; abilityPower: number; attackDamage: number };
-type Sample = { time: number; ms: number; key: string };
+type Sample = { time: number; ms: number; key: string; dead: boolean };
 type GameState = { boots: BootsItem | null; base: number | null; samples: Sample[]; settled: MoveStats | null; seen: number };
 
 const WINDOW_SECONDS = 60;
 const MIN_SAMPLES = 3;
 const MAX_GAMES = 4;
 const MAX_WALKING_SPEED = 550;
-/** How far the measured bonus may be from an upgrade's Data Dragon move speed. */
-const FIT_TOLERANCE = 6;
+/** How far the measured bonus may be from a boots item's Data Dragon move speed (real boots land on it exactly). */
+const FIT_TOLERANCE = 3;
 
 const holder = globalThis as typeof globalThis & { __riftLensBootsSlotV1?: Map<string, GameState> };
 const games: Map<string, GameState> = holder.__riftLensBootsSlotV1 ??= new Map();
@@ -42,8 +44,14 @@ function stateFor(gameId: string) {
   return state;
 }
 
-/** Most common move speed among this inventory's samples in the window; null until it repeats often enough. */
+/**
+ * The player's plain move speed: the last two samples taken while dead when they agree (dead, the game reports it without
+ * slows, buffs or fountain speed, so a death-shop purchase counts at once), else the most common value among this
+ * inventory's samples in the window; null until it repeats often enough.
+ */
 function resting(samples: Sample[], key: string, now: number) {
+  const [before, last] = samples.filter((sample) => sample.key === key).slice(-2);
+  if (before?.dead && last?.dead && before.ms === last.ms) return last.ms;
   const counts = new Map<number, number>();
   for (const sample of samples) if (sample.key === key && now - sample.time <= WINDOW_SECONDS) counts.set(sample.ms, (counts.get(sample.ms) || 0) + 1);
   let best: [number, number] | null = null;
@@ -75,26 +83,32 @@ function pickUpgrade(candidates: BootsItem[], bonus: number, before: MoveStats |
 
 /**
  * The boots to count as owned this sample though the item list does not show them, or null. `visible` = boots in the item
- * list; `upgrades` = every upgraded boots item; `percent` = the listed items' percent move speed (0.04 = 4%).
+ * list; `boots` = every boots item (plain Boots and upgrades); `percent` = the listed items' percent move speed (0.04 = 4%);
+ * `baseMoveSpeed` = the champion's Data Dragon base move speed, which spots boots bought straight into the boots slot
+ * (never listed: 325 → 370 on a dead-shop Berserker's) before any listed boots could calibrate it; `roleQuests` = the
+ * queue has role quests (Summoner's Rift draft, not Swiftplay), the only place boots enter the slot unlisted, so a jungle
+ * pet's move speed elsewhere is never taken for boots.
  */
 export function slottedBoots(gameId: string, input: {
   time: number;
-  alive: boolean;
   stats: MoveStats;
+  dead: boolean;
   visible: BootsItem | null;
   percent: number;
-  upgrades: BootsItem[];
+  boots: BootsItem[];
+  baseMoveSpeed: number | null;
+  roleQuests: boolean;
 }): BootsItem | null {
   const state = stateFor(gameId);
-  const { time, alive, stats, visible, percent } = input;
+  const { time, stats, visible, percent, dead } = input;
   // A replay or a reloaded game going back in time starts over.
   if (time < state.seen - 5) { state.boots = null; state.base = null; state.samples = []; state.settled = null; }
   state.seen = time;
   const boots = visible || state.boots;
   const key = `${boots?.id || 0}:${visible ? "listed" : "hidden"}:${percent.toFixed(3)}`;
   // Fountain speed (~700) is not walking speed, however long the player shops.
-  if (alive && stats.moveSpeed > 0 && stats.moveSpeed < MAX_WALKING_SPEED) {
-    state.samples.push({ time, ms: Math.round(stats.moveSpeed * 100) / 100, key });
+  if (stats.moveSpeed > 0 && stats.moveSpeed < MAX_WALKING_SPEED) {
+    state.samples.push({ time, ms: Math.round(stats.moveSpeed * 100) / 100, key, dead });
     state.samples = state.samples.filter((sample) => time - sample.time <= WINDOW_SECONDS);
   }
   const speed = resting(state.samples, key, time);
@@ -106,13 +120,20 @@ export function slottedBoots(gameId: string, input: {
     }
     return null;
   }
-  if (!state.boots) return null;
-  if (speed === null || state.base === null) return state.boots;
-  const bonus = speed / (1 + percent) - state.base;
-  if (bonus < Math.min(8, state.boots.flat / 2)) { state.boots = null; return null; }
-  if (bonus > state.boots.flat + 10) {
+  // Calibrated from listed boots beats the Data Dragon base (it already holds runes and other constant bonuses).
+  const base = state.base ?? input.baseMoveSpeed;
+  if (speed === null || !base) return state.boots;
+  const bonus = speed / (1 + percent) - base;
+  const fits = (item: BootsItem) => Math.abs(item.flat - bonus) <= FIT_TOLERANCE;
+  if (!state.boots) {
+    // No boots known yet: a resting bonus that fits a boots item is boots bought straight into the boots slot.
+    const candidates = input.boots.filter((item) => item.flat > 0 && fits(item));
+    if (input.roleQuests && bonus >= 15 && candidates.length) state.boots = pickUpgrade(candidates, bonus, state.settled, stats);
+  } else if (bonus < Math.min(8, state.boots.flat / 2)) {
+    state.boots = null;
+  } else if (bonus > state.boots.flat + 10) {
     // Only what these boots build into, and only a move speed that fits the bonus.
-    const candidates = input.upgrades.filter((item) => item.from?.includes(state.boots!.id) && Math.abs(item.flat - bonus) <= FIT_TOLERANCE);
+    const candidates = input.boots.filter((item) => item.from?.includes(state.boots!.id) && fits(item));
     const upgrade = candidates.length ? pickUpgrade(candidates, bonus, state.settled, stats) : null;
     if (upgrade) state.boots = upgrade;
   }

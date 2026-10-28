@@ -41,6 +41,8 @@ export type ChampionBaseStats = {
   /** Bonus attack speed per level, in percent (Data Dragon `attackspeedperlevel`). */
   attackSpeedPerLevel: number;
   attackRange: number;
+  /** Base move speed (Data Dragon `movespeed`); does not grow with level. Absent on the generic fallback. */
+  moveSpeed?: number;
 };
 
 /** Flat stats one copy of an item grants. Percent fields are 0–100. */
@@ -262,6 +264,7 @@ export function buildEnemyStatsData(
       magicResist: num(stats.spellblock), magicResistPerLevel: num(stats.spellblockperlevel),
       attackDamage: num(stats.attackdamage), attackDamagePerLevel: adGrowth,
       attackSpeed: num(stats.attackspeed) || 0.625, attackSpeedPerLevel: num(stats.attackspeedperlevel), attackRange: num(stats.attackrange),
+      moveSpeed: num(stats.movespeed) || undefined,
     };
     champions.set(key(entry.name), entry);
     champions.set(key(entry.id), entry);
