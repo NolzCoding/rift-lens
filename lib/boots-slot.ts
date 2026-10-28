@@ -1,0 +1,127 @@
+/**
+ * Boots in the role-quest boots slot. Once a role quest moves boots out of the six item slots, the Live Client API stops
+ * listing them: in a 2026 draft game Boots vanished from the item list at 13:07 while move speed kept their +25, and an
+ * upgrade to Berserker's Greaves later only showed as +45 move speed.
+ *
+ * Per game (process-local, like lib/live-history.ts): the last boots seen stay owned. The player's resting move speed (the
+ * most common value over the last minute alive, which skips buffs, slows and fountain speed) is calibrated while the boots
+ * are listed; once they are hidden, a bonus that grew past the hidden boots' own means they were upgraded, and one that
+ * dropped to nothing means they were sold.
+ */
+
+export type BootsItem = {
+  id: number;
+  name: string;
+  price: number;
+  description?: string;
+  /** Data Dragon flat movement speed. */
+  flat: number;
+  from?: number[];
+};
+export type MoveStats = { moveSpeed: number; attackSpeed: number; armor: number; magicResist: number; magicPenetrationFlat: number; abilityHaste: number; abilityPower: number; attackDamage: number };
+type Sample = { time: number; ms: number; key: string };
+type GameState = { boots: BootsItem | null; base: number | null; samples: Sample[]; settled: MoveStats | null; seen: number };
+
+const WINDOW_SECONDS = 60;
+const MIN_SAMPLES = 3;
+const MAX_GAMES = 4;
+const MAX_WALKING_SPEED = 550;
+/** How far the measured bonus may be from an upgrade's Data Dragon move speed. */
+const FIT_TOLERANCE = 6;
+
+const holder = globalThis as typeof globalThis & { __riftLensBootsSlotV1?: Map<string, GameState> };
+const games: Map<string, GameState> = holder.__riftLensBootsSlotV1 ??= new Map();
+
+function stateFor(gameId: string) {
+  let state = games.get(gameId);
+  if (!state) {
+    state = { boots: null, base: null, samples: [], settled: null, seen: 0 };
+    games.set(gameId, state);
+    while (games.size > MAX_GAMES) games.delete(games.keys().next().value!);
+  }
+  return state;
+}
+
+/** Most common move speed among this inventory's samples in the window; null until it repeats often enough. */
+function resting(samples: Sample[], key: string, now: number) {
+  const counts = new Map<number, number>();
+  for (const sample of samples) if (sample.key === key && now - sample.time <= WINDOW_SECONDS) counts.set(sample.ms, (counts.get(sample.ms) || 0) + 1);
+  let best: [number, number] | null = null;
+  for (const entry of counts) if (!best || entry[1] > best[1] || (entry[1] === best[1] && entry[0] < best[0])) best = entry;
+  return best && best[1] >= MIN_SAMPLES ? best[0] : null;
+}
+
+/** Stat words in an item's description that its effect on the player's stats can confirm. */
+const SIGNATURES: Array<{ text: RegExp; moved: (before: MoveStats, after: MoveStats) => boolean }> = [
+  { text: /attack speed/i, moved: (before, after) => after.attackSpeed - before.attackSpeed >= 0.09 },
+  { text: /magic penetration/i, moved: (before, after) => after.magicPenetrationFlat - before.magicPenetrationFlat >= 8 },
+  { text: /ability haste/i, moved: (before, after) => after.abilityHaste - before.abilityHaste >= 7 },
+  { text: /\bmagic resist/i, moved: (before, after) => after.magicResist - before.magicResist >= 12 },
+  { text: /\barmor\b/i, moved: (before, after) => after.armor - before.armor >= 15 },
+];
+
+/** Which upgrade the bonus and the stat jump point to: fitting move speed first, then the stat that moved, then the kit's damage type. */
+function pickUpgrade(candidates: BootsItem[], bonus: number, before: MoveStats | null, after: MoveStats) {
+  const close = Math.min(...candidates.map((item) => Math.abs(item.flat - bonus)));
+  const fitting = candidates.filter((item) => Math.abs(item.flat - bonus) <= close + 2);
+  const score = (item: BootsItem) => {
+    const matched = before ? SIGNATURES.filter((signature) => signature.text.test(item.description || "") && signature.moved(before, after)).length : 0;
+    const ap = after.abilityPower > after.attackDamage;
+    const fits = /attack speed/i.test(item.description || "") ? !ap : /magic penetration/i.test(item.description || "") ? ap : false;
+    return matched * 2 + (fits ? 1 : 0);
+  };
+  return [...fitting].sort((a, b) => score(b) - score(a) || a.price - b.price)[0] || null;
+}
+
+/**
+ * The boots to count as owned this sample though the item list does not show them, or null. `visible` = boots in the item
+ * list; `upgrades` = every upgraded boots item; `percent` = the listed items' percent move speed (0.04 = 4%).
+ */
+export function slottedBoots(gameId: string, input: {
+  time: number;
+  alive: boolean;
+  stats: MoveStats;
+  visible: BootsItem | null;
+  percent: number;
+  upgrades: BootsItem[];
+}): BootsItem | null {
+  const state = stateFor(gameId);
+  const { time, alive, stats, visible, percent } = input;
+  // A replay or a reloaded game going back in time starts over.
+  if (time < state.seen - 5) { state.boots = null; state.base = null; state.samples = []; state.settled = null; }
+  state.seen = time;
+  const boots = visible || state.boots;
+  const key = `${boots?.id || 0}:${visible ? "listed" : "hidden"}:${percent.toFixed(3)}`;
+  // Fountain speed (~700) is not walking speed, however long the player shops.
+  if (alive && stats.moveSpeed > 0 && stats.moveSpeed < MAX_WALKING_SPEED) {
+    state.samples.push({ time, ms: Math.round(stats.moveSpeed * 100) / 100, key });
+    state.samples = state.samples.filter((sample) => time - sample.time <= WINDOW_SECONDS);
+  }
+  const speed = resting(state.samples, key, time);
+  if (visible) {
+    state.boots = visible;
+    if (speed !== null) {
+      state.base = speed / (1 + percent) - visible.flat;
+      if (Math.abs(stats.moveSpeed - speed) < 0.01) state.settled = stats;
+    }
+    return null;
+  }
+  if (!state.boots) return null;
+  if (speed === null || state.base === null) return state.boots;
+  const bonus = speed / (1 + percent) - state.base;
+  if (bonus < Math.min(8, state.boots.flat / 2)) { state.boots = null; return null; }
+  if (bonus > state.boots.flat + 10) {
+    // Only what these boots build into, and only a move speed that fits the bonus.
+    const candidates = input.upgrades.filter((item) => item.from?.includes(state.boots!.id) && Math.abs(item.flat - bonus) <= FIT_TOLERANCE);
+    const upgrade = candidates.length ? pickUpgrade(candidates, bonus, state.settled, stats) : null;
+    if (upgrade) state.boots = upgrade;
+  }
+  // Stats from a sample at the settled speed: the "before" an upgrade's stat jump is compared against.
+  if (Math.abs(stats.moveSpeed - speed) < 0.01) state.settled = stats;
+  return state.boots;
+}
+
+/** Forget every game (tests that reuse one roster for unrelated scenarios). */
+export function resetBootsSlot() {
+  games.clear();
+}

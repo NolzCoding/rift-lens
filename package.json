@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --import ./scripts/alias.mjs --experimental-transform-types --no-warnings --test --test-reporter=spec tests/engine.test.ts tests/raw-capture.test.ts tests/history.test.ts tests/build-research.test.ts tests/enemy-stats.test.ts tests/item-groups.test.ts tests/scaling.test.ts tests/replay-review.test.ts tests/counters.test.ts tests/meta-evidence.test.ts tests/ai-json.test.ts",
-    "check:replay": "node --import ./scripts/alias.mjs --experimental-transform-types --no-warnings scripts/check.ts",
+    "test": "node --import ./scripts/alias.mjs --experimental-transform-types --no-warnings --test --test-reporter=spec tests/engine.test.ts tests/raw-capture.test.ts tests/history.test.ts tests/build-research.test.ts tests/enemy-stats.test.ts tests/item-groups.test.ts tests/scaling.test.ts tests/replay-review.test.ts tests/counters.test.ts tests/meta-evidence.test.ts tests/ai-json.test.ts tests/boots-slot.test.ts",
+    "check:replay": "node --env-file-if-exists=.env.local --import ./scripts/alias.mjs --experimental-transform-types --no-warnings scripts/check.ts",
     "check:rofl": "node --import ./scripts/alias.mjs --experimental-transform-types --no-warnings scripts/compare-rofl.ts",
     "check": "npm run check:chars && tsc --noEmit && npm run test && npm run check:replay",
     "check:chars": "node scripts/scan-control-chars.cjs ."

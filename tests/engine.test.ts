@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { configureItemGroups } from "@/lib/item-groups";
-import { findItem, getItemCatalog, normalizeLiveData, type ItemCatalog, type RawLiveData } from "@/lib/live-game";
+import { findItem, getItemCatalog, normalizeLiveData, resetGameMemory, type ItemCatalog, type RawLiveData } from "@/lib/live-game";
 import { resolveBuys } from "@/lib/live-help-build";
 import { configureChampionTraits } from "@/lib/champion-traits";
 import { buildCheck, buildCheckLine, metaBuildFor, registerResearchedBuilds } from "@/lib/meta-builds";
@@ -53,7 +53,8 @@ const brief: PlayerBrief = {
   champion: "Caitlyn", gamesOnChampion: 2, winRateOnChampion: 1, usualBuild: ["Hexoptics C44", "The Collector"], usualBuildGames: 2, pinnedBuild: null, importedBuild: null,
   preferredItems: [], avoidItems: [], matchupNote: null, killerNotes: [], issues: [], focus: null, notes: [], lines: [],
 };
-const run = (input: RawLiveData, sold: number[] = []) => normalizeLiveData(input, { loadBrief: async () => brief, soldItemIds: () => sold });
+// Every call is its own scenario on one shared roster: no steady signals or slotted boots from the previous call.
+const run = (input: RawLiveData, sold: number[] = []) => { resetGameMemory(); return normalizeLiveData(input, { loadBrief: async () => brief, soldItemIds: () => sold }); };
 
 function tree(id: number, out = new Set<number>(), depth = 0) {
   for (const child of catalog.byId.get(id)?.from || []) { out.add(child); if (depth < 4) tree(child, out, depth + 1); }
@@ -137,7 +138,7 @@ test("objectives: Swiftplay at 5:00 shows Baron 12:00 and Elder 15:00, no grubs/
 });
 
 // Top build (lib/meta-builds.ts): Caitlyn bottom follows the fixture build's slots; history only picks between a slot's options.
-const runWith = (input: RawLiveData, usualBuild: string[]) => normalizeLiveData(input, { loadBrief: async () => ({ ...brief, usualBuild }), soldItemIds: () => [] });
+const runWith = (input: RawLiveData, usualBuild: string[]) => { resetGameMemory(); return normalizeLiveData(input, { loadBrief: async () => ({ ...brief, usualBuild }), soldItemIds: () => [] }); };
 const unownedSteps = (snap: LiveGameSnapshot) => snap.buildPath.steps.filter((s) => s.status !== "owned").map((s) => s.item);
 
 test("meta: a player who builds The Collector first gets The Collector in slot 1 (Hexoptics dropped)", { skip }, async () => {
@@ -218,7 +219,7 @@ test("resell: AI 'sell Long Sword, buy Yun Tal' is dropped (Long Sword is in Yun
 });
 
 test("resell: AI 'sell Hexoptics for GA / boots' is dropped (owned path step); 'sell RFC for GA' is kept", { skip }, () => {
-  const snapshot = helpSnapshot([ID.hexoptics, ID.collector, ID.ldr, ID.rfc, ID.ie, ID.bt], 3800, [[ID.hexoptics, "owned"], [ID.collector, "owned"], [ID.yunTal, "next"]]);
+  const snapshot = helpSnapshot([ID.hexoptics, ID.collector, ID.ldr, ID.rfc, ID.ie, ID.bt], 3800, [[ID.hexoptics, "owned"], [ID.collector, "owned"], [ID.yunTal, "next"], [ID.ga, "later"]]);
   const bad = { buyOptions: [
     { item: "Guardian Angel", targetItem: "Guardian Angel", timing: "endgame-swap" as const, reason: "Conditional survival swap: sell Hexoptics C44 for 1960g, buy Guardian Angel for 3200g." },
     { item: "Berserker's Greaves", targetItem: "Berserker's Greaves", timing: "endgame-swap" as const, reason: "Boots checkpoint: sell Hexoptics C44 for 1960g, buy Berserker's Greaves for 1100g." },
@@ -226,6 +227,15 @@ test("resell: AI 'sell Hexoptics for GA / boots' is dropped (owned path step); '
   assert.deepEqual(resolveBuys(bad, snapshot, catalog).map((b) => b.item), []);
   const good = { buyOptions: [{ item: "Guardian Angel", targetItem: "Guardian Angel", timing: "endgame-swap" as const, reason: "Sell Rapid Firecannon for 1855g, buy Guardian Angel." }] };
   assert.deepEqual(resolveBuys(good, snapshot, catalog).map((b) => b.item), ["Guardian Angel"]);
+});
+
+test("one build: an AI buy of a completed item off the build path is dropped; path steps are kept", { skip }, () => {
+  const snapshot = helpSnapshot([ID.hexoptics, ID.berserkers], 3500, [[ID.hexoptics, "owned"], [ID.ie, "next"], [ID.rfc, "later"]]);
+  const review = { buyOptions: [
+    { item: "Guardian Angel", targetItem: "Guardian Angel", timing: "next-recall" as const, reason: "Changes your build: Guardian Angel instead of Rapid Firecannon." },
+    { item: "Infinity Edge", targetItem: "Infinity Edge", timing: "next-recall" as const, reason: "Next build step." },
+  ] };
+  assert.deepEqual(resolveBuys(review, snapshot, catalog).map((b) => b.item), ["Infinity Edge"]);
 });
 
 // Counter-build from enemy signals inside the top build (last real game: squishy Pyke/Evelynn/MF/Tristana/Gwen team,

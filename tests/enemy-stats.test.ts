@@ -11,7 +11,7 @@ import {
 } from "@/lib/enemy-stats";
 import { configureChampionTraits } from "@/lib/champion-traits";
 import { configureItemGroups } from "@/lib/item-groups";
-import { getItemCatalog, normalizeLiveData, type RawLiveData } from "@/lib/live-game";
+import { getItemCatalog, normalizeLiveData, resetGameMemory, type RawLiveData } from "@/lib/live-game";
 import { registerResearchedBuilds } from "@/lib/meta-builds";
 
 import { caitlynResearched } from "./fixtures/meta";
@@ -231,6 +231,8 @@ async function snapshot(mine: number[], enemies: Seat[], opts: { level?: number;
     events: { Events: [] },
     gameData: { gameMode: "CLASSIC", gameTime: 1500, mapName: "Map11", mapNumber: 11 },
   };
+  // Every call is its own scenario on one shared roster: no steady signals from the previous call.
+  resetGameMemory();
   return { catalog, snap: await normalizeLiveData(raw, { loadBrief: async () => null, soldItemIds: () => [] }) };
 }
 const nextStep = (snap: Awaited<ReturnType<typeof snapshot>>["snap"]) => snap.buildPath.steps.find((step) => step.status === "next")?.item;

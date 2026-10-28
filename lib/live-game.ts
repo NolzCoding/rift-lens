@@ -20,6 +20,7 @@ import { championEntry, inferDamageProfile, loadChampionIndex, type ChampionInde
 import {
   buildClass, championTraits, championTraitsStatus, ensureChampionTraits, isDiver, isEnchanter, isMarksman, isTank, type BuildClass, type ChampionTraits,
 } from "@/lib/champion-traits";
+import { resetBootsSlot, slottedBoots, type BootsItem } from "@/lib/boots-slot";
 import { aliveSampleAt, historyKey, recordSample, type HistorySample } from "@/lib/live-history";
 import { evidencePick, isMetaItem, metaBuildFor, metaOption, metaOriginLabel, metaPatchNote, optionEvidence, roleName, type MetaBuild } from "@/lib/meta-builds";
 import {
@@ -125,6 +126,8 @@ type CatalogItem = {
   usageTip?: string;
   /** The item applies Grievous Wounds (its full Data Dragon description); absent offline / on hand-made test items. */
   antiHeal?: boolean;
+  /** Data Dragon movement speed: flat bonus and percent (0.04 = 4%); absent when the item gives none. */
+  moveSpeed?: { flat: number; percent: number };
 };
 /** `fallback` = Data Dragon was unreachable and the small hard-coded FALLBACK_ITEMS list is in use. */
 type Catalog = { version: string; byName: Map<string, CatalogItem>; byId: Map<number, CatalogItem>; fallback?: boolean };
@@ -178,6 +181,8 @@ const FALLBACK_ITEMS: CatalogItem[] = [
 
 const STANDARD_POSITIONS = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"];
 const TRINKETS = [3340, 3363, 3364];
+/** Takes one of the six item slots: not a trinket, and not boots in the role-quest boots slot. */
+const inSlot = (item: LiveItem) => !TRINKETS.includes(item.id) && !item.bootsSlot;
 const CONTROL_WARD: CatalogItem = { id: 2055, name: "Control Ward", cost: 75 };
 // Objective timings in game seconds. 2026 season: Atakhan removed in every queue, first Baron back to 20:00 on SR.
 // Swiftplay (Riot support page + "/dev: A Swifter Swiftplay", Dec 2025): no grubs/herald, Baron 12:00, max 2 elemental
@@ -452,6 +457,8 @@ async function fetchCatalog(): Promise<Catalog> {
         ...itemScaling(Number(id), item),
         usageTip: itemUsageTip(item.description, item.tags),
         antiHeal: GRIEVOUS_WOUNDS.test(cleanText(item.description)),
+        ...(item.stats?.FlatMovementSpeedMod || item.stats?.PercentMovementSpeedMod
+          ? { moveSpeed: { flat: num(item.stats.FlatMovementSpeedMod), percent: num(item.stats.PercentMovementSpeedMod) } } : {}),
       }]
     : []);
   const byId = new Map(items.map((item) => [item.id, item]));
@@ -1171,7 +1178,7 @@ function buildSwapPlan(
   /** A heavy counter-buy: the cheapest completed item outside the path may be swapped before the endgame too. */
   options: { anyTime?: boolean } = {},
 ): LiveRecommendation["swapPlan"] {
-  const inventory = active.items.filter((item) => !TRINKETS.includes(item.id) && item.id !== target.id);
+  const inventory = active.items.filter((item) => inSlot(item) && item.id !== target.id);
   if (inventory.length < 6) return null;
   // Selling something the target is built from, or something on the player's own path, only means buying it again.
   const targetTree = protectedFromSale({ path: { source: "default", label: "", steps: [{ itemId: target.id, item: target.name, cost: target.cost, status: "next" }] } } as BuildPlan, catalog);
@@ -1405,7 +1412,7 @@ function buildRecommendations(
     signal?: CounterSignal;
   };
   const choices: Choice[] = [];
-  const realInventory = active.items.filter((item) => !TRINKETS.includes(item.id));
+  const realInventory = active.items.filter(inSlot);
   const fullInventory = realInventory.length >= 6;
   let threatMode = false;
   let threatSignal: CounterSignal | undefined;
@@ -1646,7 +1653,7 @@ function buildRecommendations(
       if (!swapPlan) room = fullInventoryAdvice(item, plan, active, catalog);
     }
     // A potion or Biscuit holds the slot: using it makes room, nothing needs selling.
-    const snack = needsSale && !swapPlan ? active.items.find((entry) => !TRINKETS.includes(entry.id) && isConsumable(entry, catalog)) : null;
+    const snack = needsSale && !swapPlan ? active.items.find((entry) => inSlot(entry) && isConsumable(entry, catalog)) : null;
     if (snack) room = `Inventory full: use your ${snack.name} to free a slot, then buy ${item.name}.`;
     if (needsSale && !swapPlan && !room) return;
     used.add(itemKey);
@@ -1869,7 +1876,7 @@ function insertCounter(plan: BuildPlan, item: CatalogItem, reason: string, activ
   }
   // Full inventory and the counter frees no slot itself: the in-progress step whose purchase frees one (two or more held
   // components) comes first, so the path reads "finish X, then the counter" like the card does.
-  const full = active.items.filter((entry) => !TRINKETS.includes(entry.id)).length >= 6;
+  const full = active.items.filter(inSlot).length >= 6;
   if (full && !freesSlot(item, active, catalog)) {
     const opener = plan.next.findIndex((step) => consumeOwned(step, ownedCounts(active), catalog).slots >= 2);
     if (opener > at) {
@@ -1918,7 +1925,7 @@ function fullInventoryAdvice(item: CatalogItem, plan: BuildPlan, active: LiveGam
   const walk = (id: number, depth: number) => { for (const child of catalog.byId.get(id)?.from || []) { targetTree.add(child); if (depth < 4) walk(child, depth + 1); } };
   walk(item.id, 0);
   const candidates = active.items
-    .filter((entry) => !TRINKETS.includes(entry.id) && !targetTree.has(entry.id) && !/ward|lens|potion|elixir/i.test(entry.name))
+    .filter((entry) => inSlot(entry) && !targetTree.has(entry.id) && !/ward|lens|potion|elixir/i.test(entry.name))
     .map((entry) => ({ entry, info: catalog.byId.get(entry.id) }))
     // An item kept as a counter to this enemy team is never the one to sell for another item.
     .filter(({ info }) => info && !isUpgradedBootsItem(info) && !plan.counters.has(info.id))
@@ -1931,7 +1938,7 @@ function fullInventoryAdvice(item: CatalogItem, plan: BuildPlan, active: LiveGam
 }
 
 function buildMobilityRecommendation(active: LiveGameSnapshot["activePlayer"], catalog: Catalog, gameTime: number, index: ChampionIndex | null, plan: BuildPlan, sold: Set<number> = new Set(), profile: EnemyProfile | null = null): LiveRecommendation | null {
-  const realInventory = active.items.filter((item) => !TRINKETS.includes(item.id));
+  const realInventory = active.items.filter(inSlot);
   if (ownsUpgradedBoots(active, catalog)) return null;
   // Boots sold this game were a deliberate slot trade: no boots checkpoint afterwards.
   if (soldUpgradedBoots(sold, catalog)) return null;
@@ -2239,6 +2246,8 @@ function buildDeathMoment(input: {
   findPlayer: (name?: string) => LivePlayer | null;
   recommendations: LiveRecommendation[];
   mobility: LiveRecommendation | null;
+  /** The build path's un-owned steps in order: the follow-up goal is the path's next step, never an off-path card. */
+  pathAhead: number[];
   catalog: Catalog;
   brief: PlayerBrief | null;
   sr: boolean;
@@ -2258,9 +2267,11 @@ function buildDeathMoment(input: {
   const goldNow = Math.max(0, Math.floor(active.currentGold));
 
   const owned = ownedCounts(active);
-  const state = { gold: goldNow, slots: active.items.filter((item) => !TRINKETS.includes(item.id)).length, owned: new Map(owned), bought: [] as number[] };
+  const state = { gold: goldNow, slots: active.items.filter(inSlot).length, owned: new Map(owned), bought: [] as number[] };
   // Follows recommendations[0] (the next build-path step) whenever it is a buy.
-  const primary = input.recommendations[0]?.action === "buy" ? input.recommendations[0] : input.recommendations.find((entry) => entry.action === "buy");
+  // A swap on top (full inventory): the first buy that is a path step, never an off-path card further down.
+  const primary = input.recommendations[0]?.action === "buy" ? input.recommendations[0]
+    : input.recommendations.find((entry) => entry.action === "buy" && input.pathAhead.includes(entry.itemId));
   const target = primary ? catalog.byId.get(primary.itemId) || catalogChoice(catalog, [primary.item]) : null;
   // Each goal's costNow credits only the owned components still unclaimed when its purchases are planned: an earlier
   // goal's buy uses up (or reserves) shared components (a Long Sword spent on Death's Dance no longer discounts Guardian
@@ -2270,12 +2281,15 @@ function buildDeathMoment(input: {
   const buyNow = target ? plan(target, 4) : [];
   const boots = input.mobility?.action === "buy" && input.mobility.itemId !== target?.id ? catalog.byId.get(input.mobility.itemId) : null;
   if (boots) buyNow.push(...plan(boots, 1));
-  // Leftover gold starts the following build step instead of sitting in the pocket.
-  const secondRec = input.recommendations.find((entry) => entry.action === "buy" && entry.itemId !== target?.id && entry.itemId !== boots?.id);
+  // Leftover gold starts the following build step instead of sitting in the pocket: the path's step after the main goal,
+  // the same item the build path shows next (a counter card further down the list, Wit's End, is not the path).
+  const secondId = input.pathAhead.find((id) => id !== target?.id && id !== boots?.id && !(catalog.byId.get(id) && isBootsItem(catalog.byId.get(id)!)));
+  const secondRec = secondId ? input.recommendations.find((entry) => entry.action === "buy" && entry.itemId === secondId) || null : null;
+  const secondItem = secondId ? catalog.byId.get(secondId) || null : null;
   // Only once the main goal is finished this trip: planning both made it buy a duplicate of a component the main
   // goal had reserved (a 2nd Cloak of Agility for LDR while the owned Cloak waited for Infinity Edge).
   const mainDone = !target || buyNow.some((buy) => buy.itemId === target.id);
-  const second = mainDone && secondRec && state.gold >= 250 ? catalog.byId.get(secondRec.itemId) || null : null;
+  const second = mainDone && secondItem && state.gold >= 250 ? secondItem : null;
   if (second) buyNow.push(...plan(second, 2));
   // What the components are for: finishing cost with owned parts credited, minus what this trip spends on it.
   const goal = (item: CatalogItem | null | undefined, rec: LiveRecommendation | null | undefined): LiveDeathMoment["goals"][number] | null => {
@@ -2400,6 +2414,62 @@ function gameResult(events: RawEvent[]): LiveGameSnapshot["gameResult"] {
  * First 16 hex of sha1 over the sorted riotIds (summonerName fallback) of every player. Champion names are NOT hashed:
  * Viego's possession changes his championName mid-game, which used to split one match into several gameIds.
  */
+const LATCHED_SIGNALS = ["armorStack", "mrStack", "hpStack", "healing", "burstThreat", "hardCc", "poke"] as const;
+const LEVEL_RANK: Record<string, number> = { none: 0, some: 1, heavy: 2 };
+/** How far the enemy physical share must move before the boots choice follows it. */
+const SHARE_DEAD_BAND = 0.08;
+const steadyStore = globalThis as typeof globalThis & { __riftLensSteadySignalsV1?: Map<string, { time: number; profile: EnemyProfile }> };
+const steadyProfiles = steadyStore.__riftLensSteadySignalsV1 ??= new Map();
+
+/**
+ * Per game, each enemy signal keeps the strongest level (then score) it reached: a threat that counted keeps counting, so
+ * the build path and counter cards do not flip every time an estimate wobbles across a threshold (a 2026 game swapped its
+ * last three items 13 times on burst threat alone). The physical share only moves past a dead band.
+ */
+function steadyProfile(gameId: string, time: number, profile: EnemyProfile): EnemyProfile {
+  const previous = steadyProfiles.get(gameId);
+  const steady: EnemyProfile = { ...profile };
+  if (previous && time >= previous.time - 5) {
+    for (const signal of LATCHED_SIGNALS) {
+      const before = previous.profile[signal];
+      const now = profile[signal];
+      const stronger = LEVEL_RANK[before.level] - LEVEL_RANK[now.level] || before.score - now.score;
+      if (stronger > 0) (steady as Record<string, unknown>)[signal] = before;
+    }
+    if (Math.abs(profile.physicalShare.share - previous.profile.physicalShare.share) < SHARE_DEAD_BAND) steady.physicalShare = previous.profile.physicalShare;
+  }
+  steadyProfiles.set(gameId, { time, profile: steady });
+  while (steadyProfiles.size > 4) steadyProfiles.delete(steadyProfiles.keys().next().value!);
+  return steady;
+}
+
+/** Forget what earlier samples of every game taught (steady signals, slotted boots): tests that reuse one roster. */
+export function resetGameMemory() {
+  steadyProfiles.clear();
+  resetBootsSlot();
+}
+
+/** The boots in the role-quest boots slot this sample, as an owned item, or null (lib/boots-slot.ts). */
+function bootsSlotItem(gameId: string, time: number, active: LiveGameSnapshot["activePlayer"], stats: RawChampionStats, catalog: Catalog): LiveItem | null {
+  const asBoots = (item: CatalogItem): BootsItem => ({ id: item.id, name: item.name, price: item.cost, description: item.description, flat: item.moveSpeed?.flat || 0, from: item.from });
+  const listed = active.items.flatMap((item) => catalog.byId.get(item.id) || []);
+  const visible = listed.find((item) => isBootsItem(item));
+  const percent = listed.reduce((sum, item) => sum + (isBootsItem(item) ? 0 : item.moveSpeed?.percent || 0), 0);
+  const upgrades = [...catalog.byId.values()].filter((item) => isUpgradedBootsItem(item) && (item.moveSpeed?.flat || 0) > 0).map(asBoots);
+  const boots = slottedBoots(gameId, {
+    time,
+    alive: !active.isDead,
+    stats: {
+      moveSpeed: num(stats.moveSpeed), attackSpeed: num(stats.attackSpeed), armor: num(stats.armor), magicResist: num(stats.magicResist),
+      magicPenetrationFlat: num(stats.magicPenetrationFlat), abilityHaste: num(stats.abilityHaste), abilityPower: num(stats.abilityPower), attackDamage: num(stats.attackDamage),
+    },
+    visible: visible ? asBoots(visible) : null,
+    percent,
+    upgrades,
+  });
+  return boots ? { id: boots.id, name: boots.name, count: 1, price: boots.price, description: boots.description || "", bootsSlot: true } : null;
+}
+
 export function liveGameId(raw: RawLiveData) {
   const roster = (raw.allPlayers || []).map((player) => player.riotId || player.summonerName || "").sort().join("|");
   return createHash("sha1").update(roster).digest("hex").slice(0, 16);
@@ -2519,6 +2589,9 @@ export async function normalizeLiveData(raw: RawLiveData, options: NormalizeOpti
       secondaryTree: rawActive.fullRunes?.secondaryRuneTree?.displayName || activeRaw.runes?.secondaryRuneTree?.displayName || null,
     },
   };
+  // Boots a role quest moved into the boots slot are no longer listed (lib/boots-slot.ts): they still count as owned.
+  const hiddenBoots = bootsSlotItem(liveGameId(raw), num(raw.gameData?.gameTime), activePlayer, stats, catalog);
+  if (hiddenBoots) activePlayer.items.push(hiddenBoots);
   const positionOpponent = enemies.find((enemy) => STANDARD_POSITIONS.includes(activePlayer.position) && enemy.position === activePlayer.position);
   const laneOpponent = positionOpponent || enemies[0] || null;
   const matchup = positionOpponent
@@ -2535,11 +2608,11 @@ export async function normalizeLiveData(raw: RawLiveData, options: NormalizeOpti
   ]);
   // Estimated enemy stats + team counter-build signals (lib/enemy-stats.ts). Cheap once Data Dragon data is cached.
   const enemyProfile: EnemyProfile | null = enemyStatsData
-    ? enemyThreatProfile(
+    ? steadyProfile(liveGameId(raw), num(raw.gameData?.gameTime), enemyThreatProfile(
       enemies.map((enemy) => ({ champion: enemy.champion, level: enemy.level, items: enemy.items, kills: enemy.kills, deaths: enemy.deaths, assists: enemy.assists, damageProfile: enemy.damageProfile })),
       enemyStatsData,
       { referenceLevel: activePlayer.level, referenceItemGold: itemGold(activePlayer) },
-    )
+    ))
     : null;
   if (enemyProfile) enemies.forEach((enemy, at) => { enemy.estStats = enemyProfile.enemies[at].stats; });
   // Each enemy item's armor / MR (Data Dragon stats): the resist alerts name the purchase that moved a resist.
@@ -2583,6 +2656,7 @@ export async function normalizeLiveData(raw: RawLiveData, options: NormalizeOpti
   const { objectives, dragonState } = objectiveState(events, time, sideOf, ruleset);
   const death = buildDeathMoment({
     events, time, active: activePlayer, findPlayer, recommendations, mobility: mobilityRecommendation, catalog, brief: playerBrief, sr, ruleset,
+    pathAhead: plan.path.steps.filter((step) => step.status !== "owned" && step.status !== "skipped").map((step) => step.itemId),
     atDeath: (diedAt) => aliveSampleAt(gameId, diedAt),
   });
   const deathMoment = death?.moment ?? null;

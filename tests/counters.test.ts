@@ -10,7 +10,7 @@ import { after, test } from "node:test";
 import { configureChampionTraits } from "@/lib/champion-traits";
 import { configureItemGroups, conflict } from "@/lib/item-groups";
 import { deriveAlerts } from "@/lib/live-alerts";
-import { findItem, getItemCatalog, itemFitsScaling, itemRecipe, normalizeLiveData, type ItemCatalog, type RawLiveData } from "@/lib/live-game";
+import { findItem, getItemCatalog, itemFitsScaling, itemRecipe, normalizeLiveData, resetGameMemory, type ItemCatalog, type RawLiveData } from "@/lib/live-game";
 import { isMetaItem, registerResearchedBuilds, type MetaBuild, type MetaOption } from "@/lib/meta-builds";
 import type { LiveGameSnapshot, LiveRecommendation } from "@/lib/types";
 
@@ -59,7 +59,8 @@ function raw(me: { champion: string; position: string; items?: string[]; level?:
     gameData: { gameMode: "SWIFTPLAY", gameTime: time, mapName: "Map11", mapNumber: 11 },
   };
 }
-const run = (input: RawLiveData) => normalizeLiveData(input, { loadBrief: async () => null, soldItemIds: () => [] });
+// Every call is its own scenario on one shared roster: no steady signals or slotted boots from the previous call.
+const run = (input: RawLiveData) => { resetGameMemory(); return normalizeLiveData(input, { loadBrief: async () => null, soldItemIds: () => [] }); };
 const pathText = (snap: LiveGameSnapshot) => snap.buildPath.steps.map((step) => `${step.item}(${step.status})`).join(" > ");
 const cards = (snap: LiveGameSnapshot) => snap.recommendations.map((rec) => `${rec.item}[${rec.action}]`).join(", ");
 const armorPen = (rec: LiveRecommendation) => (catalog.byId.get(rec.itemId)?.pen?.armorPercent || 0) > 0;

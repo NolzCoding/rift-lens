@@ -35,6 +35,8 @@ const INVARIANTS: Record<string, string> = {
   death_moment_presence: "deathMoment is non-null exactly while the active player is dead",
   death_buy_within_gold: "sum(deathMoment.buyNow.cost) <= gold",
   death_goals_consistent: "goals: costNow <= cost, spendNow <= costNow, remainingAfter = max(0, costNow - spendNow) >= 0",
+  death_goals_on_path: "every deathMoment goal is an un-owned buildPath step, the boots checkpoint or recommendations[0] (one build on the death screen and alive)",
+  path_no_flip: "the un-owned buildPath never changes back to the arrangement it had two changes ago (threat estimates wobbling across a threshold)",
   objectives_sane: "objective countdowns never negative; nextSpawnAt only on respawning/not-spawned",
   objectives_ruleset: "Swiftplay: Baron 12:00 / Elder 15:00, no grubs/herald/atakhan; SR: no atakhan",
   names_resolve: "every item name in buildPath/recommendations/mobility/buyNow/goals resolves via findItem to the same name",
@@ -46,6 +48,8 @@ const INVARIANTS: Record<string, string> = {
   heavy_counter_visible: "a heavy armor/MR signal with a fitting, unlocked counter item (snapshot.counterPicks) puts that item in the top 3 cards, with a buy, a swap plan or a sell/finish-first line",
 };
 for (const name of Object.keys(INVARIANTS)) stats.set(name, { pass: 0, fail: [] });
+/** Per replay game: the un-owned path arrangements in the order they appeared (path_no_flip). */
+const pathHistory = new Map<string, Array<{ arrangement: string; inventory: string }>>();
 
 function check(name: string, ok: boolean, game: string, sample: ReplaySample, detail: () => string) {
   const entry = stats.get(name)!;
@@ -103,6 +107,27 @@ function checkSample(game: ReplayGame, sample: ReplaySample, snap: LiveGameSnaps
   for (const step of unowned) {
     const isOwned = owned.has(step.itemId) || (hasBoots && isUpgradedBoots(catalog, step.itemId));
     c("path_next_not_owned", !isOwned, () => `step ${step.item} marked ${step.status} but owned; path=${pathText()}`);
+  }
+
+  // --- one build ---
+  for (const goal of snap.deathMoment?.goals || []) {
+    // The buy card's item counts too: past a fully owned path, both screens name the same extra item.
+    const onPath = unowned.some((step) => step.itemId === goal.itemId) || isUpgradedBoots(catalog, goal.itemId) || goal.itemId === r0?.itemId;
+    c("death_goals_on_path", onPath, () => `death goal ${goal.item} is not an un-owned path step; path=${pathText()}`);
+  }
+  const arrangement = unowned.filter((step) => step.status !== "skipped").map((step) => step.item).join(" > ");
+  // The with-memory and no-brief runs of a sample build different paths: one history each.
+  const track = `${g}${sample.note.endsWith("no-brief") ? " no-brief" : ""}`;
+  const seen = pathHistory.get(track) || [];
+  const inventory = [...owned.keys()].sort((a, b) => a - b).join(",");
+  const last = seen.at(-1);
+  if (last?.arrangement !== arrangement) {
+    // Buying the counter the path had added brings the old arrangement back legitimately: only a return with the
+    // inventory unchanged since the last change is a flip.
+    const flip = seen.length >= 2 && seen.at(-2)!.arrangement === arrangement && last!.inventory === inventory;
+    c("path_no_flip", !flip, () => `path went back to ${arrangement} (was ${last?.arrangement}); inv=[${ownedNames}]`);
+    seen.push({ arrangement, inventory });
+    pathHistory.set(track, seen);
   }
 
   // --- avoid / sold ---

@@ -291,6 +291,8 @@ export type LiveItem = {
   count: number;
   price: number;
   description: string;
+  /** Active player only: boots in the role-quest boots slot, which the Live Client API no longer lists (lib/boots-slot.ts). */
+  bootsSlot?: true;
   /** Enemies only: armor / magic resist one copy grants (Data Dragon item stats), when it grants any. */
   armor?: number;
   magicResist?: number;

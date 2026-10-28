@@ -306,6 +306,12 @@ export function resolveBuys(review: Pick<LiveHelpAdvice, "buyOptions">, snapshot
     if (resold) { console.warn(`[live-help] dropped AI sell-then-rebuy: ${resold.name} → ${target.name}`); continue; }
     const completed = !isConsumable(target) && (target.cost >= 2000 || isBoots(target));
     if (completed && (owned.get(target.id) ?? 0) > 0) continue;
+    // One build: a completed item off the build path is dropped (the path already takes a counter item when its threat is
+    // heavy), so the AI never shows a second build next to the path, the buy card and the death shop.
+    if (completed && pathIds.size > 0 && !pathIds.has(target.id) && !(isBoots(target) && !pathHasBoots)) {
+      console.warn(`[live-help] dropped off-path AI buy: ${target.name}`);
+      continue;
+    }
     // League refuses a purchase that overflows an exclusive group (Lord Dominik's Regards or its Last Whisper while
     // owning Mortal Reminder).
     const targetClash = conflict(target.id, owned, [], recipe);
@@ -329,7 +335,8 @@ export function resolveBuys(review: Pick<LiveHelpAdvice, "buyOptions">, snapshot
       timing: TIMINGS.includes(option.timing) ? option.timing : "later-conditional",
       reason: typeof option.reason === "string" ? option.reason.slice(0, 320) : "",
       affordable: gold >= buy.cost, goldNeeded: Math.max(0, buy.cost - gold),
-      deviation: completed && pathIds.size > 0 && !pathIds.has(target.id) && !(isBoots(target) && !pathHasBoots),
+      // Off-path completed items were dropped above.
+      deviation: false,
     });
     if (buys.length >= 3) break;
   }
