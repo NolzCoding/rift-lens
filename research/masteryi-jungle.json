@@ -1,0 +1,590 @@
+{
+  "version": 1,
+  "champion": "Master Yi",
+  "role": "JUNGLE",
+  "researchedAt": "2026-10-22T15:38:24.585Z",
+  "researchedOn": "16.21.1",
+  "durationMs": 96523,
+  "model": "gpt-6-sol",
+  "trigger": "manual",
+  "freshness": "current",
+  "dropped": [],
+  "warnings": [
+    "5th item: every option was conditional; Immortal Shieldbow kept as the default.",
+    "Last situational item: every option was conditional; Guardian Angel kept as the default."
+  ],
+  "notes": "LoLalytics and OP.GG show patch 16.21; the opened Mobalytics page shows 16.19. OP.GG's most-played third item is Lord Dominik's Regards, while LoLalytics highlights Infinity Edge in its displayed core; fourth through sixth item win rates come from small EUW samples, and slot pick rates were not shown.",
+  "build": {
+    "champion": "Master Yi",
+    "role": "JUNGLE",
+    "patch": "16.21",
+    "verified": "2026-10-22",
+    "sample": "Emerald+ Ranked Solo/Duo; 13,757 global games on LoLalytics",
+    "sources": [
+      {
+        "name": "lolalytics — Patch 16.21 Emerald+ global build and sample.",
+        "url": "https://lolalytics.com/lol/masteryi/build/",
+        "site": "lolalytics",
+        "read": "Patch 16.21 Emerald+ global build and sample."
+      },
+      {
+        "name": "op.gg — Patch 16.21 EUW Emerald+ core combinations, boots and item rates.",
+        "url": "https://op.gg/nl/lol/champions/masteryi/items/jungle?patch=16.21&region=euw&tier=emerald_plus&type=ranked",
+        "site": "op.gg",
+        "read": "Patch 16.21 EUW Emerald+ core combinations, boots and item rates."
+      },
+      {
+        "name": "op.gg — Patch 16.21 EUW Emerald+ fourth, fifth and sixth item options.",
+        "url": "https://op.gg/nl/lol/champions/masteryi/build/jungle?patch=16.21&region=euw&tier=emerald_plus&type=ranked",
+        "site": "op.gg",
+        "read": "Patch 16.21 EUW Emerald+ fourth, fifth and sixth item options."
+      },
+      {
+        "name": "Mobalytics — Patch 16.19 Emerald+ Ranked Solo full build and buy order.",
+        "url": "https://mobalytics.gg/lol/champions/masteryi/build?c_queue=ranked_solo",
+        "site": "Mobalytics",
+        "read": "Patch 16.19 Emerald+ Ranked Solo full build and buy order."
+      }
+    ],
+    "slots": [
+      {
+        "id": "slot1",
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Kraken Slayer"
+          }
+        ]
+      },
+      {
+        "id": "boots",
+        "label": "Boots",
+        "kind": "boots",
+        "options": [
+          {
+            "item": "Berserker's Greaves",
+            "pickRate": 34.4,
+            "winRate": 48.3,
+            "note": "OP.GG EUW Emerald+."
+          },
+          {
+            "item": "Gluttonous Greaves",
+            "pickRate": 25.1,
+            "winRate": 54.9,
+            "when": "situational",
+            "condition": "for sustain",
+            "note": "OP.GG EUW Emerald+."
+          },
+          {
+            "item": "Mercury's Treads",
+            "pickRate": 20.7,
+            "winRate": 53.8,
+            "when": "situational",
+            "condition": "vs magic damage or crowd control",
+            "note": "OP.GG EUW Emerald+."
+          }
+        ]
+      },
+      {
+        "id": "slot2",
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "The Collector"
+          },
+          {
+            "item": "Guinsoo's Rageblade",
+            "when": "situational",
+            "condition": "for an on-hit build"
+          }
+        ]
+      },
+      {
+        "id": "slot3",
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Lord Dominik's Regards"
+          },
+          {
+            "item": "Infinity Edge",
+            "when": "situational",
+            "condition": "after The Collector"
+          },
+          {
+            "item": "Experimental Hexplate",
+            "when": "situational",
+            "condition": "after Guinsoo's Rageblade"
+          },
+          {
+            "item": "Blade of The Ruined King",
+            "when": "healing",
+            "condition": "after Guinsoo's Rageblade; vs high-health targets"
+          }
+        ]
+      },
+      {
+        "id": "slot4",
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Infinity Edge",
+            "winRate": 61.7,
+            "note": "OP.GG fourth-item win rate."
+          },
+          {
+            "item": "Death's Dance",
+            "winRate": 66.3,
+            "when": "situational",
+            "condition": "vs physical burst",
+            "note": "OP.GG fourth-item win rate."
+          },
+          {
+            "item": "Lord Dominik's Regards",
+            "winRate": 60.3,
+            "when": "situational",
+            "condition": "if delayed from third",
+            "note": "OP.GG fourth-item win rate."
+          },
+          {
+            "item": "Immortal Shieldbow",
+            "winRate": 62.6,
+            "when": "situational",
+            "condition": "vs burst",
+            "note": "OP.GG fourth-item win rate."
+          }
+        ]
+      },
+      {
+        "id": "slot5",
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Immortal Shieldbow",
+            "winRate": 62.3,
+            "note": "best vs burst; OP.GG fifth-item win rate."
+          },
+          {
+            "item": "Guardian Angel",
+            "winRate": 72.7,
+            "when": "situational",
+            "condition": "when revival is valuable",
+            "note": "OP.GG fifth-item win rate."
+          },
+          {
+            "item": "Death's Dance",
+            "winRate": 52,
+            "when": "situational",
+            "condition": "vs physical burst",
+            "note": "OP.GG fifth-item win rate."
+          },
+          {
+            "item": "Lord Dominik's Regards",
+            "winRate": 61.8,
+            "when": "situational",
+            "condition": "if delayed",
+            "note": "OP.GG fifth-item win rate."
+          }
+        ]
+      },
+      {
+        "id": "slot6",
+        "label": "Last situational item",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Guardian Angel",
+            "winRate": 56.3,
+            "note": "best when revival is valuable; OP.GG sixth-item win rate; 16 games."
+          },
+          {
+            "item": "Death's Dance",
+            "winRate": 57.1,
+            "when": "situational",
+            "condition": "vs physical burst",
+            "note": "OP.GG sixth-item win rate; 7 games."
+          },
+          {
+            "item": "Endless Hunger",
+            "winRate": 40,
+            "when": "situational",
+            "condition": "for sustained fights",
+            "note": "OP.GG sixth-item win rate; 5 games."
+          }
+        ]
+      }
+    ],
+    "cores": [
+      {
+        "items": [
+          "Kraken Slayer",
+          "The Collector",
+          "Lord Dominik's Regards"
+        ],
+        "games": 473,
+        "winRate": 52.2
+      },
+      {
+        "items": [
+          "Kraken Slayer",
+          "The Collector",
+          "Infinity Edge"
+        ],
+        "games": 213,
+        "winRate": 55.4
+      },
+      {
+        "items": [
+          "Kraken Slayer",
+          "Guinsoo's Rageblade",
+          "Experimental Hexplate"
+        ],
+        "games": 187,
+        "winRate": 52.9
+      },
+      {
+        "items": [
+          "Kraken Slayer",
+          "Guinsoo's Rageblade",
+          "Blade of The Ruined King"
+        ],
+        "games": 139,
+        "winRate": 56.1
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Terminus",
+        "pickRate": 3.7,
+        "note": "Rare on-hit penetration option."
+      },
+      {
+        "item": "Yun Tal Wildarrows",
+        "pickRate": 3.2,
+        "note": "Uncommon critical-strike option."
+      },
+      {
+        "item": "Fiendhunter Bolts",
+        "pickRate": 2.8,
+        "note": "Rare damage alternative."
+      },
+      {
+        "item": "Hubris",
+        "pickRate": 2.4,
+        "note": "Uncommon snowball item."
+      },
+      {
+        "item": "Randuin's Omen",
+        "pickRate": 1.9,
+        "note": "Defensive choice against critical strikes."
+      },
+      {
+        "item": "Titanic Hydra",
+        "pickRate": 1.8,
+        "note": "Uncommon health and damage option."
+      }
+    ],
+    "origin": "researched",
+    "researchedAt": "2026-10-22T15:38:24.585Z",
+    "researchedOn": "16.21.1",
+    "stale": false,
+    "starting": [
+      "Gustwalker Hatchling"
+    ]
+  },
+  "raw": {
+    "champion": "Master Yi",
+    "role": "JUNGLE",
+    "patch": "16.21",
+    "sample": "Emerald+ Ranked Solo/Duo; 13,757 global games on LoLalytics",
+    "sources": [
+      {
+        "url": "https://lolalytics.com/lol/masteryi/build/",
+        "site": "LoLalytics",
+        "read": "Patch 16.21 Emerald+ global build and sample."
+      },
+      {
+        "url": "https://op.gg/nl/lol/champions/masteryi/items/jungle?patch=16.21&region=euw&tier=emerald_plus&type=ranked",
+        "site": "OP.GG",
+        "read": "Patch 16.21 EUW Emerald+ core combinations, boots and item rates."
+      },
+      {
+        "url": "https://op.gg/nl/lol/champions/masteryi/build/jungle?patch=16.21&region=euw&tier=emerald_plus&type=ranked",
+        "site": "OP.GG",
+        "read": "Patch 16.21 EUW Emerald+ fourth, fifth and sixth item options."
+      },
+      {
+        "url": "https://mobalytics.gg/lol/champions/masteryi/build?c_queue=ranked_solo",
+        "site": "Mobalytics",
+        "read": "Patch 16.19 Emerald+ Ranked Solo full build and buy order."
+      }
+    ],
+    "starting": [
+      "Gustwalker Hatchling"
+    ],
+    "slots": [
+      {
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Kraken Slayer",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "The Collector",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Guinsoo's Rageblade",
+            "pickRate": null,
+            "winRate": null,
+            "when": "for an on-hit build",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Lord Dominik's Regards",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Infinity Edge",
+            "pickRate": null,
+            "winRate": null,
+            "when": "after The Collector",
+            "note": null
+          },
+          {
+            "item": "Experimental Hexplate",
+            "pickRate": null,
+            "winRate": null,
+            "when": "after Guinsoo's Rageblade",
+            "note": null
+          },
+          {
+            "item": "Blade of The Ruined King",
+            "pickRate": null,
+            "winRate": null,
+            "when": "after Guinsoo's Rageblade; vs high-health targets",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Infinity Edge",
+            "pickRate": null,
+            "winRate": 61.68,
+            "when": null,
+            "note": "OP.GG fourth-item win rate."
+          },
+          {
+            "item": "Death's Dance",
+            "pickRate": null,
+            "winRate": 66.29,
+            "when": "vs physical burst",
+            "note": "OP.GG fourth-item win rate."
+          },
+          {
+            "item": "Lord Dominik's Regards",
+            "pickRate": null,
+            "winRate": 60.31,
+            "when": "if delayed from third",
+            "note": "OP.GG fourth-item win rate."
+          },
+          {
+            "item": "Immortal Shieldbow",
+            "pickRate": null,
+            "winRate": 62.62,
+            "when": "vs burst",
+            "note": "OP.GG fourth-item win rate."
+          }
+        ]
+      },
+      {
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Immortal Shieldbow",
+            "pickRate": null,
+            "winRate": 62.26,
+            "when": "vs burst",
+            "note": "OP.GG fifth-item win rate."
+          },
+          {
+            "item": "Guardian Angel",
+            "pickRate": null,
+            "winRate": 72.73,
+            "when": "when revival is valuable",
+            "note": "OP.GG fifth-item win rate."
+          },
+          {
+            "item": "Death's Dance",
+            "pickRate": null,
+            "winRate": 52,
+            "when": "vs physical burst",
+            "note": "OP.GG fifth-item win rate."
+          },
+          {
+            "item": "Lord Dominik's Regards",
+            "pickRate": null,
+            "winRate": 61.76,
+            "when": "if delayed",
+            "note": "OP.GG fifth-item win rate."
+          }
+        ]
+      },
+      {
+        "label": "Last situational item",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Guardian Angel",
+            "pickRate": null,
+            "winRate": 56.25,
+            "when": "when revival is valuable",
+            "note": "OP.GG sixth-item win rate; 16 games."
+          },
+          {
+            "item": "Death's Dance",
+            "pickRate": null,
+            "winRate": 57.14,
+            "when": "vs physical burst",
+            "note": "OP.GG sixth-item win rate; 7 games."
+          },
+          {
+            "item": "Endless Hunger",
+            "pickRate": null,
+            "winRate": 40,
+            "when": "for sustained fights",
+            "note": "OP.GG sixth-item win rate; 5 games."
+          }
+        ]
+      }
+    ],
+    "boots": [
+      {
+        "item": "Berserker's Greaves",
+        "pickRate": 34.37,
+        "winRate": 48.29,
+        "when": null,
+        "note": "OP.GG EUW Emerald+."
+      },
+      {
+        "item": "Gluttonous Greaves",
+        "pickRate": 25.05,
+        "winRate": 54.91,
+        "when": "for sustain",
+        "note": "OP.GG EUW Emerald+."
+      },
+      {
+        "item": "Mercury's Treads",
+        "pickRate": 20.72,
+        "winRate": 53.75,
+        "when": "vs magic damage or crowd control",
+        "note": "OP.GG EUW Emerald+."
+      }
+    ],
+    "bootsAfterItem": 1,
+    "cores": [
+      {
+        "items": [
+          "Kraken Slayer",
+          "The Collector",
+          "Lord Dominik's Regards"
+        ],
+        "games": 473,
+        "winRate": 52.22
+      },
+      {
+        "items": [
+          "Kraken Slayer",
+          "The Collector",
+          "Infinity Edge"
+        ],
+        "games": 213,
+        "winRate": 55.4
+      },
+      {
+        "items": [
+          "Kraken Slayer",
+          "Guinsoo's Rageblade",
+          "Experimental Hexplate"
+        ],
+        "games": 187,
+        "winRate": 52.94
+      },
+      {
+        "items": [
+          "Kraken Slayer",
+          "Guinsoo's Rageblade",
+          "Blade of The Ruined King"
+        ],
+        "games": 139,
+        "winRate": 56.12
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Terminus",
+        "pickRate": 3.65,
+        "note": "Rare on-hit penetration option."
+      },
+      {
+        "item": "Yun Tal Wildarrows",
+        "pickRate": 3.21,
+        "note": "Uncommon critical-strike option."
+      },
+      {
+        "item": "Fiendhunter Bolts",
+        "pickRate": 2.77,
+        "note": "Rare damage alternative."
+      },
+      {
+        "item": "Hubris",
+        "pickRate": 2.38,
+        "note": "Uncommon snowball item."
+      },
+      {
+        "item": "Randuin's Omen",
+        "pickRate": 1.9,
+        "note": "Defensive choice against critical strikes."
+      },
+      {
+        "item": "Titanic Hydra",
+        "pickRate": 1.78,
+        "note": "Uncommon health and damage option."
+      }
+    ],
+    "notes": "LoLalytics and OP.GG show patch 16.21; the opened Mobalytics page shows 16.19. OP.GG's most-played third item is Lord Dominik's Regards, while LoLalytics highlights Infinity Edge in its displayed core; fourth through sixth item win rates come from small EUW samples, and slot pick rates were not shown."
+  }
+}

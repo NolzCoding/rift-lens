@@ -1,0 +1,624 @@
+{
+  "version": 1,
+  "champion": "Fizz",
+  "role": "MIDDLE",
+  "researchedAt": "2026-10-25T17:23:08.526Z",
+  "researchedOn": "16.21.1",
+  "durationMs": 112785,
+  "model": "gpt-6-sol",
+  "trigger": "champ-select",
+  "freshness": "current",
+  "dropped": [],
+  "warnings": [
+    "Late situational replac…: every option was conditional; Banshee's Veil kept as the default.",
+    "4th item: its default repeats an earlier slot; Void Staff becomes its default.",
+    "5th item: its default repeats an earlier slot; Void Staff becomes its default."
+  ],
+  "notes": "OP.GG, LoLalytics and League of Graphs show patch 16.21; Mobalytics showed 16.20 and was used only as a comparison. Slot-specific pick rates were unavailable, so they are null; League of Graphs final-item rates describe replacement choices, and its default bracket includes Platinum+ normal and ranked games.",
+  "build": {
+    "champion": "Fizz",
+    "role": "MIDDLE",
+    "patch": "16.21",
+    "verified": "2026-10-25",
+    "sample": "Emerald+, ranked Solo/Duo; 38,521 Fizz mid games on LoLalytics",
+    "sources": [
+      {
+        "name": "op.gg — Patch 16.21 Emerald+ ranked core builds, boots, starting items and item rates.",
+        "url": "https://fortnite.op.gg/lol/champions/fizz/items/mid?patch=16.21&region=global&tier=emerald_plus&type=ranked",
+        "site": "op.gg",
+        "read": "Patch 16.21 Emerald+ ranked core builds, boots, starting items and item rates."
+      },
+      {
+        "name": "op.gg — Patch 16.21 Emerald+ ranked fourth and fifth item tables.",
+        "url": "https://fortnite.op.gg/lol/champions/fizz/build/mid?patch=16.21&region=global&tier=emerald_plus&type=ranked",
+        "site": "op.gg",
+        "read": "Patch 16.21 Emerald+ ranked fourth and fifth item tables."
+      },
+      {
+        "name": "lolalytics — Patch 16.21 Emerald+ ranked Solo/Duo sample and recommended build.",
+        "url": "https://lolalytics.com/lol/fizz/build/",
+        "site": "lolalytics",
+        "read": "Patch 16.21 Emerald+ ranked Solo/Duo sample and recommended build."
+      },
+      {
+        "name": "League of Graphs — Patch 16.21 mid starting, core, boots and final item tables.",
+        "url": "https://www.leagueofgraphs.com/en/champions/items/fizz/middle",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 mid starting, core, boots and final item tables."
+      },
+      {
+        "name": "Mobalytics — Patch 16.20 Emerald+ ranked Solo build for comparison.",
+        "url": "https://mobalytics.gg/lol/champions/fizz/build/mid?_lang=en_us",
+        "site": "Mobalytics",
+        "read": "Patch 16.20 Emerald+ ranked Solo build for comparison."
+      }
+    ],
+    "slots": [
+      {
+        "id": "slot1",
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Lich Bane",
+            "note": "Most common first completed item."
+          },
+          {
+            "item": "Luden's Echo",
+            "note": "Alternate first item."
+          },
+          {
+            "item": "Blackfire Torch",
+            "note": "Less common alternate first item."
+          }
+        ]
+      },
+      {
+        "id": "boots",
+        "label": "Boots",
+        "kind": "boots",
+        "options": [
+          {
+            "item": "Sorcerer's Shoes",
+            "pickRate": 65.6,
+            "winRate": 52.1,
+            "note": "OP.GG: 22,631 games."
+          },
+          {
+            "item": "Ionian Boots of Lucidity",
+            "pickRate": 29.3,
+            "winRate": 51.2,
+            "note": "OP.GG: 10,090 games."
+          },
+          {
+            "item": "Mercury's Treads",
+            "pickRate": 3.8,
+            "winRate": 48.9,
+            "when": "situational",
+            "condition": "vs magic damage and crowd control",
+            "note": "OP.GG: 1,293 games."
+          }
+        ]
+      },
+      {
+        "id": "slot2",
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Zhonya's Hourglass"
+          },
+          {
+            "item": "Shadowflame"
+          },
+          {
+            "item": "Lich Bane",
+            "when": "situational",
+            "condition": "after Luden's Echo"
+          }
+        ]
+      },
+      {
+        "id": "slot3",
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Shadowflame"
+          },
+          {
+            "item": "Zhonya's Hourglass",
+            "when": "situational",
+            "condition": "after Shadowflame second"
+          },
+          {
+            "item": "Rabadon's Deathcap"
+          },
+          {
+            "item": "Stormsurge",
+            "note": "Less common third item."
+          }
+        ]
+      },
+      {
+        "id": "slot4",
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap",
+            "winRate": 58,
+            "note": "OP.GG: 4,556 fourth-item games."
+          },
+          {
+            "item": "Zhonya's Hourglass",
+            "winRate": 60.7,
+            "note": "if not built earlier; OP.GG: 2,148 fourth-item games."
+          },
+          {
+            "item": "Shadowflame",
+            "winRate": 59.6,
+            "note": "if not built earlier; OP.GG: 2,000 fourth-item games."
+          },
+          {
+            "item": "Void Staff",
+            "winRate": 54.2,
+            "note": "best vs magic resistance; OP.GG: 1,264 fourth-item games."
+          }
+        ]
+      },
+      {
+        "id": "slot5",
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap",
+            "winRate": 66.7,
+            "note": "if not built earlier; OP.GG: 932 fifth-item games."
+          },
+          {
+            "item": "Void Staff",
+            "winRate": 56.4,
+            "note": "best vs magic resistance; OP.GG: 817 fifth-item games."
+          },
+          {
+            "item": "Shadowflame",
+            "winRate": 58.6,
+            "note": "if not built earlier; OP.GG: 452 fifth-item games."
+          },
+          {
+            "item": "Stormsurge",
+            "winRate": 55.9,
+            "note": "OP.GG: 404 fifth-item games."
+          }
+        ]
+      },
+      {
+        "id": "slot6",
+        "label": "Late situational replac…",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Banshee's Veil",
+            "pickRate": 6.2,
+            "winRate": 54.9,
+            "note": "best vs a key hostile spell; League of Graphs final item option."
+          },
+          {
+            "item": "Cryptbloom",
+            "pickRate": 3,
+            "winRate": 60.5,
+            "when": "situational",
+            "condition": "vs magic resistance",
+            "note": "League of Graphs final item option."
+          },
+          {
+            "item": "Morellonomicon",
+            "pickRate": 1.3,
+            "winRate": 47.2,
+            "when": "healing",
+            "condition": "vs heavy healing",
+            "note": "League of Graphs final item option."
+          }
+        ]
+      }
+    ],
+    "cores": [
+      {
+        "items": [
+          "Lich Bane",
+          "Zhonya's Hourglass",
+          "Shadowflame"
+        ],
+        "games": 2893,
+        "winRate": 50.9
+      },
+      {
+        "items": [
+          "Lich Bane",
+          "Shadowflame",
+          "Zhonya's Hourglass"
+        ],
+        "games": 2232,
+        "winRate": 50.5
+      },
+      {
+        "items": [
+          "Lich Bane",
+          "Zhonya's Hourglass",
+          "Rabadon's Deathcap"
+        ],
+        "games": 1914,
+        "winRate": 51.9
+      },
+      {
+        "items": [
+          "Luden's Echo",
+          "Lich Bane",
+          "Shadowflame"
+        ],
+        "games": 887,
+        "winRate": 51.2
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Dusk and Dawn",
+        "pickRate": 2.1,
+        "note": "Rare alternate AP item."
+      },
+      {
+        "item": "Hextech Rocketbelt",
+        "pickRate": 1.5,
+        "note": "Rare mobility option."
+      },
+      {
+        "item": "Liandry's Torment",
+        "pickRate": 0.9,
+        "note": "Rare sustained-damage option."
+      },
+      {
+        "item": "Riftmaker",
+        "pickRate": 0.7,
+        "note": "Rare sustained-fight option."
+      },
+      {
+        "item": "Bloodletter's Curse",
+        "pickRate": 0.7,
+        "note": "Rare magic-resistance reduction option."
+      },
+      {
+        "item": "Nashor's Tooth",
+        "pickRate": 0.5,
+        "note": "Rare attack-focused option."
+      }
+    ],
+    "origin": "researched",
+    "researchedAt": "2026-10-25T17:23:08.526Z",
+    "researchedOn": "16.21.1",
+    "stale": false,
+    "starting": [
+      "Doran's Ring",
+      "Health Potion"
+    ]
+  },
+  "raw": {
+    "champion": "Fizz",
+    "role": "MIDDLE",
+    "patch": "16.21",
+    "sample": "Emerald+, ranked Solo/Duo; 38,521 Fizz mid games on LoLalytics",
+    "sources": [
+      {
+        "url": "https://fortnite.op.gg/lol/champions/fizz/items/mid?patch=16.21&region=global&tier=emerald_plus&type=ranked",
+        "site": "OP.GG",
+        "read": "Patch 16.21 Emerald+ ranked core builds, boots, starting items and item rates."
+      },
+      {
+        "url": "https://fortnite.op.gg/lol/champions/fizz/build/mid?patch=16.21&region=global&tier=emerald_plus&type=ranked",
+        "site": "OP.GG",
+        "read": "Patch 16.21 Emerald+ ranked fourth and fifth item tables."
+      },
+      {
+        "url": "https://lolalytics.com/lol/fizz/build/",
+        "site": "LoLalytics",
+        "read": "Patch 16.21 Emerald+ ranked Solo/Duo sample and recommended build."
+      },
+      {
+        "url": "https://www.leagueofgraphs.com/en/champions/items/fizz/middle",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 mid starting, core, boots and final item tables."
+      },
+      {
+        "url": "https://mobalytics.gg/lol/champions/fizz/build/mid?_lang=en_us",
+        "site": "Mobalytics",
+        "read": "Patch 16.20 Emerald+ ranked Solo build for comparison."
+      }
+    ],
+    "starting": [
+      "Doran's Ring",
+      "Health Potion",
+      "Health Potion"
+    ],
+    "slots": [
+      {
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Lich Bane",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Most common first completed item."
+          },
+          {
+            "item": "Luden's Echo",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Alternate first item."
+          },
+          {
+            "item": "Blackfire Torch",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Less common alternate first item."
+          }
+        ]
+      },
+      {
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Zhonya's Hourglass",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Shadowflame",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Lich Bane",
+            "pickRate": null,
+            "winRate": null,
+            "when": "after Luden's Echo",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Shadowflame",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Zhonya's Hourglass",
+            "pickRate": null,
+            "winRate": null,
+            "when": "after Shadowflame second",
+            "note": null
+          },
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Stormsurge",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Less common third item."
+          }
+        ]
+      },
+      {
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": null,
+            "winRate": 57.99,
+            "when": null,
+            "note": "OP.GG: 4,556 fourth-item games."
+          },
+          {
+            "item": "Zhonya's Hourglass",
+            "pickRate": null,
+            "winRate": 60.71,
+            "when": "if not built earlier",
+            "note": "OP.GG: 2,148 fourth-item games."
+          },
+          {
+            "item": "Shadowflame",
+            "pickRate": null,
+            "winRate": 59.6,
+            "when": "if not built earlier",
+            "note": "OP.GG: 2,000 fourth-item games."
+          },
+          {
+            "item": "Void Staff",
+            "pickRate": null,
+            "winRate": 54.19,
+            "when": "vs magic resistance",
+            "note": "OP.GG: 1,264 fourth-item games."
+          }
+        ]
+      },
+      {
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": null,
+            "winRate": 66.74,
+            "when": "if not built earlier",
+            "note": "OP.GG: 932 fifth-item games."
+          },
+          {
+            "item": "Void Staff",
+            "pickRate": null,
+            "winRate": 56.43,
+            "when": "vs magic resistance",
+            "note": "OP.GG: 817 fifth-item games."
+          },
+          {
+            "item": "Shadowflame",
+            "pickRate": null,
+            "winRate": 58.63,
+            "when": "if not built earlier",
+            "note": "OP.GG: 452 fifth-item games."
+          },
+          {
+            "item": "Stormsurge",
+            "pickRate": null,
+            "winRate": 55.94,
+            "when": null,
+            "note": "OP.GG: 404 fifth-item games."
+          }
+        ]
+      },
+      {
+        "label": "Late situational replacement",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Banshee's Veil",
+            "pickRate": 6.2,
+            "winRate": 54.9,
+            "when": "vs a key hostile spell",
+            "note": "League of Graphs final item option."
+          },
+          {
+            "item": "Cryptbloom",
+            "pickRate": 3,
+            "winRate": 60.5,
+            "when": "vs magic resistance",
+            "note": "League of Graphs final item option."
+          },
+          {
+            "item": "Morellonomicon",
+            "pickRate": 1.3,
+            "winRate": 47.2,
+            "when": "vs heavy healing",
+            "note": "League of Graphs final item option."
+          }
+        ]
+      }
+    ],
+    "boots": [
+      {
+        "item": "Sorcerer's Shoes",
+        "pickRate": 65.64,
+        "winRate": 52.09,
+        "when": null,
+        "note": "OP.GG: 22,631 games."
+      },
+      {
+        "item": "Ionian Boots of Lucidity",
+        "pickRate": 29.27,
+        "winRate": 51.15,
+        "when": null,
+        "note": "OP.GG: 10,090 games."
+      },
+      {
+        "item": "Mercury's Treads",
+        "pickRate": 3.75,
+        "winRate": 48.88,
+        "when": "vs magic damage and crowd control",
+        "note": "OP.GG: 1,293 games."
+      }
+    ],
+    "bootsAfterItem": 1,
+    "cores": [
+      {
+        "items": [
+          "Lich Bane",
+          "Zhonya's Hourglass",
+          "Shadowflame"
+        ],
+        "games": 2893,
+        "winRate": 50.88
+      },
+      {
+        "items": [
+          "Lich Bane",
+          "Shadowflame",
+          "Zhonya's Hourglass"
+        ],
+        "games": 2232,
+        "winRate": 50.54
+      },
+      {
+        "items": [
+          "Lich Bane",
+          "Zhonya's Hourglass",
+          "Rabadon's Deathcap"
+        ],
+        "games": 1914,
+        "winRate": 51.93
+      },
+      {
+        "items": [
+          "Luden's Echo",
+          "Lich Bane",
+          "Shadowflame"
+        ],
+        "games": 887,
+        "winRate": 51.18
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Dusk and Dawn",
+        "pickRate": 2.05,
+        "note": "Rare alternate AP item."
+      },
+      {
+        "item": "Hextech Rocketbelt",
+        "pickRate": 1.5,
+        "note": "Rare mobility option."
+      },
+      {
+        "item": "Liandry's Torment",
+        "pickRate": 0.94,
+        "note": "Rare sustained-damage option."
+      },
+      {
+        "item": "Riftmaker",
+        "pickRate": 0.74,
+        "note": "Rare sustained-fight option."
+      },
+      {
+        "item": "Bloodletter's Curse",
+        "pickRate": 0.7,
+        "note": "Rare magic-resistance reduction option."
+      },
+      {
+        "item": "Nashor's Tooth",
+        "pickRate": 0.54,
+        "note": "Rare attack-focused option."
+      }
+    ],
+    "notes": "OP.GG, LoLalytics and League of Graphs show patch 16.21; Mobalytics showed 16.20 and was used only as a comparison. Slot-specific pick rates were unavailable, so they are null; League of Graphs final-item rates describe replacement choices, and its default bracket includes Platinum+ normal and ranked games."
+  }
+}

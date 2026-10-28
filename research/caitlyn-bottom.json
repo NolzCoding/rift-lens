@@ -1,0 +1,591 @@
+{
+  "version": 1,
+  "champion": "Caitlyn",
+  "role": "BOTTOM",
+  "researchedAt": "2026-10-26T23:10:07.563Z",
+  "researchedOn": "16.21.1",
+  "durationMs": 59884,
+  "model": "gpt-6-sol",
+  "trigger": "champ-select",
+  "freshness": "current",
+  "dropped": [],
+  "warnings": [
+    "4th item: its default repeats an earlier slot; Lord Dominik's Regards becomes its default.",
+    "5th item: its default repeats an earlier slot; Guardian Angel becomes its default."
+  ],
+  "notes": "All cited build data is from patch 16.21. OP.GG supplies the Emerald+ Solo/Duo numbers; League of Graphs uses a broader Platinum+ normal-and-ranked filter, while Lolalytics' item-slot values did not render, so unshown slot pick rates are null. Sixth-item statistics reflect rare games that reach that purchase.",
+  "build": {
+    "champion": "Caitlyn",
+    "role": "BOTTOM",
+    "patch": "16.21",
+    "verified": "2026-10-26",
+    "sample": "Emerald+ global ranked Solo/Duo; 135,219 games on Lolalytics",
+    "sources": [
+      {
+        "name": "op.gg — Patch 16.21 Emerald+ Solo/Duo starters, boots, core builds and later item order.",
+        "url": "https://op.gg/lol/champions/caitlyn/build/adc?type=ranked",
+        "site": "op.gg",
+        "read": "Patch 16.21 Emerald+ Solo/Duo starters, boots, core builds and later item order."
+      },
+      {
+        "name": "op.gg — Patch 16.21 Emerald+ Solo/Duo item and boot pick rates.",
+        "url": "https://op.gg/lol/champions/caitlyn/items/adc?type=ranked",
+        "site": "op.gg",
+        "read": "Patch 16.21 Emerald+ Solo/Duo item and boot pick rates."
+      },
+      {
+        "name": "League of Graphs — Patch 16.21 bottom item and boot popularity; Platinum+ normal and ranked.",
+        "url": "https://www.leagueofgraphs.com/champions/items/caitlyn/adc",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 bottom item and boot popularity; Platinum+ normal and ranked."
+      },
+      {
+        "name": "League of Graphs — Patch 16.21 bottom full build order and final item options.",
+        "url": "https://www.leagueofgraphs.com/champions/fullbuilds/caitlyn/adc",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 bottom full build order and final item options."
+      },
+      {
+        "name": "lolalytics — Patch 16.21 Emerald+ Solo/Duo sample and item trends.",
+        "url": "https://lolalytics.com/lol/caitlyn/build/",
+        "site": "lolalytics",
+        "read": "Patch 16.21 Emerald+ Solo/Duo sample and item trends."
+      }
+    ],
+    "slots": [
+      {
+        "id": "slot1",
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Hexoptics C44",
+            "note": "First item in the most played Emerald+ cores."
+          },
+          {
+            "item": "The Collector"
+          }
+        ]
+      },
+      {
+        "id": "boots",
+        "label": "Boots",
+        "kind": "boots",
+        "options": [
+          {
+            "item": "Berserker's Greaves",
+            "pickRate": 85.6,
+            "winRate": 48.5
+          },
+          {
+            "item": "Boots of Swiftness",
+            "pickRate": 7.2,
+            "winRate": 49.1,
+            "when": "situational",
+            "condition": "vs slows"
+          },
+          {
+            "item": "Gluttonous Greaves",
+            "pickRate": 5.4,
+            "winRate": 51.5,
+            "when": "situational",
+            "condition": "for sustain"
+          }
+        ]
+      },
+      {
+        "id": "slot2",
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Infinity Edge"
+          }
+        ]
+      },
+      {
+        "id": "slot3",
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Lord Dominik's Regards",
+            "when": "situational",
+            "condition": "vs armor or tanks",
+            "note": "Third in OP.GG's most played core."
+          },
+          {
+            "item": "Rapid Firecannon"
+          },
+          {
+            "item": "Mortal Reminder",
+            "when": "healing",
+            "condition": "vs heavy healing"
+          }
+        ]
+      },
+      {
+        "id": "slot4",
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rapid Firecannon",
+            "winRate": 54.4,
+            "note": "OP.GG shows 19,103 fourth-item games."
+          },
+          {
+            "item": "Lord Dominik's Regards",
+            "winRate": 56.9,
+            "note": "best vs armor or tanks; OP.GG shows 14,617 fourth-item games."
+          },
+          {
+            "item": "Mortal Reminder",
+            "winRate": 52.6,
+            "when": "healing",
+            "condition": "vs heavy healing"
+          },
+          {
+            "item": "Immortal Shieldbow",
+            "winRate": 57.9,
+            "when": "situational",
+            "condition": "vs burst"
+          }
+        ]
+      },
+      {
+        "id": "slot5",
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Guardian Angel",
+            "winRate": 58.3,
+            "note": "best vs lethal dive or burst; OP.GG shows 7,359 fifth-item games."
+          },
+          {
+            "item": "Bloodthirster",
+            "winRate": 54.5,
+            "when": "situational",
+            "condition": "for sustain",
+            "note": "OP.GG shows 6,441 fifth-item games."
+          },
+          {
+            "item": "Rapid Firecannon",
+            "winRate": 53.8
+          },
+          {
+            "item": "Mercurial Scimitar",
+            "winRate": 54.6,
+            "when": "situational",
+            "condition": "vs dangerous crowd control"
+          }
+        ]
+      },
+      {
+        "id": "slot6",
+        "label": "6th item",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Guardian Angel",
+            "winRate": 57.7,
+            "when": "situational",
+            "condition": "vs lethal dive or burst"
+          },
+          {
+            "item": "Bloodthirster",
+            "winRate": 57.1,
+            "when": "situational",
+            "condition": "for sustain"
+          },
+          {
+            "item": "Mercurial Scimitar",
+            "winRate": 54,
+            "when": "situational",
+            "condition": "vs dangerous crowd control"
+          },
+          {
+            "item": "Stormrazor",
+            "winRate": 52.1
+          }
+        ]
+      }
+    ],
+    "cores": [
+      {
+        "items": [
+          "Hexoptics C44",
+          "Infinity Edge",
+          "Lord Dominik's Regards"
+        ],
+        "games": 18432,
+        "winRate": 53.5
+      },
+      {
+        "items": [
+          "Hexoptics C44",
+          "Infinity Edge",
+          "Rapid Firecannon"
+        ],
+        "games": 16648,
+        "winRate": 54.2
+      },
+      {
+        "items": [
+          "The Collector",
+          "Infinity Edge",
+          "Lord Dominik's Regards"
+        ],
+        "games": 13981,
+        "winRate": 52.8
+      },
+      {
+        "items": [
+          "The Collector",
+          "Infinity Edge",
+          "Rapid Firecannon"
+        ],
+        "games": 5969,
+        "winRate": 53.8
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Yun Tal Wildarrows",
+        "pickRate": 4.4,
+        "note": "Occasional alternative first item."
+      },
+      {
+        "item": "Phantom Dancer",
+        "pickRate": 3.9,
+        "note": "Occasional attack-speed alternative."
+      },
+      {
+        "item": "Hubris",
+        "pickRate": 2.1,
+        "note": "Occasional lethality purchase."
+      },
+      {
+        "item": "Serpent's Fang",
+        "pickRate": 1,
+        "note": "Situational purchase against shields."
+      },
+      {
+        "item": "Maw of Malmortius",
+        "pickRate": 0.9,
+        "note": "Occasional magic-damage defense."
+      },
+      {
+        "item": "Voltaic Cyclosword",
+        "pickRate": 0.7,
+        "note": "Rare energized-damage purchase."
+      }
+    ],
+    "origin": "researched",
+    "researchedAt": "2026-10-26T23:10:07.563Z",
+    "researchedOn": "16.21.1",
+    "stale": false,
+    "starting": [
+      "Doran's Bow",
+      "Health Potion"
+    ]
+  },
+  "raw": {
+    "champion": "Caitlyn",
+    "role": "BOTTOM",
+    "patch": "16.21",
+    "sample": "Emerald+ global ranked Solo/Duo; 135,219 games on Lolalytics",
+    "sources": [
+      {
+        "url": "https://op.gg/lol/champions/caitlyn/build/adc?type=ranked",
+        "site": "OP.GG",
+        "read": "Patch 16.21 Emerald+ Solo/Duo starters, boots, core builds and later item order."
+      },
+      {
+        "url": "https://op.gg/lol/champions/caitlyn/items/adc?type=ranked",
+        "site": "OP.GG",
+        "read": "Patch 16.21 Emerald+ Solo/Duo item and boot pick rates."
+      },
+      {
+        "url": "https://www.leagueofgraphs.com/champions/items/caitlyn/adc",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 bottom item and boot popularity; Platinum+ normal and ranked."
+      },
+      {
+        "url": "https://www.leagueofgraphs.com/champions/fullbuilds/caitlyn/adc",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 bottom full build order and final item options."
+      },
+      {
+        "url": "https://lolalytics.com/lol/caitlyn/build/",
+        "site": "Lolalytics",
+        "read": "Patch 16.21 Emerald+ Solo/Duo sample and item trends."
+      }
+    ],
+    "starting": [
+      "Doran's Bow",
+      "Health Potion",
+      "Health Potion"
+    ],
+    "slots": [
+      {
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Hexoptics C44",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "First item in the most played Emerald+ cores."
+          },
+          {
+            "item": "The Collector",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Infinity Edge",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Lord Dominik's Regards",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs armor or tanks",
+            "note": "Third in OP.GG's most played core."
+          },
+          {
+            "item": "Rapid Firecannon",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Mortal Reminder",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs heavy healing",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rapid Firecannon",
+            "pickRate": null,
+            "winRate": 54.38,
+            "when": null,
+            "note": "OP.GG shows 19,103 fourth-item games."
+          },
+          {
+            "item": "Lord Dominik's Regards",
+            "pickRate": null,
+            "winRate": 56.89,
+            "when": "vs armor or tanks",
+            "note": "OP.GG shows 14,617 fourth-item games."
+          },
+          {
+            "item": "Mortal Reminder",
+            "pickRate": null,
+            "winRate": 52.58,
+            "when": "vs heavy healing",
+            "note": null
+          },
+          {
+            "item": "Immortal Shieldbow",
+            "pickRate": null,
+            "winRate": 57.85,
+            "when": "vs burst",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Guardian Angel",
+            "pickRate": null,
+            "winRate": 58.3,
+            "when": "vs lethal dive or burst",
+            "note": "OP.GG shows 7,359 fifth-item games."
+          },
+          {
+            "item": "Bloodthirster",
+            "pickRate": null,
+            "winRate": 54.51,
+            "when": "for sustain",
+            "note": "OP.GG shows 6,441 fifth-item games."
+          },
+          {
+            "item": "Rapid Firecannon",
+            "pickRate": null,
+            "winRate": 53.84,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Mercurial Scimitar",
+            "pickRate": null,
+            "winRate": 54.56,
+            "when": "vs dangerous crowd control",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "6th item",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Guardian Angel",
+            "pickRate": null,
+            "winRate": 57.65,
+            "when": "vs lethal dive or burst",
+            "note": null
+          },
+          {
+            "item": "Bloodthirster",
+            "pickRate": null,
+            "winRate": 57.08,
+            "when": "for sustain",
+            "note": null
+          },
+          {
+            "item": "Mercurial Scimitar",
+            "pickRate": null,
+            "winRate": 54.04,
+            "when": "vs dangerous crowd control",
+            "note": null
+          },
+          {
+            "item": "Stormrazor",
+            "pickRate": null,
+            "winRate": 52.06,
+            "when": null,
+            "note": null
+          }
+        ]
+      }
+    ],
+    "boots": [
+      {
+        "item": "Berserker's Greaves",
+        "pickRate": 85.57,
+        "winRate": 48.5,
+        "when": null,
+        "note": null
+      },
+      {
+        "item": "Boots of Swiftness",
+        "pickRate": 7.17,
+        "winRate": 49.11,
+        "when": "vs slows",
+        "note": null
+      },
+      {
+        "item": "Gluttonous Greaves",
+        "pickRate": 5.35,
+        "winRate": 51.5,
+        "when": "for sustain",
+        "note": null
+      }
+    ],
+    "bootsAfterItem": 1,
+    "cores": [
+      {
+        "items": [
+          "Hexoptics C44",
+          "Infinity Edge",
+          "Lord Dominik's Regards"
+        ],
+        "games": 18432,
+        "winRate": 53.48
+      },
+      {
+        "items": [
+          "Hexoptics C44",
+          "Infinity Edge",
+          "Rapid Firecannon"
+        ],
+        "games": 16648,
+        "winRate": 54.19
+      },
+      {
+        "items": [
+          "The Collector",
+          "Infinity Edge",
+          "Lord Dominik's Regards"
+        ],
+        "games": 13981,
+        "winRate": 52.83
+      },
+      {
+        "items": [
+          "The Collector",
+          "Infinity Edge",
+          "Rapid Firecannon"
+        ],
+        "games": 5969,
+        "winRate": 53.84
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Yun Tal Wildarrows",
+        "pickRate": 4.41,
+        "note": "Occasional alternative first item."
+      },
+      {
+        "item": "Phantom Dancer",
+        "pickRate": 3.94,
+        "note": "Occasional attack-speed alternative."
+      },
+      {
+        "item": "Hubris",
+        "pickRate": 2.1,
+        "note": "Occasional lethality purchase."
+      },
+      {
+        "item": "Serpent's Fang",
+        "pickRate": 1,
+        "note": "Situational purchase against shields."
+      },
+      {
+        "item": "Maw of Malmortius",
+        "pickRate": 0.85,
+        "note": "Occasional magic-damage defense."
+      },
+      {
+        "item": "Voltaic Cyclosword",
+        "pickRate": 0.69,
+        "note": "Rare energized-damage purchase."
+      }
+    ],
+    "notes": "All cited build data is from patch 16.21. OP.GG supplies the Emerald+ Solo/Duo numbers; League of Graphs uses a broader Platinum+ normal-and-ranked filter, while Lolalytics' item-slot values did not render, so unshown slot pick rates are null. Sixth-item statistics reflect rare games that reach that purchase."
+  }
+}

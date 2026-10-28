@@ -1,0 +1,564 @@
+{
+  "version": 1,
+  "champion": "Zyra",
+  "role": "UTILITY",
+  "researchedAt": "2026-10-23T19:16:45.889Z",
+  "researchedOn": "16.21.1",
+  "durationMs": 94849,
+  "model": "gpt-6-sol",
+  "trigger": "manual",
+  "freshness": "current",
+  "dropped": [],
+  "warnings": [
+    "Situational: every option was conditional; Banshee's Veil kept as the default."
+  ],
+  "notes": "All listed pages show patch 16.21. League of Graphs uses Platinum+ ranked globally, while OP.GG's accessible Emerald+ Solo/Duo figures are NA only; their most-played third item is Zhonya's Hourglass, with Morellonomicon close behind. Slot-specific pick rates and reliable fifth-item rates were not shown, so those fields are null.",
+  "build": {
+    "champion": "Zyra",
+    "role": "UTILITY",
+    "patch": "16.21",
+    "verified": "2026-10-23",
+    "sample": "Emerald+ Solo/Duo: 7,318 games; Platinum+ ranked: 26,125 matches",
+    "sources": [
+      {
+        "name": "lolalytics — Patch 16.21 Emerald+ Solo/Duo starting items and build options.",
+        "url": "https://lolalytics.com/lol/zyra/build/",
+        "site": "lolalytics",
+        "read": "Patch 16.21 Emerald+ Solo/Duo starting items and build options."
+      },
+      {
+        "name": "League of Graphs — Patch 16.21 Platinum+ ranked starting build, core paths, boots and item popularity.",
+        "url": "https://www.leagueofgraphs.com/en/champions/items/zyra/support/sr-ranked",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 Platinum+ ranked starting build, core paths, boots and item popularity."
+      },
+      {
+        "name": "op.gg — Patch 16.21 NA Emerald+ Solo/Duo three-item cores and boots.",
+        "url": "https://fortnite.op.gg/lol/champions/zyra/items/support?patch=16.21&region=na&tier=emerald_plus&type=ranked",
+        "site": "op.gg",
+        "read": "Patch 16.21 NA Emerald+ Solo/Duo three-item cores and boots."
+      },
+      {
+        "name": "op.gg — Patch 16.21 NA Emerald+ Solo/Duo fourth- and fifth-item outcomes.",
+        "url": "https://fortnite.op.gg/lol/champions/zyra/build/support?patch=16.21&region=na&tier=emerald_plus&type=ranked",
+        "site": "op.gg",
+        "read": "Patch 16.21 NA Emerald+ Solo/Duo fourth- and fifth-item outcomes."
+      }
+    ],
+    "slots": [
+      {
+        "id": "slot1",
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Liandry's Torment"
+          },
+          {
+            "item": "Blackfire Torch",
+            "note": "Less common alternate opening."
+          }
+        ]
+      },
+      {
+        "id": "boots",
+        "label": "Boots",
+        "kind": "boots",
+        "options": [
+          {
+            "item": "Sorcerer's Shoes",
+            "pickRate": 74.6,
+            "winRate": 51.4,
+            "note": "League of Graphs Platinum+ ranked."
+          },
+          {
+            "item": "Ionian Boots of Lucidity",
+            "pickRate": 11.9,
+            "winRate": 50.1,
+            "note": "League of Graphs Platinum+ ranked."
+          },
+          {
+            "item": "Boots of Swiftness",
+            "pickRate": 3.2,
+            "winRate": 50,
+            "when": "situational",
+            "condition": "vs slows",
+            "note": "League of Graphs Platinum+ ranked."
+          }
+        ]
+      },
+      {
+        "id": "slot2",
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Rylai's Crystal Scepter"
+          },
+          {
+            "item": "Liandry's Torment",
+            "when": "situational",
+            "condition": "after Blackfire Torch"
+          }
+        ]
+      },
+      {
+        "id": "slot3",
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Zhonya's Hourglass",
+            "when": "situational",
+            "condition": "vs burst or dive"
+          },
+          {
+            "item": "Morellonomicon",
+            "when": "healing",
+            "condition": "vs heavy healing"
+          },
+          {
+            "item": "Blackfire Torch",
+            "note": "Alternative damage path."
+          },
+          {
+            "item": "Imperial Mandate",
+            "note": "Lower-frequency utility path."
+          }
+        ]
+      },
+      {
+        "id": "slot4",
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Morellonomicon",
+            "winRate": 48,
+            "when": "healing",
+            "condition": "vs heavy healing",
+            "note": "OP.GG: 25 NA Emerald+ games."
+          },
+          {
+            "item": "Zhonya's Hourglass",
+            "winRate": 40,
+            "when": "situational",
+            "condition": "vs burst or dive",
+            "note": "OP.GG: 10 NA Emerald+ games."
+          },
+          {
+            "item": "Malignance",
+            "winRate": 33.3,
+            "note": "OP.GG: 3 NA Emerald+ games."
+          },
+          {
+            "item": "Shadowflame",
+            "winRate": 50,
+            "note": "OP.GG: 2 NA Emerald+ games."
+          }
+        ]
+      },
+      {
+        "id": "slot5",
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap",
+            "note": "Frequent final-item choice on League of Graphs."
+          },
+          {
+            "item": "Shadowflame",
+            "note": "Frequent final-item choice on League of Graphs."
+          },
+          {
+            "item": "Malignance"
+          },
+          {
+            "item": "Cryptbloom",
+            "when": "situational",
+            "condition": "vs magic resistance"
+          }
+        ]
+      },
+      {
+        "id": "slot6",
+        "label": "Situational",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Banshee's Veil",
+            "note": "best vs dangerous magic damage or pick tools"
+          },
+          {
+            "item": "Void Staff",
+            "when": "situational",
+            "condition": "vs heavy magic resistance"
+          },
+          {
+            "item": "Bloodletter's Curse",
+            "when": "situational",
+            "condition": "vs durable teams"
+          }
+        ]
+      }
+    ],
+    "cores": [
+      {
+        "items": [
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter",
+          "Zhonya's Hourglass"
+        ],
+        "games": 34,
+        "winRate": 38.2
+      },
+      {
+        "items": [
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter",
+          "Morellonomicon"
+        ],
+        "games": 20,
+        "winRate": 60
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter"
+        ],
+        "games": 13,
+        "winRate": 38.5
+      },
+      {
+        "items": [
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter",
+          "Imperial Mandate"
+        ],
+        "games": 12,
+        "winRate": 66.7
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Luden's Echo",
+        "pickRate": 0.5,
+        "note": "Rare burst option; League of Graphs Platinum+ ranked."
+      },
+      {
+        "item": "Stormsurge",
+        "pickRate": 0.3,
+        "note": "Rare burst option; League of Graphs Platinum+ ranked."
+      },
+      {
+        "item": "Bandlepipes",
+        "pickRate": null,
+        "note": "Shown below 0.1% by League of Graphs."
+      },
+      {
+        "item": "Shurelya's Battlesong",
+        "pickRate": null,
+        "note": "Shown below 0.1% by League of Graphs."
+      }
+    ],
+    "origin": "researched",
+    "researchedAt": "2026-10-23T19:16:45.889Z",
+    "researchedOn": "16.21.1",
+    "stale": false,
+    "starting": [
+      "World Atlas",
+      "Health Potion"
+    ]
+  },
+  "raw": {
+    "champion": "Zyra",
+    "role": "UTILITY",
+    "patch": "16.21",
+    "sample": "Emerald+ Solo/Duo: 7,318 games; Platinum+ ranked: 26,125 matches",
+    "sources": [
+      {
+        "url": "https://lolalytics.com/lol/zyra/build/",
+        "site": "LoLalytics",
+        "read": "Patch 16.21 Emerald+ Solo/Duo starting items and build options."
+      },
+      {
+        "url": "https://www.leagueofgraphs.com/en/champions/items/zyra/support/sr-ranked",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 Platinum+ ranked starting build, core paths, boots and item popularity."
+      },
+      {
+        "url": "https://fortnite.op.gg/lol/champions/zyra/items/support?patch=16.21&region=na&tier=emerald_plus&type=ranked",
+        "site": "OP.GG",
+        "read": "Patch 16.21 NA Emerald+ Solo/Duo three-item cores and boots."
+      },
+      {
+        "url": "https://fortnite.op.gg/lol/champions/zyra/build/support?patch=16.21&region=na&tier=emerald_plus&type=ranked",
+        "site": "OP.GG",
+        "read": "Patch 16.21 NA Emerald+ Solo/Duo fourth- and fifth-item outcomes."
+      }
+    ],
+    "starting": [
+      "World Atlas",
+      "Health Potion",
+      "Health Potion"
+    ],
+    "slots": [
+      {
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Liandry's Torment",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Blackfire Torch",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Less common alternate opening."
+          }
+        ]
+      },
+      {
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Rylai's Crystal Scepter",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Liandry's Torment",
+            "pickRate": null,
+            "winRate": null,
+            "when": "after Blackfire Torch",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Zhonya's Hourglass",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs burst or dive",
+            "note": null
+          },
+          {
+            "item": "Morellonomicon",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs heavy healing",
+            "note": null
+          },
+          {
+            "item": "Blackfire Torch",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Alternative damage path."
+          },
+          {
+            "item": "Imperial Mandate",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Lower-frequency utility path."
+          }
+        ]
+      },
+      {
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Morellonomicon",
+            "pickRate": null,
+            "winRate": 48,
+            "when": "vs heavy healing",
+            "note": "OP.GG: 25 NA Emerald+ games."
+          },
+          {
+            "item": "Zhonya's Hourglass",
+            "pickRate": null,
+            "winRate": 40,
+            "when": "vs burst or dive",
+            "note": "OP.GG: 10 NA Emerald+ games."
+          },
+          {
+            "item": "Malignance",
+            "pickRate": null,
+            "winRate": 33.33,
+            "when": null,
+            "note": "OP.GG: 3 NA Emerald+ games."
+          },
+          {
+            "item": "Shadowflame",
+            "pickRate": null,
+            "winRate": 50,
+            "when": null,
+            "note": "OP.GG: 2 NA Emerald+ games."
+          }
+        ]
+      },
+      {
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Frequent final-item choice on League of Graphs."
+          },
+          {
+            "item": "Shadowflame",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Frequent final-item choice on League of Graphs."
+          },
+          {
+            "item": "Malignance",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Cryptbloom",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs magic resistance",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "Situational",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Banshee's Veil",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs dangerous magic damage or pick tools",
+            "note": null
+          },
+          {
+            "item": "Void Staff",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs heavy magic resistance",
+            "note": null
+          },
+          {
+            "item": "Bloodletter's Curse",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs durable teams",
+            "note": null
+          }
+        ]
+      }
+    ],
+    "boots": [
+      {
+        "item": "Sorcerer's Shoes",
+        "pickRate": 74.6,
+        "winRate": 51.4,
+        "when": null,
+        "note": "League of Graphs Platinum+ ranked."
+      },
+      {
+        "item": "Ionian Boots of Lucidity",
+        "pickRate": 11.9,
+        "winRate": 50.1,
+        "when": null,
+        "note": "League of Graphs Platinum+ ranked."
+      },
+      {
+        "item": "Boots of Swiftness",
+        "pickRate": 3.2,
+        "winRate": 50,
+        "when": "vs slows",
+        "note": "League of Graphs Platinum+ ranked."
+      }
+    ],
+    "bootsAfterItem": 1,
+    "cores": [
+      {
+        "items": [
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter",
+          "Zhonya's Hourglass"
+        ],
+        "games": 34,
+        "winRate": 38.24
+      },
+      {
+        "items": [
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter",
+          "Morellonomicon"
+        ],
+        "games": 20,
+        "winRate": 60
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter"
+        ],
+        "games": 13,
+        "winRate": 38.46
+      },
+      {
+        "items": [
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter",
+          "Imperial Mandate"
+        ],
+        "games": 12,
+        "winRate": 66.67
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Luden's Echo",
+        "pickRate": 0.5,
+        "note": "Rare burst option; League of Graphs Platinum+ ranked."
+      },
+      {
+        "item": "Stormsurge",
+        "pickRate": 0.3,
+        "note": "Rare burst option; League of Graphs Platinum+ ranked."
+      },
+      {
+        "item": "Bandlepipes",
+        "pickRate": null,
+        "note": "Shown below 0.1% by League of Graphs."
+      },
+      {
+        "item": "Shurelya's Battlesong",
+        "pickRate": null,
+        "note": "Shown below 0.1% by League of Graphs."
+      }
+    ],
+    "notes": "All listed pages show patch 16.21. League of Graphs uses Platinum+ ranked globally, while OP.GG's accessible Emerald+ Solo/Duo figures are NA only; their most-played third item is Zhonya's Hourglass, with Morellonomicon close behind. Slot-specific pick rates and reliable fifth-item rates were not shown, so those fields are null."
+  }
+}

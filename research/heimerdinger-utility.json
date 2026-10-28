@@ -1,0 +1,554 @@
+{
+  "version": 1,
+  "champion": "Heimerdinger",
+  "role": "UTILITY",
+  "researchedAt": "2026-10-23T18:40:17.220Z",
+  "researchedOn": "16.21.1",
+  "durationMs": 108656,
+  "model": "gpt-6-sol",
+  "trigger": "manual",
+  "freshness": "current",
+  "dropped": [],
+  "warnings": [
+    "Situational replacement: every option was conditional; Banshee's Veil kept as the default.",
+    "Fifth completed item: its default repeats an earlier slot; Void Staff becomes its default."
+  ],
+  "notes": "All three sources showed patch 16.21; League of Graphs used Platinum+ Normal & Ranked, while Mobalytics and LoLalytics used Emerald+ ranked Solo or Solo/Duo. League of Graphs showed the most common three-item path but no games or slot-specific rates; its item and boot rates use a different sample. The situational slot lists replacements, since the support item occupies an inventory slot.",
+  "build": {
+    "champion": "Heimerdinger",
+    "role": "UTILITY",
+    "patch": "16.21",
+    "verified": "2026-10-23",
+    "sample": "Emerald+ ranked Solo, 844 matches on Mobalytics",
+    "sources": [
+      {
+        "name": "Mobalytics — Patch 16.21 Emerald+ ranked Solo build order and sample.",
+        "url": "https://mobalytics.gg/lol/champions/heimerdinger/build/support",
+        "site": "Mobalytics",
+        "read": "Patch 16.21 Emerald+ ranked Solo build order and sample."
+      },
+      {
+        "name": "lolalytics — Patch 16.21 Emerald+ ranked Solo/Duo build options.",
+        "url": "https://lolalytics.com/lol/heimerdinger/build/?lane=support",
+        "site": "lolalytics",
+        "read": "Patch 16.21 Emerald+ ranked Solo/Duo build options."
+      },
+      {
+        "name": "League of Graphs — Patch 16.21 support starting builds, item paths, boots and item rates.",
+        "url": "https://www.leagueofgraphs.com/champions/items/heimerdinger/support",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 support starting builds, item paths, boots and item rates."
+      }
+    ],
+    "slots": [
+      {
+        "id": "boots",
+        "label": "Boots",
+        "kind": "boots",
+        "options": [
+          {
+            "item": "Sorcerer's Shoes",
+            "pickRate": 67.1,
+            "winRate": 47.5
+          },
+          {
+            "item": "Ionian Boots of Lucidity",
+            "pickRate": 10.9,
+            "winRate": 46.5
+          },
+          {
+            "item": "Boots of Swiftness",
+            "pickRate": 4.6,
+            "winRate": 56,
+            "when": "situational",
+            "condition": "vs slows"
+          }
+        ]
+      },
+      {
+        "id": "slot1",
+        "label": "First completed item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Rylai's Crystal Scepter",
+            "note": "Starts the most common League of Graphs three-item path."
+          },
+          {
+            "item": "Blackfire Torch",
+            "note": "Common alternate opening."
+          },
+          {
+            "item": "Liandry's Torment"
+          }
+        ]
+      },
+      {
+        "id": "slot2",
+        "label": "Second completed item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Liandry's Torment"
+          },
+          {
+            "item": "Rylai's Crystal Scepter",
+            "note": "Common after a Blackfire Torch opening."
+          }
+        ]
+      },
+      {
+        "id": "slot3",
+        "label": "Third completed item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Zhonya's Hourglass",
+            "when": "situational",
+            "condition": "vs burst",
+            "note": "Completes the most common League of Graphs path."
+          },
+          {
+            "item": "Rylai's Crystal Scepter",
+            "note": "Common in Blackfire Torch paths."
+          },
+          {
+            "item": "Liandry's Torment"
+          }
+        ]
+      },
+      {
+        "id": "slot4",
+        "label": "Fourth completed item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap"
+          },
+          {
+            "item": "Morellonomicon",
+            "when": "healing",
+            "condition": "vs heavy healing"
+          },
+          {
+            "item": "Shadowflame"
+          }
+        ]
+      },
+      {
+        "id": "slot5",
+        "label": "Fifth completed item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Void Staff",
+            "pickRate": 17.5,
+            "winRate": 50,
+            "note": "best vs magic resistance; League of Graphs final-item rate."
+          },
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": 17.5,
+            "winRate": 50,
+            "note": "League of Graphs final-item rate."
+          },
+          {
+            "item": "Shadowflame",
+            "pickRate": 10,
+            "winRate": 62.5,
+            "note": "League of Graphs final-item rate."
+          },
+          {
+            "item": "Morellonomicon",
+            "pickRate": 5,
+            "winRate": 25,
+            "when": "healing",
+            "condition": "vs heavy healing",
+            "note": "League of Graphs final-item rate."
+          }
+        ]
+      },
+      {
+        "id": "slot6",
+        "label": "Situational replacement",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Banshee's Veil",
+            "pickRate": 0.6,
+            "winRate": 60,
+            "note": "best vs dangerous spells; Overall item rate, not a slot-specific rate."
+          },
+          {
+            "item": "Cryptbloom",
+            "pickRate": 0.3,
+            "winRate": 36.4,
+            "when": "situational",
+            "condition": "vs magic resistance",
+            "note": "Overall item rate, not a slot-specific rate."
+          }
+        ]
+      }
+    ],
+    "cores": [
+      {
+        "items": [
+          "Rylai's Crystal Scepter",
+          "Liandry's Torment",
+          "Zhonya's Hourglass"
+        ],
+        "games": null,
+        "winRate": 51.4
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter"
+        ],
+        "games": null,
+        "winRate": 48
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Rylai's Crystal Scepter",
+          "Zhonya's Hourglass"
+        ],
+        "games": null,
+        "winRate": 44
+      },
+      {
+        "items": [
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter",
+          "Zhonya's Hourglass"
+        ],
+        "games": null,
+        "winRate": 60.9
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Imperial Mandate",
+        "pickRate": 0.2,
+        "note": "Rare utility choice with Rylai's slow."
+      },
+      {
+        "item": "Shurelya's Battlesong",
+        "pickRate": 0.2,
+        "note": "Rare team mobility choice."
+      },
+      {
+        "item": "Rod of Ages",
+        "pickRate": 0.2,
+        "note": "Rare scaling health and mana choice."
+      },
+      {
+        "item": "Bandlepipes",
+        "pickRate": 0.1,
+        "note": "Rare support utility choice."
+      },
+      {
+        "item": "Cosmic Drive",
+        "pickRate": 0.1,
+        "note": "Rare ability haste and mobility choice."
+      },
+      {
+        "item": "Riftmaker",
+        "pickRate": 0.1,
+        "note": "Rare extended-fight damage choice."
+      }
+    ],
+    "origin": "researched",
+    "researchedAt": "2026-10-23T18:40:17.220Z",
+    "researchedOn": "16.21.1",
+    "stale": false,
+    "starting": [
+      "World Atlas",
+      "Health Potion",
+      "Stealth Ward"
+    ]
+  },
+  "raw": {
+    "champion": "Heimerdinger",
+    "role": "UTILITY",
+    "patch": "16.21",
+    "sample": "Emerald+ ranked Solo, 844 matches on Mobalytics",
+    "sources": [
+      {
+        "url": "https://mobalytics.gg/lol/champions/heimerdinger/build/support",
+        "site": "Mobalytics",
+        "read": "Patch 16.21 Emerald+ ranked Solo build order and sample."
+      },
+      {
+        "url": "https://lolalytics.com/lol/heimerdinger/build/?lane=support",
+        "site": "LoLalytics",
+        "read": "Patch 16.21 Emerald+ ranked Solo/Duo build options."
+      },
+      {
+        "url": "https://www.leagueofgraphs.com/champions/items/heimerdinger/support",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 support starting builds, item paths, boots and item rates."
+      }
+    ],
+    "starting": [
+      "World Atlas",
+      "Health Potion",
+      "Health Potion",
+      "Stealth Ward"
+    ],
+    "slots": [
+      {
+        "label": "First completed item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Rylai's Crystal Scepter",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Starts the most common League of Graphs three-item path."
+          },
+          {
+            "item": "Blackfire Torch",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Common alternate opening."
+          },
+          {
+            "item": "Liandry's Torment",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "Second completed item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Liandry's Torment",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Rylai's Crystal Scepter",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Common after a Blackfire Torch opening."
+          }
+        ]
+      },
+      {
+        "label": "Third completed item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Zhonya's Hourglass",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs burst",
+            "note": "Completes the most common League of Graphs path."
+          },
+          {
+            "item": "Rylai's Crystal Scepter",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Common in Blackfire Torch paths."
+          },
+          {
+            "item": "Liandry's Torment",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "Fourth completed item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Morellonomicon",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs heavy healing",
+            "note": null
+          },
+          {
+            "item": "Shadowflame",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "Fifth completed item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Void Staff",
+            "pickRate": 17.5,
+            "winRate": 50,
+            "when": "vs magic resistance",
+            "note": "League of Graphs final-item rate."
+          },
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": 17.5,
+            "winRate": 50,
+            "when": null,
+            "note": "League of Graphs final-item rate."
+          },
+          {
+            "item": "Shadowflame",
+            "pickRate": 10,
+            "winRate": 62.5,
+            "when": null,
+            "note": "League of Graphs final-item rate."
+          },
+          {
+            "item": "Morellonomicon",
+            "pickRate": 5,
+            "winRate": 25,
+            "when": "vs heavy healing",
+            "note": "League of Graphs final-item rate."
+          }
+        ]
+      },
+      {
+        "label": "Situational replacement",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Banshee's Veil",
+            "pickRate": 0.6,
+            "winRate": 60,
+            "when": "vs dangerous spells",
+            "note": "Overall item rate, not a slot-specific rate."
+          },
+          {
+            "item": "Cryptbloom",
+            "pickRate": 0.3,
+            "winRate": 36.4,
+            "when": "vs magic resistance",
+            "note": "Overall item rate, not a slot-specific rate."
+          }
+        ]
+      }
+    ],
+    "boots": [
+      {
+        "item": "Sorcerer's Shoes",
+        "pickRate": 67.1,
+        "winRate": 47.5,
+        "when": null,
+        "note": null
+      },
+      {
+        "item": "Ionian Boots of Lucidity",
+        "pickRate": 10.9,
+        "winRate": 46.5,
+        "when": null,
+        "note": null
+      },
+      {
+        "item": "Boots of Swiftness",
+        "pickRate": 4.6,
+        "winRate": 56,
+        "when": "vs slows",
+        "note": null
+      }
+    ],
+    "bootsAfterItem": 0,
+    "cores": [
+      {
+        "items": [
+          "Rylai's Crystal Scepter",
+          "Liandry's Torment",
+          "Zhonya's Hourglass"
+        ],
+        "games": null,
+        "winRate": 51.4
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter"
+        ],
+        "games": null,
+        "winRate": 48
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Rylai's Crystal Scepter",
+          "Zhonya's Hourglass"
+        ],
+        "games": null,
+        "winRate": 44
+      },
+      {
+        "items": [
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter",
+          "Zhonya's Hourglass"
+        ],
+        "games": null,
+        "winRate": 60.9
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Imperial Mandate",
+        "pickRate": 0.2,
+        "note": "Rare utility choice with Rylai's slow."
+      },
+      {
+        "item": "Shurelya's Battlesong",
+        "pickRate": 0.2,
+        "note": "Rare team mobility choice."
+      },
+      {
+        "item": "Rod of Ages",
+        "pickRate": 0.2,
+        "note": "Rare scaling health and mana choice."
+      },
+      {
+        "item": "Bandlepipes",
+        "pickRate": 0.1,
+        "note": "Rare support utility choice."
+      },
+      {
+        "item": "Cosmic Drive",
+        "pickRate": 0.1,
+        "note": "Rare ability haste and mobility choice."
+      },
+      {
+        "item": "Riftmaker",
+        "pickRate": 0.1,
+        "note": "Rare extended-fight damage choice."
+      }
+    ],
+    "notes": "All three sources showed patch 16.21; League of Graphs used Platinum+ Normal & Ranked, while Mobalytics and LoLalytics used Emerald+ ranked Solo or Solo/Duo. League of Graphs showed the most common three-item path but no games or slot-specific rates; its item and boot rates use a different sample. The situational slot lists replacements, since the support item occupies an inventory slot."
+  }
+}

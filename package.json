@@ -1,0 +1,35 @@
+{
+  "name": "rift-lens",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "node --import ./scripts/alias.mjs --experimental-transform-types --no-warnings --test --test-reporter=spec tests/engine.test.ts tests/raw-capture.test.ts tests/history.test.ts tests/build-research.test.ts tests/enemy-stats.test.ts tests/item-groups.test.ts tests/scaling.test.ts tests/replay-review.test.ts tests/counters.test.ts tests/meta-evidence.test.ts tests/ai-json.test.ts",
+    "check:replay": "node --import ./scripts/alias.mjs --experimental-transform-types --no-warnings scripts/check.ts",
+    "check:rofl": "node --import ./scripts/alias.mjs --experimental-transform-types --no-warnings scripts/compare-rofl.ts",
+    "check": "npm run check:chars && tsc --noEmit && npm run test && npm run check:replay",
+    "check:chars": "node scripts/scan-control-chars.cjs ."
+  },
+  "dependencies": {
+    "@openai/codex": "0.157.1",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
+    "next": "^16.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "recharts": "^2.15.0",
+    "tailwind-merge": "^2.6.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.0"
+  }
+}

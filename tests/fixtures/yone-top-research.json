@@ -1,0 +1,611 @@
+{
+ "_note": "Copied from work/rift-lens-memory/meta-research/yone-top.json (research stored as-is: build + the model's raw answer) for offline tests.",
+ "build": {
+  "champion": "Yone",
+  "role": "TOP",
+  "patch": "16.20",
+  "verified": "2026-10-16",
+  "sample": "Emerald+, ranked Solo/Duo; Mobalytics shows 150 527 matches",
+  "sources": [
+   {
+    "name": "op.gg — Patch 16.20 top build, three-item cores and fourth through sixth item tables.",
+    "url": "https://op.gg/no/lol/champions/yone/build/top",
+    "site": "op.gg",
+    "read": "Patch 16.20 top build, three-item cores and fourth through sixth item tables."
+   },
+   {
+    "name": "op.gg — Patch 16.20 top items, boots, starting items and overall item rates.",
+    "url": "https://op.gg/no/lol/champions/yone/items/top",
+    "site": "op.gg",
+    "read": "Patch 16.20 top items, boots, starting items and overall item rates."
+   },
+   {
+    "name": "Mobalytics — Patch 16.20 Emerald+ ranked Solo top build and item order.",
+    "url": "https://mobalytics.gg/lol/champions/yone/build/top?int_medium=tier-list-icon",
+    "site": "Mobalytics",
+    "read": "Patch 16.20 Emerald+ ranked Solo top build and item order."
+   },
+   {
+    "name": "lolalytics — Patch 16.20 Emerald+ ranked Solo/Duo top build and sample.",
+    "url": "https://lolalytics.com/lol/yone/build/",
+    "site": "lolalytics",
+    "read": "Patch 16.20 Emerald+ ranked Solo/Duo top build and sample."
+   },
+   {
+    "name": "League of Graphs — Opened items page returned cached patch 16.17; excluded its numbers.",
+    "url": "https://www.leagueofgraphs.com/champions/items/yone/top",
+    "site": "League of Graphs",
+    "read": "Opened items page returned cached patch 16.17; excluded its numbers."
+   }
+  ],
+  "slots": [
+   {
+    "id": "slot1",
+    "label": "1st item",
+    "kind": "core",
+    "options": [
+     {
+      "item": "Blade of The Ruined King",
+      "note": "First item in the most-played three-item core."
+     },
+     {
+      "item": "Immortal Shieldbow",
+      "note": "Starts the second-most-played three-item core."
+     }
+    ]
+   },
+   {
+    "id": "boots",
+    "label": "Boots",
+    "kind": "boots",
+    "options": [
+     {
+      "item": "Berserker's Greaves",
+      "pickRate": 94.5,
+      "winRate": 50.2
+     },
+     {
+      "item": "Plated Steelcaps",
+      "pickRate": 3.3,
+      "winRate": 47.5,
+      "when": "situational",
+      "condition": "vs physical damage"
+     },
+     {
+      "item": "Mercury's Treads",
+      "pickRate": 1.6,
+      "winRate": 48.8,
+      "when": "situational",
+      "condition": "vs magic damage and crowd control"
+     }
+    ]
+   },
+   {
+    "id": "slot2",
+    "label": "2nd item",
+    "kind": "core",
+    "options": [
+     {
+      "item": "Immortal Shieldbow"
+     },
+     {
+      "item": "Infinity Edge",
+      "note": "Follows a first-item Immortal Shieldbow."
+     }
+    ]
+   },
+   {
+    "id": "slot3",
+    "label": "3rd item",
+    "kind": "core",
+    "options": [
+     {
+      "item": "Infinity Edge"
+     },
+     {
+      "item": "Lord Dominik's Regards",
+      "when": "situational",
+      "condition": "vs tanks"
+     },
+     {
+      "item": "Mortal Reminder",
+      "when": "healing",
+      "condition": "vs heavy healing"
+     },
+     {
+      "item": "Death's Dance",
+      "when": "situational",
+      "condition": "vs physical burst",
+      "note": "Third item after Shieldbow and Infinity Edge."
+     }
+    ]
+   },
+   {
+    "id": "slot4",
+    "label": "4th item",
+    "kind": "flex",
+    "options": [
+     {
+      "item": "Death's Dance",
+      "winRate": 59.3,
+      "note": "best vs physical burst; 13,601 games in OP.GG's fourth-item table."
+     },
+     {
+      "item": "Guardian Angel",
+      "winRate": 62.8,
+      "when": "situational",
+      "condition": "when revival is valuable",
+      "note": "5,125 games in OP.GG's fourth-item table."
+     },
+     {
+      "item": "Infinity Edge",
+      "winRate": 57.3,
+      "when": "situational",
+      "condition": "if delayed at third item",
+      "note": "2,543 games in OP.GG's fourth-item table."
+     },
+     {
+      "item": "Wit's End",
+      "winRate": 55.5,
+      "when": "situational",
+      "condition": "vs magic damage",
+      "note": "2,406 games in OP.GG's fourth-item table."
+     }
+    ]
+   },
+   {
+    "id": "slot5",
+    "label": "5th item",
+    "kind": "flex",
+    "options": [
+     {
+      "item": "Guardian Angel",
+      "winRate": 61.6,
+      "note": "best when revival is valuable; 3,144 games in OP.GG's fifth-item table."
+     },
+     {
+      "item": "Death's Dance",
+      "winRate": 59.6,
+      "when": "situational",
+      "condition": "vs physical burst",
+      "note": "1,212 games in OP.GG's fifth-item table."
+     },
+     {
+      "item": "Jak'Sho, The Protean",
+      "winRate": 56,
+      "when": "situational",
+      "condition": "vs mixed damage",
+      "note": "1,134 games in OP.GG's fifth-item table."
+     },
+     {
+      "item": "Bloodthirster",
+      "winRate": 54.8,
+      "when": "situational",
+      "condition": "for extra sustain",
+      "note": "580 games in OP.GG's fifth-item table."
+     }
+    ]
+   },
+   {
+    "id": "slot6",
+    "label": "Situational swap",
+    "kind": "situational",
+    "options": [
+     {
+      "item": "Lord Dominik's Regards",
+      "note": "best vs tanks; Mobalytics lists it as situational."
+     },
+     {
+      "item": "Mortal Reminder",
+      "when": "healing",
+      "condition": "vs heavy healing",
+      "note": "Mobalytics lists it as situational."
+     },
+     {
+      "item": "Wit's End",
+      "when": "situational",
+      "condition": "vs magic damage",
+      "note": "Mobalytics lists it as situational."
+     },
+     {
+      "item": "Mercurial Scimitar",
+      "when": "situational",
+      "condition": "vs disabling crowd control",
+      "note": "Mobalytics lists it as situational."
+     }
+    ]
+   }
+  ],
+  "cores": [
+   {
+    "items": [
+     "Blade of The Ruined King",
+     "Immortal Shieldbow",
+     "Infinity Edge"
+    ],
+    "games": 24240,
+    "winRate": 58.5
+   },
+   {
+    "items": [
+     "Immortal Shieldbow",
+     "Infinity Edge",
+     "Death's Dance"
+    ],
+    "games": 7820,
+    "winRate": 60
+   },
+   {
+    "items": [
+     "Blade of The Ruined King",
+     "Immortal Shieldbow",
+     "Lord Dominik's Regards"
+    ],
+    "games": 7615,
+    "winRate": 57.4
+   },
+   {
+    "items": [
+     "Blade of The Ruined King",
+     "Immortal Shieldbow",
+     "Mortal Reminder"
+    ],
+    "games": 6254,
+    "winRate": 54.5
+   }
+  ],
+  "offMeta": [
+   {
+    "item": "Kraken Slayer",
+    "pickRate": 5.4,
+    "note": "Alternative first-item damage path."
+   },
+   {
+    "item": "Stormrazor",
+    "pickRate": 3.7,
+    "note": "Occasional attack-speed damage option."
+   },
+   {
+    "item": "Yun Tal Wildarrows",
+    "pickRate": 2.2,
+    "note": "Occasional critical-strike option."
+   },
+   {
+    "item": "Kaenic Rookern",
+    "pickRate": 0.8,
+    "note": "Rare defense against magic damage."
+   },
+   {
+    "item": "Phantom Dancer",
+    "pickRate": 0.8,
+    "note": "Rare attack-speed option."
+   },
+   {
+    "item": "Terminus",
+    "pickRate": 0.4,
+    "note": "Rare sustained-damage option."
+   }
+  ],
+  "origin": "researched",
+  "researchedAt": "2026-10-16T21:48:11.164Z",
+  "researchedOn": "16.20.1",
+  "stale": false,
+  "starting": [
+   "Doran's Bow",
+   "Health Potion",
+   "Stealth Ward"
+  ]
+ },
+ "raw": {
+  "champion": "Yone",
+  "role": "TOP",
+  "patch": "16.20",
+  "sample": "Emerald+, ranked Solo/Duo; Mobalytics shows 150 527 matches",
+  "sources": [
+   {
+    "url": "https://op.gg/no/lol/champions/yone/build/top",
+    "site": "OP.GG",
+    "read": "Patch 16.20 top build, three-item cores and fourth through sixth item tables."
+   },
+   {
+    "url": "https://op.gg/no/lol/champions/yone/items/top",
+    "site": "OP.GG",
+    "read": "Patch 16.20 top items, boots, starting items and overall item rates."
+   },
+   {
+    "url": "https://mobalytics.gg/lol/champions/yone/build/top?int_medium=tier-list-icon",
+    "site": "Mobalytics",
+    "read": "Patch 16.20 Emerald+ ranked Solo top build and item order."
+   },
+   {
+    "url": "https://lolalytics.com/lol/yone/build/",
+    "site": "LoLalytics",
+    "read": "Patch 16.20 Emerald+ ranked Solo/Duo top build and sample."
+   },
+   {
+    "url": "https://www.leagueofgraphs.com/champions/items/yone/top",
+    "site": "League of Graphs",
+    "read": "Opened items page returned cached patch 16.17; excluded its numbers."
+   }
+  ],
+  "starting": [
+   "Doran's Bow",
+   "Health Potion",
+   "Health Potion",
+   "Stealth Ward"
+  ],
+  "slots": [
+   {
+    "label": "1st item",
+    "kind": "core",
+    "options": [
+     {
+      "item": "Blade of The Ruined King",
+      "pickRate": null,
+      "winRate": null,
+      "when": null,
+      "note": "First item in the most-played three-item core."
+     },
+     {
+      "item": "Immortal Shieldbow",
+      "pickRate": null,
+      "winRate": null,
+      "when": null,
+      "note": "Starts the second-most-played three-item core."
+     }
+    ]
+   },
+   {
+    "label": "2nd item",
+    "kind": "core",
+    "options": [
+     {
+      "item": "Immortal Shieldbow",
+      "pickRate": null,
+      "winRate": null,
+      "when": null,
+      "note": null
+     },
+     {
+      "item": "Infinity Edge",
+      "pickRate": null,
+      "winRate": null,
+      "when": null,
+      "note": "Follows a first-item Immortal Shieldbow."
+     }
+    ]
+   },
+   {
+    "label": "3rd item",
+    "kind": "core",
+    "options": [
+     {
+      "item": "Infinity Edge",
+      "pickRate": null,
+      "winRate": null,
+      "when": null,
+      "note": null
+     },
+     {
+      "item": "Lord Dominik's Regards",
+      "pickRate": null,
+      "winRate": null,
+      "when": "vs tanks",
+      "note": null
+     },
+     {
+      "item": "Mortal Reminder",
+      "pickRate": null,
+      "winRate": null,
+      "when": "vs heavy healing",
+      "note": null
+     },
+     {
+      "item": "Death's Dance",
+      "pickRate": null,
+      "winRate": null,
+      "when": "vs physical burst",
+      "note": "Third item after Shieldbow and Infinity Edge."
+     }
+    ]
+   },
+   {
+    "label": "4th item",
+    "kind": "flex",
+    "options": [
+     {
+      "item": "Death's Dance",
+      "pickRate": null,
+      "winRate": 59.28,
+      "when": "vs physical burst",
+      "note": "13,601 games in OP.GG's fourth-item table."
+     },
+     {
+      "item": "Guardian Angel",
+      "pickRate": null,
+      "winRate": 62.81,
+      "when": "when revival is valuable",
+      "note": "5,125 games in OP.GG's fourth-item table."
+     },
+     {
+      "item": "Infinity Edge",
+      "pickRate": null,
+      "winRate": 57.33,
+      "when": "if delayed at third item",
+      "note": "2,543 games in OP.GG's fourth-item table."
+     },
+     {
+      "item": "Wit's End",
+      "pickRate": null,
+      "winRate": 55.49,
+      "when": "vs magic damage",
+      "note": "2,406 games in OP.GG's fourth-item table."
+     }
+    ]
+   },
+   {
+    "label": "5th item",
+    "kind": "flex",
+    "options": [
+     {
+      "item": "Guardian Angel",
+      "pickRate": null,
+      "winRate": 61.61,
+      "when": "when revival is valuable",
+      "note": "3,144 games in OP.GG's fifth-item table."
+     },
+     {
+      "item": "Death's Dance",
+      "pickRate": null,
+      "winRate": 59.57,
+      "when": "vs physical burst",
+      "note": "1,212 games in OP.GG's fifth-item table."
+     },
+     {
+      "item": "Jak'Sho, The Protean",
+      "pickRate": null,
+      "winRate": 56,
+      "when": "vs mixed damage",
+      "note": "1,134 games in OP.GG's fifth-item table."
+     },
+     {
+      "item": "Bloodthirster",
+      "pickRate": null,
+      "winRate": 54.83,
+      "when": "for extra sustain",
+      "note": "580 games in OP.GG's fifth-item table."
+     }
+    ]
+   },
+   {
+    "label": "Situational swap",
+    "kind": "situational",
+    "options": [
+     {
+      "item": "Lord Dominik's Regards",
+      "pickRate": null,
+      "winRate": null,
+      "when": "vs tanks",
+      "note": "Mobalytics lists it as situational."
+     },
+     {
+      "item": "Mortal Reminder",
+      "pickRate": null,
+      "winRate": null,
+      "when": "vs heavy healing",
+      "note": "Mobalytics lists it as situational."
+     },
+     {
+      "item": "Wit's End",
+      "pickRate": null,
+      "winRate": null,
+      "when": "vs magic damage",
+      "note": "Mobalytics lists it as situational."
+     },
+     {
+      "item": "Mercurial Scimitar",
+      "pickRate": null,
+      "winRate": null,
+      "when": "vs disabling crowd control",
+      "note": "Mobalytics lists it as situational."
+     }
+    ]
+   }
+  ],
+  "boots": [
+   {
+    "item": "Berserker's Greaves",
+    "pickRate": 94.51,
+    "winRate": 50.16,
+    "when": null,
+    "note": null
+   },
+   {
+    "item": "Plated Steelcaps",
+    "pickRate": 3.25,
+    "winRate": 47.45,
+    "when": "vs physical damage",
+    "note": null
+   },
+   {
+    "item": "Mercury's Treads",
+    "pickRate": 1.55,
+    "winRate": 48.78,
+    "when": "vs magic damage and crowd control",
+    "note": null
+   }
+  ],
+  "bootsAfterItem": 1,
+  "cores": [
+   {
+    "items": [
+     "Blade of The Ruined King",
+     "Immortal Shieldbow",
+     "Infinity Edge"
+    ],
+    "games": 24240,
+    "winRate": 58.54
+   },
+   {
+    "items": [
+     "Immortal Shieldbow",
+     "Infinity Edge",
+     "Death's Dance"
+    ],
+    "games": 7820,
+    "winRate": 59.97
+   },
+   {
+    "items": [
+     "Blade of The Ruined King",
+     "Immortal Shieldbow",
+     "Lord Dominik's Regards"
+    ],
+    "games": 7615,
+    "winRate": 57.39
+   },
+   {
+    "items": [
+     "Blade of The Ruined King",
+     "Immortal Shieldbow",
+     "Mortal Reminder"
+    ],
+    "games": 6254,
+    "winRate": 54.54
+   }
+  ],
+  "offMeta": [
+   {
+    "item": "Kraken Slayer",
+    "pickRate": 5.38,
+    "note": "Alternative first-item damage path."
+   },
+   {
+    "item": "Stormrazor",
+    "pickRate": 3.68,
+    "note": "Occasional attack-speed damage option."
+   },
+   {
+    "item": "Yun Tal Wildarrows",
+    "pickRate": 2.24,
+    "note": "Occasional critical-strike option."
+   },
+   {
+    "item": "Kaenic Rookern",
+    "pickRate": 0.82,
+    "note": "Rare defense against magic damage."
+   },
+   {
+    "item": "Phantom Dancer",
+    "pickRate": 0.77,
+    "note": "Rare attack-speed option."
+   },
+   {
+    "item": "Terminus",
+    "pickRate": 0.37,
+    "note": "Rare sustained-damage option."
+   }
+  ],
+  "notes": "OP.GG, Mobalytics and LoLalytics showed patch 16.20; the opened League of Graphs page returned cached patch 16.17, so its numbers were excluded. OP.GG's fourth- and fifth-item tables showed win rates and games but no slot-specific pick rates; site win rates differ across samples."
+ }
+}

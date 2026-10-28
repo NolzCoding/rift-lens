@@ -1,0 +1,257 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "champion",
+    "role",
+    "patch",
+    "sample",
+    "sources",
+    "starting",
+    "slots",
+    "boots",
+    "bootsAfterItem",
+    "cores",
+    "offMeta",
+    "notes"
+  ],
+  "properties": {
+    "champion": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "TOP",
+        "JUNGLE",
+        "MIDDLE",
+        "BOTTOM",
+        "UTILITY"
+      ]
+    },
+    "patch": {
+      "type": "string"
+    },
+    "sample": {
+      "type": "string"
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "url",
+          "site",
+          "read"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "site": {
+            "type": "string"
+          },
+          "read": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "starting": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "type": "string"
+      }
+    },
+    "slots": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "label",
+          "kind",
+          "options"
+        ],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "core",
+              "flex",
+              "situational"
+            ]
+          },
+          "options": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "item",
+                "pickRate",
+                "winRate",
+                "when",
+                "note"
+              ],
+              "properties": {
+                "item": {
+                  "type": "string"
+                },
+                "pickRate": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "winRate": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "when": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "note": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "boots": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "item",
+          "pickRate",
+          "winRate",
+          "when",
+          "note"
+        ],
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "pickRate": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "winRate": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "when": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "bootsAfterItem": {
+      "type": "integer"
+    },
+    "cores": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "games",
+          "winRate"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 3,
+            "items": {
+              "type": "string"
+            }
+          },
+          "games": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "winRate": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "offMeta": {
+      "type": "array",
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "item",
+          "pickRate",
+          "note"
+        ],
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "pickRate": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

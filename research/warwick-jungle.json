@@ -1,0 +1,601 @@
+{
+  "version": 1,
+  "champion": "Warwick",
+  "role": "JUNGLE",
+  "researchedAt": "2026-10-22T20:05:16.733Z",
+  "researchedOn": "16.21.1",
+  "durationMs": 65282,
+  "model": "gpt-6-sol",
+  "trigger": "live",
+  "freshness": "current",
+  "dropped": [],
+  "warnings": [
+    "3rd item: every option was conditional; Death's Dance kept as the default.",
+    "4th item: every option was conditional; Spirit Visage kept as the default.",
+    "5th item: every option was conditional; Thornmail kept as the default.",
+    "6th item: every option was conditional; Guardian Angel kept as the default.",
+    "Boots: every option was conditional; Plated Steelcaps kept as the default."
+  ],
+  "notes": "All listed sources showed patch 16.21; League of Graphs used its broader Platinum+ Normal & Ranked default, while the main rates come from OP.GG Emerald+ Ranked Solo/Duo. Sites agree on Stridebreaker and Blade of The Ruined King, but Lolalytics also highlights a Blade of The Ruined King first path; slot pick rates were left null where only overall item or core rates appeared.",
+  "build": {
+    "champion": "Warwick",
+    "role": "JUNGLE",
+    "patch": "16.21",
+    "verified": "2026-10-22",
+    "sample": "Emerald+ Ranked Solo/Duo; 6,593 games on Lolalytics",
+    "sources": [
+      {
+        "name": "op.gg — Patch 16.21 build order, starting items, boots, and later item options.",
+        "url": "https://op.gg/lol/champions/warwick/build/jungle",
+        "site": "op.gg",
+        "read": "Patch 16.21 build order, starting items, boots, and later item options."
+      },
+      {
+        "name": "op.gg — Patch 16.21 three-item cores, boots, and overall item rates.",
+        "url": "https://op.gg/lol/champions/warwick/items/jungle",
+        "site": "op.gg",
+        "read": "Patch 16.21 three-item cores, boots, and overall item rates."
+      },
+      {
+        "name": "lolalytics — Patch 16.21 Emerald+ Ranked Solo/Duo sample and build alternatives.",
+        "url": "https://lolalytics.com/lol/warwick/build/",
+        "site": "lolalytics",
+        "read": "Patch 16.21 Emerald+ Ranked Solo/Duo sample and build alternatives."
+      },
+      {
+        "name": "Mobalytics — Patch 16.21 Emerald+ Ranked Solo build order and situational items.",
+        "url": "https://mobalytics.gg/lol/champions/warwick/build/jungle",
+        "site": "Mobalytics",
+        "read": "Patch 16.21 Emerald+ Ranked Solo build order and situational items."
+      },
+      {
+        "name": "League of Graphs — Patch 16.21 starting build, core order, and boot popularity.",
+        "url": "https://www.leagueofgraphs.com/champions/items/warwick/jungle",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 starting build, core order, and boot popularity."
+      }
+    ],
+    "slots": [
+      {
+        "id": "slot1",
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Stridebreaker",
+            "note": "Most-played core begins here."
+          },
+          {
+            "item": "Blade of The Ruined King",
+            "note": "Alternative rush."
+          },
+          {
+            "item": "Kraken Slayer",
+            "note": "Less common damage rush."
+          }
+        ]
+      },
+      {
+        "id": "boots",
+        "label": "Boots",
+        "kind": "boots",
+        "options": [
+          {
+            "item": "Plated Steelcaps",
+            "pickRate": 44.8,
+            "winRate": 51.9,
+            "note": "best vs physical damage and basic attacks"
+          },
+          {
+            "item": "Mercury's Treads",
+            "pickRate": 41.1,
+            "winRate": 49.8,
+            "when": "situational",
+            "condition": "vs magic damage and crowd control"
+          },
+          {
+            "item": "Boots of Swiftness",
+            "pickRate": 7.5,
+            "winRate": 54.3,
+            "when": "situational",
+            "condition": "vs slows"
+          }
+        ]
+      },
+      {
+        "id": "slot2",
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Blade of The Ruined King"
+          },
+          {
+            "item": "Stridebreaker",
+            "note": "After a Blade of The Ruined King rush."
+          }
+        ]
+      },
+      {
+        "id": "slot3",
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Death's Dance",
+            "note": "best vs physical damage; Most-played third item in OP.GG cores."
+          },
+          {
+            "item": "Spirit Visage",
+            "when": "situational",
+            "condition": "vs magic damage"
+          },
+          {
+            "item": "Thornmail",
+            "when": "healing",
+            "condition": "vs heavy healing"
+          }
+        ]
+      },
+      {
+        "id": "slot4",
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Spirit Visage",
+            "winRate": 55,
+            "note": "best vs magic damage; 555 OP.GG games in this slot."
+          },
+          {
+            "item": "Thornmail",
+            "winRate": 51.5,
+            "when": "healing",
+            "condition": "vs heavy healing",
+            "note": "359 OP.GG games in this slot."
+          },
+          {
+            "item": "Death's Dance",
+            "winRate": 57.8,
+            "when": "situational",
+            "condition": "vs physical damage",
+            "note": "287 OP.GG games in this slot."
+          },
+          {
+            "item": "Sterak's Gage",
+            "winRate": 52.3,
+            "when": "situational",
+            "condition": "vs burst",
+            "note": "132 OP.GG games in this slot."
+          }
+        ]
+      },
+      {
+        "id": "slot5",
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Thornmail",
+            "winRate": 51.4,
+            "note": "best vs heavy healing; 72 OP.GG games in this slot."
+          },
+          {
+            "item": "Death's Dance",
+            "winRate": 62,
+            "when": "situational",
+            "condition": "vs physical damage",
+            "note": "71 OP.GG games in this slot."
+          },
+          {
+            "item": "Spirit Visage",
+            "winRate": 45.6,
+            "when": "situational",
+            "condition": "vs magic damage",
+            "note": "68 OP.GG games in this slot."
+          },
+          {
+            "item": "Sterak's Gage",
+            "winRate": 68.7,
+            "when": "situational",
+            "condition": "vs burst",
+            "note": "67 OP.GG games in this slot."
+          }
+        ]
+      },
+      {
+        "id": "slot6",
+        "label": "6th item",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Guardian Angel",
+            "winRate": 57.1,
+            "note": "best when a revive matters; Seven OP.GG games in this slot."
+          },
+          {
+            "item": "Jak'Sho, The Protean",
+            "winRate": 60,
+            "when": "situational",
+            "condition": "vs mixed damage",
+            "note": "Five OP.GG games in this slot."
+          }
+        ]
+      }
+    ],
+    "cores": [
+      {
+        "items": [
+          "Stridebreaker",
+          "Blade of The Ruined King",
+          "Death's Dance"
+        ],
+        "games": 362,
+        "winRate": 55.3
+      },
+      {
+        "items": [
+          "Stridebreaker",
+          "Blade of The Ruined King",
+          "Spirit Visage"
+        ],
+        "games": 262,
+        "winRate": 51.2
+      },
+      {
+        "items": [
+          "Stridebreaker",
+          "Blade of The Ruined King",
+          "Thornmail"
+        ],
+        "games": 248,
+        "winRate": 55.2
+      },
+      {
+        "items": [
+          "Blade of The Ruined King",
+          "Stridebreaker",
+          "Death's Dance"
+        ],
+        "games": 128,
+        "winRate": 60.2
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Titanic Hydra",
+        "pickRate": 13.1,
+        "note": "Alternative jungle clear and health item."
+      },
+      {
+        "item": "Experimental Hexplate",
+        "pickRate": 4.6,
+        "note": "Occasional ultimate-focused fighter choice."
+      },
+      {
+        "item": "Maw of Malmortius",
+        "pickRate": 2.8,
+        "note": "Situational protection against magic burst."
+      },
+      {
+        "item": "Zeke's Convergence",
+        "pickRate": 2.1,
+        "note": "Occasional teamfight utility."
+      },
+      {
+        "item": "Terminus",
+        "pickRate": 2,
+        "note": "Occasional on-hit damage choice."
+      },
+      {
+        "item": "Wit's End",
+        "pickRate": 1.8,
+        "note": "On-hit damage with magic resistance."
+      }
+    ],
+    "origin": "researched",
+    "researchedAt": "2026-10-22T20:05:16.733Z",
+    "researchedOn": "16.21.1",
+    "stale": false,
+    "starting": [
+      "Gustwalker Hatchling",
+      "Stealth Ward"
+    ]
+  },
+  "raw": {
+    "champion": "Warwick",
+    "role": "JUNGLE",
+    "patch": "16.21",
+    "sample": "Emerald+ Ranked Solo/Duo; 6,593 games on Lolalytics",
+    "sources": [
+      {
+        "url": "https://op.gg/lol/champions/warwick/build/jungle",
+        "site": "OP.GG",
+        "read": "Patch 16.21 build order, starting items, boots, and later item options."
+      },
+      {
+        "url": "https://op.gg/lol/champions/warwick/items/jungle",
+        "site": "OP.GG",
+        "read": "Patch 16.21 three-item cores, boots, and overall item rates."
+      },
+      {
+        "url": "https://lolalytics.com/lol/warwick/build/",
+        "site": "Lolalytics",
+        "read": "Patch 16.21 Emerald+ Ranked Solo/Duo sample and build alternatives."
+      },
+      {
+        "url": "https://mobalytics.gg/lol/champions/warwick/build/jungle",
+        "site": "Mobalytics",
+        "read": "Patch 16.21 Emerald+ Ranked Solo build order and situational items."
+      },
+      {
+        "url": "https://www.leagueofgraphs.com/champions/items/warwick/jungle",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 starting build, core order, and boot popularity."
+      }
+    ],
+    "starting": [
+      "Gustwalker Hatchling",
+      "Stealth Ward"
+    ],
+    "slots": [
+      {
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Stridebreaker",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Most-played core begins here."
+          },
+          {
+            "item": "Blade of The Ruined King",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Alternative rush."
+          },
+          {
+            "item": "Kraken Slayer",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Less common damage rush."
+          }
+        ]
+      },
+      {
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Blade of The Ruined King",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Stridebreaker",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "After a Blade of The Ruined King rush."
+          }
+        ]
+      },
+      {
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Death's Dance",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs physical damage",
+            "note": "Most-played third item in OP.GG cores."
+          },
+          {
+            "item": "Spirit Visage",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs magic damage",
+            "note": null
+          },
+          {
+            "item": "Thornmail",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs heavy healing",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Spirit Visage",
+            "pickRate": null,
+            "winRate": 54.95,
+            "when": "vs magic damage",
+            "note": "555 OP.GG games in this slot."
+          },
+          {
+            "item": "Thornmail",
+            "pickRate": null,
+            "winRate": 51.53,
+            "when": "vs heavy healing",
+            "note": "359 OP.GG games in this slot."
+          },
+          {
+            "item": "Death's Dance",
+            "pickRate": null,
+            "winRate": 57.84,
+            "when": "vs physical damage",
+            "note": "287 OP.GG games in this slot."
+          },
+          {
+            "item": "Sterak's Gage",
+            "pickRate": null,
+            "winRate": 52.27,
+            "when": "vs burst",
+            "note": "132 OP.GG games in this slot."
+          }
+        ]
+      },
+      {
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Thornmail",
+            "pickRate": null,
+            "winRate": 51.39,
+            "when": "vs heavy healing",
+            "note": "72 OP.GG games in this slot."
+          },
+          {
+            "item": "Death's Dance",
+            "pickRate": null,
+            "winRate": 61.97,
+            "when": "vs physical damage",
+            "note": "71 OP.GG games in this slot."
+          },
+          {
+            "item": "Spirit Visage",
+            "pickRate": null,
+            "winRate": 45.59,
+            "when": "vs magic damage",
+            "note": "68 OP.GG games in this slot."
+          },
+          {
+            "item": "Sterak's Gage",
+            "pickRate": null,
+            "winRate": 68.66,
+            "when": "vs burst",
+            "note": "67 OP.GG games in this slot."
+          }
+        ]
+      },
+      {
+        "label": "6th item",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Guardian Angel",
+            "pickRate": null,
+            "winRate": 57.14,
+            "when": "when a revive matters",
+            "note": "Seven OP.GG games in this slot."
+          },
+          {
+            "item": "Jak'Sho, The Protean",
+            "pickRate": null,
+            "winRate": 60,
+            "when": "vs mixed damage",
+            "note": "Five OP.GG games in this slot."
+          }
+        ]
+      }
+    ],
+    "boots": [
+      {
+        "item": "Plated Steelcaps",
+        "pickRate": 44.75,
+        "winRate": 51.9,
+        "when": "vs physical damage and basic attacks",
+        "note": null
+      },
+      {
+        "item": "Mercury's Treads",
+        "pickRate": 41.06,
+        "winRate": 49.79,
+        "when": "vs magic damage and crowd control",
+        "note": null
+      },
+      {
+        "item": "Boots of Swiftness",
+        "pickRate": 7.5,
+        "winRate": 54.31,
+        "when": "vs slows",
+        "note": null
+      }
+    ],
+    "bootsAfterItem": 1,
+    "cores": [
+      {
+        "items": [
+          "Stridebreaker",
+          "Blade of The Ruined King",
+          "Death's Dance"
+        ],
+        "games": 362,
+        "winRate": 55.25
+      },
+      {
+        "items": [
+          "Stridebreaker",
+          "Blade of The Ruined King",
+          "Spirit Visage"
+        ],
+        "games": 262,
+        "winRate": 51.15
+      },
+      {
+        "items": [
+          "Stridebreaker",
+          "Blade of The Ruined King",
+          "Thornmail"
+        ],
+        "games": 248,
+        "winRate": 55.24
+      },
+      {
+        "items": [
+          "Blade of The Ruined King",
+          "Stridebreaker",
+          "Death's Dance"
+        ],
+        "games": 128,
+        "winRate": 60.16
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Titanic Hydra",
+        "pickRate": 13.12,
+        "note": "Alternative jungle clear and health item."
+      },
+      {
+        "item": "Experimental Hexplate",
+        "pickRate": 4.63,
+        "note": "Occasional ultimate-focused fighter choice."
+      },
+      {
+        "item": "Maw of Malmortius",
+        "pickRate": 2.76,
+        "note": "Situational protection against magic burst."
+      },
+      {
+        "item": "Zeke's Convergence",
+        "pickRate": 2.1,
+        "note": "Occasional teamfight utility."
+      },
+      {
+        "item": "Terminus",
+        "pickRate": 2.02,
+        "note": "Occasional on-hit damage choice."
+      },
+      {
+        "item": "Wit's End",
+        "pickRate": 1.79,
+        "note": "On-hit damage with magic resistance."
+      }
+    ],
+    "notes": "All listed sources showed patch 16.21; League of Graphs used its broader Platinum+ Normal & Ranked default, while the main rates come from OP.GG Emerald+ Ranked Solo/Duo. Sites agree on Stridebreaker and Blade of The Ruined King, but Lolalytics also highlights a Blade of The Ruined King first path; slot pick rates were left null where only overall item or core rates appeared."
+  }
+}

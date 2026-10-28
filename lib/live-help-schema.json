@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["urgentSummary", "userResponse", "buildPath", "biggestThreat", "enemyPlan", "buyOptions", "nextFiveMinutes", "fightPlan", "warnings", "historyCallout"],
+  "properties": {
+    "urgentSummary": { "type": "string" },
+    "userResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question", "answer"],
+      "properties": {
+        "question": { "type": "string" },
+        "answer": { "type": "string" }
+      }
+    },
+    "buildPath": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["currentPath", "recommendedPath", "deviation", "reason"],
+      "properties": {
+        "currentPath": { "type": "string" },
+        "recommendedPath": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "items": { "type": "string" }
+        },
+        "deviation": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "biggestThreat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["champion", "reason", "response"],
+      "properties": {
+        "champion": { "type": "string" },
+        "reason": { "type": "string" },
+        "response": { "type": "string" }
+      }
+    },
+    "enemyPlan": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["champion", "priority", "reason", "response"],
+        "properties": {
+          "champion": { "type": "string" },
+          "priority": { "type": "string", "enum": ["avoid", "focus", "watch"] },
+          "reason": { "type": "string" },
+          "response": { "type": "string" }
+        }
+      }
+    },
+    "buyOptions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["item", "targetItem", "timing", "reason"],
+        "properties": {
+          "item": { "type": "string" },
+          "targetItem": { "type": "string" },
+          "timing": { "type": "string", "enum": ["next-recall", "first-item-goal", "later-conditional", "endgame-swap"] },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "nextFiveMinutes": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 4,
+      "items": { "type": "string" }
+    },
+    "fightPlan": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 4,
+      "items": { "type": "string" }
+    },
+    "warnings": {
+      "type": "array",
+      "maxItems": 4,
+      "items": { "type": "string" }
+    },
+    "historyCallout": { "type": "string" }
+  }
+}

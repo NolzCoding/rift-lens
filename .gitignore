@@ -1,0 +1,12 @@
+node_modules
+.next
+*.log
+.rift-lens/
+*.tsbuildinfo
+next-env.d.ts
+.env*
+# The player's own data (games, settings, research, AI caches): never published
+/data/
+.claude/settings.local.json
+.publish-denylist
+*.bak

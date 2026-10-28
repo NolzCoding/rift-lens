@@ -1,0 +1,180 @@
+{
+  "champion": "Caitlyn",
+  "role": "BOTTOM",
+  "patch": "16.20",
+  "verified": "2026-10-12",
+  "sample": "Emerald+ ranked",
+  "sources": [
+    {
+      "name": "op.gg Caitlyn items (ADC)",
+      "url": "https://op.gg/lol/champions/Caitlyn/items/adc"
+    },
+    {
+      "name": "lolalytics Caitlyn build",
+      "url": "https://lolalytics.com/lol/caitlyn/build/"
+    },
+    {
+      "name": "Mobalytics Caitlyn build (73k-match summary)",
+      "url": "https://mobalytics.gg/lol/champions/caitlyn/build"
+    }
+  ],
+  "slots": [
+    {
+      "id": "first",
+      "label": "1st item",
+      "kind": "core",
+      "options": [
+        {
+          "item": "Hexoptics C44",
+          "pickRate": 62.4,
+          "note": "the most-built first item"
+        },
+        {
+          "item": "The Collector",
+          "pickRate": 36.2,
+          "note": "the other common first item"
+        }
+      ]
+    },
+    {
+      "id": "boots",
+      "label": "Boots",
+      "kind": "boots",
+      "options": [
+        {
+          "item": "Berserker's Greaves",
+          "pickRate": 84.6
+        },
+        {
+          "item": "Gluttonous Greaves",
+          "pickRate": 6.6,
+          "when": "heavy-poke",
+          "note": "52.8% WR, the anti-poke pick"
+        }
+      ]
+    },
+    {
+      "id": "second",
+      "label": "2nd item",
+      "kind": "core",
+      "options": [
+        {
+          "item": "Infinity Edge",
+          "pickRate": 86.7,
+          "note": "in almost every Caitlyn build"
+        }
+      ]
+    },
+    {
+      "id": "third",
+      "label": "3rd item",
+      "kind": "core",
+      "options": [
+        {
+          "item": "Rapid Firecannon",
+          "pickRate": 41.3,
+          "note": "Hexoptics + IE + RFC is the most-played core (55.1% WR)"
+        },
+        {
+          "item": "Lord Dominik's Regards",
+          "pickRate": 43.4,
+          "note": "Hexoptics + IE + LDR (54.2% WR); take it first into armor"
+        }
+      ]
+    },
+    {
+      "id": "fourth",
+      "label": "4th item",
+      "kind": "flex",
+      "options": [
+        {
+          "item": "Rapid Firecannon",
+          "pickRate": 41.3
+        },
+        {
+          "item": "Lord Dominik's Regards",
+          "pickRate": 43.4
+        },
+        {
+          "item": "Phantom Dancer",
+          "note": "a 4th-item option"
+        }
+      ]
+    },
+    {
+      "id": "fifth",
+      "label": "Late item",
+      "kind": "situational",
+      "options": [
+        {
+          "item": "Guardian Angel",
+          "note": "the usual 6th item"
+        },
+        {
+          "item": "Bloodthirster",
+          "note": "the other usual 6th item"
+        },
+        {
+          "item": "Mortal Reminder",
+          "when": "healing",
+          "note": "only into heavy healing (as a 3rd item it wins only ~49%)"
+        }
+      ]
+    }
+  ],
+  "cores": [
+    {
+      "items": [
+        "Hexoptics C44",
+        "Infinity Edge",
+        "Rapid Firecannon"
+      ],
+      "games": 18585,
+      "winRate": 55.1
+    },
+    {
+      "items": [
+        "Hexoptics C44",
+        "Infinity Edge",
+        "Lord Dominik's Regards"
+      ],
+      "games": 16620,
+      "winRate": 54.2
+    },
+    {
+      "items": [
+        "The Collector",
+        "Infinity Edge",
+        "Lord Dominik's Regards"
+      ],
+      "games": 11793,
+      "winRate": 54.5
+    },
+    {
+      "items": [
+        "The Collector",
+        "Infinity Edge",
+        "Rapid Firecannon"
+      ],
+      "games": 5822,
+      "winRate": 55.6
+    }
+  ],
+  "offMeta": [
+    {
+      "item": "Yun Tal Wildarrows",
+      "pickRate": 4.6,
+      "note": "rarely built on Caitlyn"
+    },
+    {
+      "item": "Essence Reaver",
+      "pickRate": null,
+      "note": "not among the items op.gg lists for Caitlyn"
+    },
+    {
+      "item": "Boots of Swiftness",
+      "pickRate": 6.9,
+      "note": "Berserker's Greaves are the standard boots"
+    }
+  ]
+}

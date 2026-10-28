@@ -1,0 +1,549 @@
+{
+  "version": 1,
+  "champion": "Heimerdinger",
+  "role": "MIDDLE",
+  "researchedAt": "2026-10-23T18:41:57.017Z",
+  "researchedOn": "16.21.1",
+  "durationMs": 94208,
+  "model": "gpt-6-sol",
+  "trigger": "manual",
+  "freshness": "current",
+  "dropped": [],
+  "warnings": [
+    "Situational item: every option was conditional; Void Staff kept as the default."
+  ],
+  "notes": "All three sites show patch 16.21. League of Graphs uses Platinum+ normal and ranked games, while LoLalytics and Mobalytics use Emerald+ ranked Solo/Duo; Mobalytics places Rylai's Crystal Scepter fourth, whereas League of Graphs shows Rabadon's Deathcap as its most popular final item. Slot specific rates and core game counts were unavailable.",
+  "build": {
+    "champion": "Heimerdinger",
+    "role": "MIDDLE",
+    "patch": "16.21",
+    "verified": "2026-10-23",
+    "sample": "Emerald+ ranked Solo/Duo, 925 games on LoLalytics",
+    "sources": [
+      {
+        "name": "lolalytics — Patch 16.21 Emerald+ ranked Solo/Duo sample and build.",
+        "url": "https://lolalytics.com/lol/heimerdinger/build/?lane=middle",
+        "site": "lolalytics",
+        "read": "Patch 16.21 Emerald+ ranked Solo/Duo sample and build."
+      },
+      {
+        "name": "Mobalytics — Patch 16.21 Emerald+ ranked Solo build order and situational items.",
+        "url": "https://mobalytics.gg/lol/champions/heimerdinger/build/mid",
+        "site": "Mobalytics",
+        "read": "Patch 16.21 Emerald+ ranked Solo build order and situational items."
+      },
+      {
+        "name": "League of Graphs — Patch 16.21 mid core combinations, boots, and item popularity.",
+        "url": "https://www.leagueofgraphs.com/champions/items/heimerdinger/middle",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 mid core combinations, boots, and item popularity."
+      }
+    ],
+    "slots": [
+      {
+        "id": "slot1",
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Blackfire Torch",
+            "note": "First item in the most common core."
+          },
+          {
+            "item": "Luden's Echo",
+            "note": "Less common first item."
+          }
+        ]
+      },
+      {
+        "id": "boots",
+        "label": "Boots",
+        "kind": "boots",
+        "options": [
+          {
+            "item": "Sorcerer's Shoes",
+            "pickRate": 81.3,
+            "winRate": 53.7
+          },
+          {
+            "item": "Mercury's Treads",
+            "pickRate": 3.7,
+            "winRate": 51.8,
+            "when": "situational",
+            "condition": "vs crowd control or magic damage"
+          },
+          {
+            "item": "Ionian Boots of Lucidity",
+            "pickRate": 3.2,
+            "winRate": 45.8,
+            "when": "situational",
+            "condition": "for ability haste"
+          }
+        ]
+      },
+      {
+        "id": "slot2",
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Liandry's Torment"
+          },
+          {
+            "item": "Zhonya's Hourglass",
+            "when": "situational",
+            "condition": "vs burst",
+            "note": "Appears second in an alternative core."
+          }
+        ]
+      },
+      {
+        "id": "slot3",
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Zhonya's Hourglass",
+            "note": "Completes the most common three item core."
+          },
+          {
+            "item": "Rylai's Crystal Scepter",
+            "when": "situational",
+            "condition": "for slows",
+            "note": "Completes the next most common core."
+          }
+        ]
+      },
+      {
+        "id": "slot4",
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rylai's Crystal Scepter",
+            "note": "Fourth completed item in Mobalytics' full build."
+          },
+          {
+            "item": "Rabadon's Deathcap",
+            "when": "situational",
+            "condition": "for ability power"
+          },
+          {
+            "item": "Shadowflame",
+            "when": "situational",
+            "condition": "for burst"
+          }
+        ]
+      },
+      {
+        "id": "slot5",
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap",
+            "note": "Most popular final item on League of Graphs."
+          },
+          {
+            "item": "Void Staff",
+            "when": "situational",
+            "condition": "vs magic resistance"
+          },
+          {
+            "item": "Shadowflame",
+            "when": "situational",
+            "condition": "for burst"
+          }
+        ]
+      },
+      {
+        "id": "slot6",
+        "label": "Situational item",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Void Staff",
+            "pickRate": 11.8,
+            "winRate": 58.3,
+            "note": "best vs magic resistance; League of Graphs final item statistic."
+          },
+          {
+            "item": "Morellonomicon",
+            "pickRate": 6.7,
+            "winRate": 44.1,
+            "when": "healing",
+            "condition": "vs heavy healing",
+            "note": "League of Graphs final item statistic."
+          },
+          {
+            "item": "Banshee's Veil",
+            "pickRate": 3.9,
+            "winRate": 45,
+            "when": "situational",
+            "condition": "vs pick or magic burst",
+            "note": "League of Graphs final item statistic."
+          },
+          {
+            "item": "Abyssal Mask",
+            "when": "situational",
+            "condition": "vs magic damage",
+            "note": "Last item in Mobalytics' full build."
+          }
+        ]
+      }
+    ],
+    "cores": [
+      {
+        "items": [
+          "Blackfire Torch",
+          "Liandry's Torment",
+          "Zhonya's Hourglass"
+        ],
+        "games": null,
+        "winRate": 58.2
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter"
+        ],
+        "games": null,
+        "winRate": 63.8
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Zhonya's Hourglass",
+          "Liandry's Torment"
+        ],
+        "games": null,
+        "winRate": 53.1
+      },
+      {
+        "items": [
+          "Luden's Echo",
+          "Zhonya's Hourglass",
+          "Liandry's Torment"
+        ],
+        "games": null,
+        "winRate": 63.2
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Archangel's Staff",
+        "pickRate": 0.3,
+        "note": "Rare mana scaling option."
+      },
+      {
+        "item": "Bloodletter's Curse",
+        "pickRate": 0.3,
+        "note": "Rare alternative damage item."
+      },
+      {
+        "item": "Cryptbloom",
+        "pickRate": 0.3,
+        "note": "Rare alternative magic penetration item."
+      },
+      {
+        "item": "Malignance",
+        "pickRate": 0.2,
+        "note": "Rare mana and ultimate focused option."
+      },
+      {
+        "item": "Cosmic Drive",
+        "pickRate": 0.1,
+        "note": "Rare mobility and haste option."
+      },
+      {
+        "item": "Rod of Ages",
+        "pickRate": null,
+        "note": "League of Graphs shows under 0.1%."
+      }
+    ],
+    "origin": "researched",
+    "researchedAt": "2026-10-23T18:41:57.017Z",
+    "researchedOn": "16.21.1",
+    "stale": false,
+    "starting": [
+      "Doran's Ring",
+      "Health Potion",
+      "Stealth Ward"
+    ]
+  },
+  "raw": {
+    "champion": "Heimerdinger",
+    "role": "MIDDLE",
+    "patch": "16.21",
+    "sample": "Emerald+ ranked Solo/Duo, 925 games on LoLalytics",
+    "sources": [
+      {
+        "url": "https://lolalytics.com/lol/heimerdinger/build/?lane=middle",
+        "site": "LoLalytics",
+        "read": "Patch 16.21 Emerald+ ranked Solo/Duo sample and build."
+      },
+      {
+        "url": "https://mobalytics.gg/lol/champions/heimerdinger/build/mid",
+        "site": "Mobalytics",
+        "read": "Patch 16.21 Emerald+ ranked Solo build order and situational items."
+      },
+      {
+        "url": "https://www.leagueofgraphs.com/champions/items/heimerdinger/middle",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 mid core combinations, boots, and item popularity."
+      }
+    ],
+    "starting": [
+      "Doran's Ring",
+      "Health Potion",
+      "Health Potion",
+      "Stealth Ward"
+    ],
+    "slots": [
+      {
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Blackfire Torch",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "First item in the most common core."
+          },
+          {
+            "item": "Luden's Echo",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Less common first item."
+          }
+        ]
+      },
+      {
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Liandry's Torment",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Zhonya's Hourglass",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs burst",
+            "note": "Appears second in an alternative core."
+          }
+        ]
+      },
+      {
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Zhonya's Hourglass",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Completes the most common three item core."
+          },
+          {
+            "item": "Rylai's Crystal Scepter",
+            "pickRate": null,
+            "winRate": null,
+            "when": "for slows",
+            "note": "Completes the next most common core."
+          }
+        ]
+      },
+      {
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rylai's Crystal Scepter",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Fourth completed item in Mobalytics' full build."
+          },
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": null,
+            "winRate": null,
+            "when": "for ability power",
+            "note": null
+          },
+          {
+            "item": "Shadowflame",
+            "pickRate": null,
+            "winRate": null,
+            "when": "for burst",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Most popular final item on League of Graphs."
+          },
+          {
+            "item": "Void Staff",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs magic resistance",
+            "note": null
+          },
+          {
+            "item": "Shadowflame",
+            "pickRate": null,
+            "winRate": null,
+            "when": "for burst",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "Situational item",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Void Staff",
+            "pickRate": 11.8,
+            "winRate": 58.3,
+            "when": "vs magic resistance",
+            "note": "League of Graphs final item statistic."
+          },
+          {
+            "item": "Morellonomicon",
+            "pickRate": 6.7,
+            "winRate": 44.1,
+            "when": "vs heavy healing",
+            "note": "League of Graphs final item statistic."
+          },
+          {
+            "item": "Banshee's Veil",
+            "pickRate": 3.9,
+            "winRate": 45,
+            "when": "vs pick or magic burst",
+            "note": "League of Graphs final item statistic."
+          },
+          {
+            "item": "Abyssal Mask",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs magic damage",
+            "note": "Last item in Mobalytics' full build."
+          }
+        ]
+      }
+    ],
+    "boots": [
+      {
+        "item": "Sorcerer's Shoes",
+        "pickRate": 81.3,
+        "winRate": 53.7,
+        "when": null,
+        "note": null
+      },
+      {
+        "item": "Mercury's Treads",
+        "pickRate": 3.7,
+        "winRate": 51.8,
+        "when": "vs crowd control or magic damage",
+        "note": null
+      },
+      {
+        "item": "Ionian Boots of Lucidity",
+        "pickRate": 3.2,
+        "winRate": 45.8,
+        "when": "for ability haste",
+        "note": null
+      }
+    ],
+    "bootsAfterItem": 1,
+    "cores": [
+      {
+        "items": [
+          "Blackfire Torch",
+          "Liandry's Torment",
+          "Zhonya's Hourglass"
+        ],
+        "games": null,
+        "winRate": 58.2
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter"
+        ],
+        "games": null,
+        "winRate": 63.8
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Zhonya's Hourglass",
+          "Liandry's Torment"
+        ],
+        "games": null,
+        "winRate": 53.1
+      },
+      {
+        "items": [
+          "Luden's Echo",
+          "Zhonya's Hourglass",
+          "Liandry's Torment"
+        ],
+        "games": null,
+        "winRate": 63.2
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Archangel's Staff",
+        "pickRate": 0.3,
+        "note": "Rare mana scaling option."
+      },
+      {
+        "item": "Bloodletter's Curse",
+        "pickRate": 0.3,
+        "note": "Rare alternative damage item."
+      },
+      {
+        "item": "Cryptbloom",
+        "pickRate": 0.3,
+        "note": "Rare alternative magic penetration item."
+      },
+      {
+        "item": "Malignance",
+        "pickRate": 0.2,
+        "note": "Rare mana and ultimate focused option."
+      },
+      {
+        "item": "Cosmic Drive",
+        "pickRate": 0.1,
+        "note": "Rare mobility and haste option."
+      },
+      {
+        "item": "Rod of Ages",
+        "pickRate": null,
+        "note": "League of Graphs shows under 0.1%."
+      }
+    ],
+    "notes": "All three sites show patch 16.21. League of Graphs uses Platinum+ normal and ranked games, while LoLalytics and Mobalytics use Emerald+ ranked Solo/Duo; Mobalytics places Rylai's Crystal Scepter fourth, whereas League of Graphs shows Rabadon's Deathcap as its most popular final item. Slot specific rates and core game counts were unavailable."
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "type": "object",
+  "properties": {
+    "headline": { "type": "string" },
+    "overview": { "type": "string" },
+    "confidence": { "type": "string", "enum": ["high", "medium", "limited"] },
+    "evidenceLimits": {
+      "type": "array",
+      "items": { "type": "string" },
+      "maxItems": 5
+    },
+    "playerReviews": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "properties": {
+          "champion": { "type": "string" },
+          "verdict": { "type": "string", "enum": ["excellent", "good", "mixed", "needs-work"] },
+          "summary": { "type": "string" },
+          "strengths": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "evidence": { "type": "string" },
+                "advice": { "type": "string" }
+              },
+              "required": ["title", "evidence", "advice"],
+              "additionalProperties": false
+            }
+          },
+          "improvements": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "evidence": { "type": "string" },
+                "advice": { "type": "string" }
+              },
+              "required": ["title", "evidence", "advice"],
+              "additionalProperties": false
+            }
+          },
+          "buildVerdict": { "type": "string" },
+          "buildNotes": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 4,
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["champion", "verdict", "summary", "strengths", "improvements", "buildVerdict", "buildNotes"],
+        "additionalProperties": false
+      }
+    },
+    "keyMoments": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "properties": {
+          "eventId": { "type": "string" },
+          "timestamp": { "type": "number" },
+          "champion": { "type": "string" },
+          "quality": { "type": "string", "enum": ["strong", "partial", "improve"] },
+          "title": { "type": "string" },
+          "read": { "type": "string" },
+          "betterPlay": { "type": "string" }
+        },
+        "required": ["eventId", "timestamp", "champion", "quality", "title", "read", "betterPlay"],
+        "additionalProperties": false
+      }
+    },
+    "priorities": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "why": { "type": "string" },
+          "drill": { "type": "string" }
+        },
+        "required": ["title", "why", "drill"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["headline", "overview", "confidence", "evidenceLimits", "playerReviews", "keyMoments", "priorities"],
+  "additionalProperties": false
+}

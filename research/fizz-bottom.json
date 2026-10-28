@@ -1,0 +1,598 @@
+{
+  "version": 1,
+  "champion": "Fizz",
+  "role": "BOTTOM",
+  "researchedAt": "2026-10-26T21:29:43.753Z",
+  "researchedOn": "16.21.1",
+  "durationMs": 97201,
+  "model": "gpt-6-sol",
+  "trigger": "champ-select",
+  "freshness": "current",
+  "dropped": [],
+  "warnings": [
+    "Situational replacement: every option was conditional; Banshee's Veil kept as the default.",
+    "4th item: its default repeats an earlier slot; Zhonya's Hourglass becomes its default."
+  ],
+  "notes": "Mobalytics and League of Graphs both show patch 16.21, but differ on whether Zhonya's Hourglass or Shadowflame comes second; their Fizz bot samples are small. Slot-specific rates for the early items are unavailable, so those fields are null; the fifth-slot rates are League of Graphs final-item statistics.",
+  "build": {
+    "champion": "Fizz",
+    "role": "BOTTOM",
+    "patch": "16.21",
+    "verified": "2026-10-26",
+    "sample": "Emerald+ ranked Solo: 313 matches; Platinum+ ranked: 391 matches",
+    "sources": [
+      {
+        "name": "Mobalytics — Patch 16.21 Emerald+ ranked Solo build order and 313-match sample.",
+        "url": "https://mobalytics.gg/lol/champions/fizz/build/adc?_lang=en_us",
+        "site": "Mobalytics",
+        "read": "Patch 16.21 Emerald+ ranked Solo build order and 313-match sample."
+      },
+      {
+        "name": "League of Graphs — Patch 16.21 Platinum+ ranked items, boots and three-item paths across 391 matches.",
+        "url": "https://www.leagueofgraphs.com/champions/items/fizz/adc/sr-ranked",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 Platinum+ ranked items, boots and three-item paths across 391 matches."
+      },
+      {
+        "name": "League of Graphs — Patch 16.21 full-build examples.",
+        "url": "https://www.leagueofgraphs.com/champions/fullbuilds/fizz/adc",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 full-build examples."
+      },
+      {
+        "name": "League of Graphs — Patch 16.21 default-bracket item page.",
+        "url": "https://www.leagueofgraphs.com/champions/items/fizz/adc",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 default-bracket item page."
+      },
+      {
+        "name": "League of Graphs — Patch 16.21 bottom-lane overview.",
+        "url": "https://www.leagueofgraphs.com/champions/tier-list/fizz/adc",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 bottom-lane overview."
+      },
+      {
+        "name": "lolalytics — Page returned patch 16.17; excluded its statistics.",
+        "url": "https://lolalytics.com/lol/fizz/build/?lane=bottom",
+        "site": "lolalytics",
+        "read": "Page returned patch 16.17; excluded its statistics."
+      }
+    ],
+    "slots": [
+      {
+        "id": "slot1",
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Lich Bane",
+            "note": "Most common first completed item."
+          },
+          {
+            "item": "Luden's Echo",
+            "note": "Alternative opening in listed three-item paths."
+          }
+        ]
+      },
+      {
+        "id": "boots",
+        "label": "Boots",
+        "kind": "boots",
+        "options": [
+          {
+            "item": "Sorcerer's Shoes",
+            "pickRate": 66.5,
+            "winRate": 45.4
+          },
+          {
+            "item": "Ionian Boots of Lucidity",
+            "pickRate": 22.5,
+            "winRate": 46.6,
+            "when": "situational",
+            "condition": "for ability haste"
+          },
+          {
+            "item": "Mercury's Treads",
+            "pickRate": 2.3,
+            "winRate": 66.7,
+            "when": "situational",
+            "condition": "vs magic damage or crowd control",
+            "note": "Small sample."
+          }
+        ]
+      },
+      {
+        "id": "slot2",
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Shadowflame"
+          },
+          {
+            "item": "Zhonya's Hourglass",
+            "when": "situational",
+            "condition": "vs burst",
+            "note": "Mobalytics lists this second."
+          },
+          {
+            "item": "Lich Bane",
+            "when": "situational",
+            "condition": "after Luden's Echo"
+          }
+        ]
+      },
+      {
+        "id": "slot3",
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Zhonya's Hourglass",
+            "when": "situational",
+            "condition": "vs burst"
+          },
+          {
+            "item": "Shadowflame",
+            "note": "Third when Zhonya's Hourglass is second."
+          },
+          {
+            "item": "Rabadon's Deathcap",
+            "note": "League of Graphs full-build example."
+          }
+        ]
+      },
+      {
+        "id": "slot4",
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap"
+          },
+          {
+            "item": "Zhonya's Hourglass",
+            "note": "best vs burst; If delayed from the core."
+          }
+        ]
+      },
+      {
+        "id": "slot5",
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Void Staff",
+            "pickRate": 21.7,
+            "winRate": 50,
+            "when": "situational",
+            "condition": "vs magic resistance",
+            "note": "League of Graphs final-item option."
+          },
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": 18.3,
+            "winRate": 59.1,
+            "note": "If delayed from fourth."
+          },
+          {
+            "item": "Stormsurge",
+            "pickRate": 14.2,
+            "winRate": 64.7,
+            "note": "League of Graphs final-item option."
+          },
+          {
+            "item": "Zhonya's Hourglass",
+            "pickRate": 7.5,
+            "winRate": 77.8,
+            "when": "situational",
+            "condition": "vs burst",
+            "note": "If delayed from earlier slots."
+          }
+        ]
+      },
+      {
+        "id": "slot6",
+        "label": "Situational replacement",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Banshee's Veil",
+            "pickRate": 5.8,
+            "winRate": 28.6,
+            "note": "best vs threatening spells; League of Graphs final-item option."
+          },
+          {
+            "item": "Cryptbloom",
+            "pickRate": 4.2,
+            "winRate": 80,
+            "when": "situational",
+            "condition": "vs magic resistance",
+            "note": "League of Graphs final-item option."
+          },
+          {
+            "item": "Hextech Rocketbelt",
+            "when": "situational",
+            "condition": "for extra mobility",
+            "note": "Mobalytics situational item."
+          }
+        ]
+      }
+    ],
+    "cores": [
+      {
+        "items": [
+          "Lich Bane",
+          "Shadowflame",
+          "Zhonya's Hourglass"
+        ],
+        "games": null,
+        "winRate": 28.6
+      },
+      {
+        "items": [
+          "Lich Bane",
+          "Zhonya's Hourglass",
+          "Shadowflame"
+        ],
+        "games": null,
+        "winRate": 37.5
+      },
+      {
+        "items": [
+          "Luden's Echo",
+          "Lich Bane",
+          "Zhonya's Hourglass"
+        ],
+        "games": null,
+        "winRate": 35.7
+      },
+      {
+        "items": [
+          "Luden's Echo",
+          "Lich Bane",
+          "Shadowflame"
+        ],
+        "games": null,
+        "winRate": 45.5
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Blackfire Torch",
+        "pickRate": 2.5,
+        "note": "Occasional mana and burn alternative."
+      },
+      {
+        "item": "Dusk and Dawn",
+        "pickRate": 1.2,
+        "note": "Rare hybrid damage choice."
+      },
+      {
+        "item": "Terminus",
+        "pickRate": 0.6,
+        "note": "Rare attack-speed choice."
+      },
+      {
+        "item": "Blade of The Ruined King",
+        "pickRate": 0.5,
+        "note": "Rare on-hit choice."
+      },
+      {
+        "item": "Nashor's Tooth",
+        "pickRate": 0.4,
+        "note": "Rare attack-speed AP choice."
+      },
+      {
+        "item": "Hextech Gunblade",
+        "pickRate": 0.4,
+        "note": "Rare hybrid choice."
+      }
+    ],
+    "origin": "researched",
+    "researchedAt": "2026-10-26T21:29:43.753Z",
+    "researchedOn": "16.21.1",
+    "stale": false,
+    "starting": [
+      "Doran's Ring",
+      "Health Potion",
+      "Stealth Ward"
+    ]
+  },
+  "raw": {
+    "champion": "Fizz",
+    "role": "BOTTOM",
+    "patch": "16.21",
+    "sample": "Emerald+ ranked Solo: 313 matches; Platinum+ ranked: 391 matches",
+    "sources": [
+      {
+        "url": "https://mobalytics.gg/lol/champions/fizz/build/adc?_lang=en_us",
+        "site": "Mobalytics",
+        "read": "Patch 16.21 Emerald+ ranked Solo build order and 313-match sample."
+      },
+      {
+        "url": "https://www.leagueofgraphs.com/champions/items/fizz/adc/sr-ranked",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 Platinum+ ranked items, boots and three-item paths across 391 matches."
+      },
+      {
+        "url": "https://www.leagueofgraphs.com/champions/fullbuilds/fizz/adc",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 full-build examples."
+      },
+      {
+        "url": "https://www.leagueofgraphs.com/champions/items/fizz/adc",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 default-bracket item page."
+      },
+      {
+        "url": "https://www.leagueofgraphs.com/champions/tier-list/fizz/adc",
+        "site": "League of Graphs",
+        "read": "Patch 16.21 bottom-lane overview."
+      },
+      {
+        "url": "https://lolalytics.com/lol/fizz/build/?lane=bottom",
+        "site": "LoLalytics",
+        "read": "Page returned patch 16.17; excluded its statistics."
+      }
+    ],
+    "starting": [
+      "Doran's Ring",
+      "Health Potion",
+      "Health Potion",
+      "Stealth Ward"
+    ],
+    "slots": [
+      {
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Lich Bane",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Most common first completed item."
+          },
+          {
+            "item": "Luden's Echo",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Alternative opening in listed three-item paths."
+          }
+        ]
+      },
+      {
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Shadowflame",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Zhonya's Hourglass",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs burst",
+            "note": "Mobalytics lists this second."
+          },
+          {
+            "item": "Lich Bane",
+            "pickRate": null,
+            "winRate": null,
+            "when": "after Luden's Echo",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Zhonya's Hourglass",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs burst",
+            "note": null
+          },
+          {
+            "item": "Shadowflame",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "Third when Zhonya's Hourglass is second."
+          },
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": "League of Graphs full-build example."
+          }
+        ]
+      },
+      {
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Zhonya's Hourglass",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs burst",
+            "note": "If delayed from the core."
+          }
+        ]
+      },
+      {
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Void Staff",
+            "pickRate": 21.7,
+            "winRate": 50,
+            "when": "vs magic resistance",
+            "note": "League of Graphs final-item option."
+          },
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": 18.3,
+            "winRate": 59.1,
+            "when": null,
+            "note": "If delayed from fourth."
+          },
+          {
+            "item": "Stormsurge",
+            "pickRate": 14.2,
+            "winRate": 64.7,
+            "when": null,
+            "note": "League of Graphs final-item option."
+          },
+          {
+            "item": "Zhonya's Hourglass",
+            "pickRate": 7.5,
+            "winRate": 77.8,
+            "when": "vs burst",
+            "note": "If delayed from earlier slots."
+          }
+        ]
+      },
+      {
+        "label": "Situational replacement",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Banshee's Veil",
+            "pickRate": 5.8,
+            "winRate": 28.6,
+            "when": "vs threatening spells",
+            "note": "League of Graphs final-item option."
+          },
+          {
+            "item": "Cryptbloom",
+            "pickRate": 4.2,
+            "winRate": 80,
+            "when": "vs magic resistance",
+            "note": "League of Graphs final-item option."
+          },
+          {
+            "item": "Hextech Rocketbelt",
+            "pickRate": null,
+            "winRate": null,
+            "when": "for extra mobility",
+            "note": "Mobalytics situational item."
+          }
+        ]
+      }
+    ],
+    "boots": [
+      {
+        "item": "Sorcerer's Shoes",
+        "pickRate": 66.5,
+        "winRate": 45.4,
+        "when": null,
+        "note": null
+      },
+      {
+        "item": "Ionian Boots of Lucidity",
+        "pickRate": 22.5,
+        "winRate": 46.6,
+        "when": "for ability haste",
+        "note": null
+      },
+      {
+        "item": "Mercury's Treads",
+        "pickRate": 2.3,
+        "winRate": 66.7,
+        "when": "vs magic damage or crowd control",
+        "note": "Small sample."
+      }
+    ],
+    "bootsAfterItem": 1,
+    "cores": [
+      {
+        "items": [
+          "Lich Bane",
+          "Shadowflame",
+          "Zhonya's Hourglass"
+        ],
+        "games": null,
+        "winRate": 28.6
+      },
+      {
+        "items": [
+          "Lich Bane",
+          "Zhonya's Hourglass",
+          "Shadowflame"
+        ],
+        "games": null,
+        "winRate": 37.5
+      },
+      {
+        "items": [
+          "Luden's Echo",
+          "Lich Bane",
+          "Zhonya's Hourglass"
+        ],
+        "games": null,
+        "winRate": 35.7
+      },
+      {
+        "items": [
+          "Luden's Echo",
+          "Lich Bane",
+          "Shadowflame"
+        ],
+        "games": null,
+        "winRate": 45.5
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Blackfire Torch",
+        "pickRate": 2.5,
+        "note": "Occasional mana and burn alternative."
+      },
+      {
+        "item": "Dusk and Dawn",
+        "pickRate": 1.2,
+        "note": "Rare hybrid damage choice."
+      },
+      {
+        "item": "Terminus",
+        "pickRate": 0.6,
+        "note": "Rare attack-speed choice."
+      },
+      {
+        "item": "Blade of The Ruined King",
+        "pickRate": 0.5,
+        "note": "Rare on-hit choice."
+      },
+      {
+        "item": "Nashor's Tooth",
+        "pickRate": 0.4,
+        "note": "Rare attack-speed AP choice."
+      },
+      {
+        "item": "Hextech Gunblade",
+        "pickRate": 0.4,
+        "note": "Rare hybrid choice."
+      }
+    ],
+    "notes": "Mobalytics and League of Graphs both show patch 16.21, but differ on whether Zhonya's Hourglass or Shadowflame comes second; their Fizz bot samples are small. Slot-specific rates for the early items are unavailable, so those fields are null; the fifth-slot rates are League of Graphs final-item statistics."
+  }
+}

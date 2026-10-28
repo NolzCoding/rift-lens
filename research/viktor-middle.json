@@ -1,0 +1,543 @@
+{
+  "version": 1,
+  "champion": "Viktor",
+  "role": "MIDDLE",
+  "researchedAt": "2026-10-16T16:07:48.252Z",
+  "researchedOn": "16.20.1",
+  "durationMs": 106344,
+  "model": "gpt-6-sol",
+  "trigger": "live",
+  "freshness": "current",
+  "dropped": [],
+  "warnings": [
+    "5th item: every option was conditional; Rabadon's Deathcap kept as the default.",
+    "6th item after replacin…: every option was conditional; Cosmic Drive kept as the default."
+  ],
+  "notes": "All cited build data is labeled patch 16.20. OP.GG reports item pick rates across all build positions, so slot-specific pick rates are null; its sixth-item sample is very small.",
+  "build": {
+    "champion": "Viktor",
+    "role": "MIDDLE",
+    "patch": "16.20",
+    "verified": "2026-10-16",
+    "sample": "Emerald+, global Ranked Solo/Duo; 138,443 games on LoLalytics",
+    "sources": [
+      {
+        "name": "lolalytics — Patch 16.20 Emerald+ sample, starting items and recommended build.",
+        "url": "https://lolalytics.com/lol/viktor/build/",
+        "site": "lolalytics",
+        "read": "Patch 16.20 Emerald+ sample, starting items and recommended build."
+      },
+      {
+        "name": "op.gg — Patch 16.20 ranked core builds, boots and overall item pick rates.",
+        "url": "https://fortnite.op.gg/lol/champions/viktor/items/mid?patch=16.20&region=global&tier=emerald_plus&type=ranked",
+        "site": "op.gg",
+        "read": "Patch 16.20 ranked core builds, boots and overall item pick rates."
+      },
+      {
+        "name": "op.gg — Patch 16.20 fourth-, fifth- and sixth-item win rates.",
+        "url": "https://fortnite.op.gg/lol/champions/viktor/build/mid?patch=16.20&region=global&tier=emerald_plus&type=ranked",
+        "site": "op.gg",
+        "read": "Patch 16.20 fourth-, fifth- and sixth-item win rates."
+      },
+      {
+        "name": "Mobalytics — Patch 16.20 Emerald+ recommended full build and starting items.",
+        "url": "https://mobalytics.gg/lol/champions/viktor/build?_lang=en_us&lane=middle",
+        "site": "Mobalytics",
+        "read": "Patch 16.20 Emerald+ recommended full build and starting items."
+      }
+    ],
+    "slots": [
+      {
+        "id": "slot1",
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Blackfire Torch"
+          },
+          {
+            "item": "Luden's Echo",
+            "when": "situational",
+            "condition": "vs squishy teams",
+            "note": "Less common first-item alternative."
+          }
+        ]
+      },
+      {
+        "id": "boots",
+        "label": "Boots",
+        "kind": "boots",
+        "options": [
+          {
+            "item": "Sorcerer's Shoes",
+            "pickRate": 50.8,
+            "winRate": 51.8
+          },
+          {
+            "item": "Ionian Boots of Lucidity",
+            "pickRate": 24.7,
+            "winRate": 50.7,
+            "when": "situational",
+            "condition": "when prioritizing haste"
+          },
+          {
+            "item": "Mercury's Treads",
+            "pickRate": 14,
+            "winRate": 48.3,
+            "when": "situational",
+            "condition": "vs magic damage or crowd control"
+          }
+        ]
+      },
+      {
+        "id": "slot2",
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Lich Bane"
+          },
+          {
+            "item": "Hextech Rocketbelt",
+            "when": "situational",
+            "condition": "when mobility helps",
+            "note": "Second-most-played three-item core uses this."
+          },
+          {
+            "item": "Liandry's Torment",
+            "when": "situational",
+            "condition": "vs durable teams"
+          }
+        ]
+      },
+      {
+        "id": "slot3",
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Zhonya's Hourglass"
+          },
+          {
+            "item": "Shadowflame",
+            "when": "situational",
+            "condition": "when stasis is unnecessary"
+          },
+          {
+            "item": "Rabadon's Deathcap",
+            "when": "situational",
+            "condition": "when ahead"
+          }
+        ]
+      },
+      {
+        "id": "slot4",
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap",
+            "winRate": 56.9
+          },
+          {
+            "item": "Void Staff",
+            "winRate": 53.5,
+            "when": "situational",
+            "condition": "vs magic resistance"
+          },
+          {
+            "item": "Shadowflame",
+            "winRate": 56.6,
+            "when": "situational",
+            "condition": "vs squishy teams"
+          }
+        ]
+      },
+      {
+        "id": "slot5",
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap",
+            "winRate": 59.6,
+            "note": "best if not already built"
+          },
+          {
+            "item": "Void Staff",
+            "winRate": 58.2,
+            "when": "situational",
+            "condition": "vs magic resistance"
+          },
+          {
+            "item": "Shadowflame",
+            "winRate": 54.8,
+            "when": "situational",
+            "condition": "vs squishy teams"
+          }
+        ]
+      },
+      {
+        "id": "slot6",
+        "label": "6th item after replacin…",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Cosmic Drive",
+            "winRate": 66.7,
+            "note": "best very late game; Only 27 games in OP.GG's sixth-item table."
+          }
+        ]
+      }
+    ],
+    "cores": [
+      {
+        "items": [
+          "Blackfire Torch",
+          "Lich Bane",
+          "Zhonya's Hourglass"
+        ],
+        "games": 10980,
+        "winRate": 54.8
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Hextech Rocketbelt",
+          "Zhonya's Hourglass"
+        ],
+        "games": 5849,
+        "winRate": 53.5
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Lich Bane",
+          "Shadowflame"
+        ],
+        "games": 4979,
+        "winRate": 55.7
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Lich Bane",
+          "Rabadon's Deathcap"
+        ],
+        "games": 3623,
+        "winRate": 58.2
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Rod of Ages",
+        "pickRate": 1.9,
+        "note": "Rare scaling alternative."
+      },
+      {
+        "item": "Banshee's Veil",
+        "pickRate": 1.8,
+        "note": "Spell-shield defense."
+      },
+      {
+        "item": "Morellonomicon",
+        "pickRate": 1.3,
+        "note": "Grievous Wounds against healing."
+      },
+      {
+        "item": "Stormsurge",
+        "pickRate": 1.3,
+        "note": "Rare burst option."
+      },
+      {
+        "item": "Bloodletter's Curse",
+        "pickRate": 1,
+        "note": "Rare sustained-damage option."
+      },
+      {
+        "item": "Rylai's Crystal Scepter",
+        "pickRate": 0.4,
+        "note": "Rare slow-focused option."
+      }
+    ],
+    "origin": "researched",
+    "researchedAt": "2026-10-16T16:07:48.252Z",
+    "researchedOn": "16.20.1",
+    "stale": false,
+    "starting": [
+      "Doran's Ring",
+      "Health Potion"
+    ]
+  },
+  "raw": {
+    "champion": "Viktor",
+    "role": "MIDDLE",
+    "patch": "16.20",
+    "sample": "Emerald+, global Ranked Solo/Duo; 138,443 games on LoLalytics",
+    "sources": [
+      {
+        "url": "https://lolalytics.com/lol/viktor/build/",
+        "site": "LoLalytics",
+        "read": "Patch 16.20 Emerald+ sample, starting items and recommended build."
+      },
+      {
+        "url": "https://fortnite.op.gg/lol/champions/viktor/items/mid?patch=16.20&region=global&tier=emerald_plus&type=ranked",
+        "site": "OP.GG",
+        "read": "Patch 16.20 ranked core builds, boots and overall item pick rates."
+      },
+      {
+        "url": "https://fortnite.op.gg/lol/champions/viktor/build/mid?patch=16.20&region=global&tier=emerald_plus&type=ranked",
+        "site": "OP.GG",
+        "read": "Patch 16.20 fourth-, fifth- and sixth-item win rates."
+      },
+      {
+        "url": "https://mobalytics.gg/lol/champions/viktor/build?_lang=en_us&lane=middle",
+        "site": "Mobalytics",
+        "read": "Patch 16.20 Emerald+ recommended full build and starting items."
+      }
+    ],
+    "starting": [
+      "Doran's Ring",
+      "Health Potion",
+      "Health Potion"
+    ],
+    "slots": [
+      {
+        "label": "1st item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Blackfire Torch",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Luden's Echo",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs squishy teams",
+            "note": "Less common first-item alternative."
+          }
+        ]
+      },
+      {
+        "label": "2nd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Lich Bane",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Hextech Rocketbelt",
+            "pickRate": null,
+            "winRate": null,
+            "when": "when mobility helps",
+            "note": "Second-most-played three-item core uses this."
+          },
+          {
+            "item": "Liandry's Torment",
+            "pickRate": null,
+            "winRate": null,
+            "when": "vs durable teams",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "3rd item",
+        "kind": "core",
+        "options": [
+          {
+            "item": "Zhonya's Hourglass",
+            "pickRate": null,
+            "winRate": null,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Shadowflame",
+            "pickRate": null,
+            "winRate": null,
+            "when": "when stasis is unnecessary",
+            "note": null
+          },
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": null,
+            "winRate": null,
+            "when": "when ahead",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "4th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": null,
+            "winRate": 56.85,
+            "when": null,
+            "note": null
+          },
+          {
+            "item": "Void Staff",
+            "pickRate": null,
+            "winRate": 53.53,
+            "when": "vs magic resistance",
+            "note": null
+          },
+          {
+            "item": "Shadowflame",
+            "pickRate": null,
+            "winRate": 56.58,
+            "when": "vs squishy teams",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "5th item",
+        "kind": "flex",
+        "options": [
+          {
+            "item": "Rabadon's Deathcap",
+            "pickRate": null,
+            "winRate": 59.6,
+            "when": "if not already built",
+            "note": null
+          },
+          {
+            "item": "Void Staff",
+            "pickRate": null,
+            "winRate": 58.21,
+            "when": "vs magic resistance",
+            "note": null
+          },
+          {
+            "item": "Shadowflame",
+            "pickRate": null,
+            "winRate": 54.76,
+            "when": "vs squishy teams",
+            "note": null
+          }
+        ]
+      },
+      {
+        "label": "6th item after replacing boots",
+        "kind": "situational",
+        "options": [
+          {
+            "item": "Cosmic Drive",
+            "pickRate": null,
+            "winRate": 66.67,
+            "when": "very late game",
+            "note": "Only 27 games in OP.GG's sixth-item table."
+          }
+        ]
+      }
+    ],
+    "boots": [
+      {
+        "item": "Sorcerer's Shoes",
+        "pickRate": 50.78,
+        "winRate": 51.84,
+        "when": null,
+        "note": null
+      },
+      {
+        "item": "Ionian Boots of Lucidity",
+        "pickRate": 24.66,
+        "winRate": 50.65,
+        "when": "when prioritizing haste",
+        "note": null
+      },
+      {
+        "item": "Mercury's Treads",
+        "pickRate": 14.04,
+        "winRate": 48.29,
+        "when": "vs magic damage or crowd control",
+        "note": null
+      }
+    ],
+    "bootsAfterItem": 1,
+    "cores": [
+      {
+        "items": [
+          "Blackfire Torch",
+          "Lich Bane",
+          "Zhonya's Hourglass"
+        ],
+        "games": 10980,
+        "winRate": 54.84
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Hextech Rocketbelt",
+          "Zhonya's Hourglass"
+        ],
+        "games": 5849,
+        "winRate": 53.45
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Lich Bane",
+          "Shadowflame"
+        ],
+        "games": 4979,
+        "winRate": 55.69
+      },
+      {
+        "items": [
+          "Blackfire Torch",
+          "Lich Bane",
+          "Rabadon's Deathcap"
+        ],
+        "games": 3623,
+        "winRate": 58.16
+      }
+    ],
+    "offMeta": [
+      {
+        "item": "Rod of Ages",
+        "pickRate": 1.88,
+        "note": "Rare scaling alternative."
+      },
+      {
+        "item": "Banshee's Veil",
+        "pickRate": 1.82,
+        "note": "Spell-shield defense."
+      },
+      {
+        "item": "Morellonomicon",
+        "pickRate": 1.27,
+        "note": "Grievous Wounds against healing."
+      },
+      {
+        "item": "Stormsurge",
+        "pickRate": 1.25,
+        "note": "Rare burst option."
+      },
+      {
+        "item": "Bloodletter's Curse",
+        "pickRate": 0.97,
+        "note": "Rare sustained-damage option."
+      },
+      {
+        "item": "Rylai's Crystal Scepter",
+        "pickRate": 0.38,
+        "note": "Rare slow-focused option."
+      }
+    ],
+    "notes": "All cited build data is labeled patch 16.20. OP.GG reports item pick rates across all build positions, so slot-specific pick rates are null; its sixth-item sample is very small."
+  }
+}
