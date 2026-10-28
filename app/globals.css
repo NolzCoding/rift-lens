@@ -306,7 +306,8 @@ footer strong { color: #8d98aa; letter-spacing: .1em; font-size: 11px; }
 .live-site-header nav a { display: inline-flex; align-items: center; gap: 6px; }
 .live-page-shell { width: min(1500px, calc(100% - 28px)); margin: 0 auto; padding: 18px 0 48px; }
 .live-dashboard { display: grid; gap: 14px; }
-.live-empty { min-height: calc(100vh - 125px); display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
+.live-empty { position: relative; min-height: calc(100vh - 125px); display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
+.live-empty-settings { position: absolute; top: 0; right: 0; text-align: left; }
 .live-empty h1 { color: white; font-size: clamp(25px, 4vw, 45px); letter-spacing: -.045em; margin: 17px 0 8px; }
 .live-empty > p { color: #7d899d; max-width: 590px; font-size: 13px; line-height: 1.65; margin: 0 0 22px; }
 .live-radar { width: 84px; height: 84px; display: grid; place-items: center; color: #67e8f9; border-radius: 50%; border: 1px solid rgba(103,232,249,.22); background: radial-gradient(circle, rgba(103,232,249,.13), transparent 65%); margin-bottom: 19px; position: relative; }

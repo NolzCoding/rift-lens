@@ -203,7 +203,7 @@ export function LiveGameDashboard({ mock = null }: { mock?: LiveFixtureName | nu
     .sort((left, right) => (right.receivedAt ?? Date.parse(right.envelope!.generatedAt)) - (left.receivedAt ?? Date.parse(left.envelope!.generatedAt)))[0]?.envelope ?? null;
   const { read: aiRead, live: aiLive } = useAiRead(buildHelp, snapshot);
 
-  if (!snapshot) return <EmptyState connection={connection} reason={reason} onRetry={() => void poll()} />;
+  if (!snapshot) return <EmptyState connection={connection} reason={reason} onRetry={() => void poll()} settings={<SettingsMenu settings={settings} onChange={updateSettings} />} />;
 
   const moment = snapshot.deathMoment;
   const deathKey = moment ? `${snapshot.gameId}:${moment.diedAt}` : null;
