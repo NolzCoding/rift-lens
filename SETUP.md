@@ -28,11 +28,14 @@ http://localhost:3000/live (second monitor, or `http://<your PC's IP>:3000/live`
 Everything important works without AI: what to buy next, the death-screen shop, counter items, timers, alerts.
 AI adds the HELP ME button, a coach read when you die, and build research for new champions.
 
-**Gemini (free with a Google account):**
+**Antigravity (Google account, e.g. a Google AI subscription):**
 
-1. In a `cmd` window: `npm install -g @google/gemini-cli`
-2. Run `gemini` once and sign in with Google in the browser it opens, then close it.
-3. In Rift Lens open the settings (gear icon on the live page) and set **AI provider** to **Gemini**.
+1. In **PowerShell** (not cmd): `irm https://antigravity.google/cli/install.ps1 | iex`
+2. Open a new window, run `agy` once and sign in with Google in the browser it opens, then close it.
+3. In Rift Lens open the settings (gear icon on the live page) and set **AI provider** to **Antigravity**.
+
+Google replaced Gemini CLI with Antigravity CLI for personal Google accounts (free and Google AI Pro/Ultra) on
+June 18, 2026, so the **Gemini** option only works with a company Gemini Code Assist license.
 
 **Codex (ChatGPT account):** `npm install -g @openai/codex`, run `codex login`, and keep **AI provider** on **Codex**.
 

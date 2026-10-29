@@ -186,7 +186,7 @@ function failureFrom(result: { stdout: string; stderr: string; code: number | nu
     return new CodexRunError("Gemini CLI is not signed in with Google.", `${GEMINI_SIGN_IN_HINT}${message ? ` (${message.slice(0, 300)})` : ""}`);
   }
   if (/quota|rate.?limit|429|RESOURCE_EXHAUSTED/i.test(tail)) {
-    return new CodexRunError("Gemini's free-tier limit was reached. Try again later or switch the AI provider to Codex.", tail.slice(-1200));
+    return new CodexRunError("Gemini's usage limit was reached. Try again later or switch the AI provider.", tail.slice(-1200));
   }
   return new CodexRunError("Gemini CLI could not finish the analysis.", tail.slice(-1600));
 }

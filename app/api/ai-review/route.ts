@@ -4,9 +4,8 @@ import { access, mkdir, readFile, rename, unlink, writeFile } from "node:fs/prom
 import path from "node:path";
 import { NextResponse } from "next/server";
 
-import { aiModelLabel, aiProvider } from "@/lib/ai-runner";
+import { aiModelLabel, aiProvider, PROVIDER_NAMES, runAiJson, type AiProvider } from "@/lib/ai-runner";
 import { CodexRunError as SharedRunError, withSyncedAuth } from "@/lib/codex-runner";
-import { runGeminiJson } from "@/lib/gemini-runner";
 import { memoryRoot } from "@/lib/memory-store";
 import { reviewInsights } from "@/lib/replay-insights";
 import type { AiReplayReview, AiReviewEnvelope, ReplayAnalysis } from "@/lib/types";
@@ -304,8 +303,9 @@ async function assertChatGptLogin(executable: string, cwd: string, codexHome: st
   }
 }
 
-/** Same review through Gemini CLI (RIFT_LENS_AI_PROVIDER=gemini or the in-app setting); Codex keeps the path below. */
-async function generateGeminiReview(
+/** Same review through a Google CLI (Antigravity or Gemini, from the in-app setting or RIFT_LENS_AI_PROVIDER); Codex keeps the path below. */
+async function generateGoogleReview(
+  provider: Exclude<AiProvider, "codex">,
   compact: ReturnType<typeof compactAnalysis>,
   cacheKey: string,
   cachePath: string,
@@ -313,7 +313,8 @@ async function generateGeminiReview(
 ): Promise<StoredReview> {
   let review: unknown;
   try {
-    review = await runGeminiJson({
+    review = await runAiJson({
+      provider,
       cacheRoot, schemaPath: path.join(process.cwd(), "lib", "ai-review-schema.json"), prompt: buildPrompt(compact),
       model: MODEL, reasoning: "medium", timeoutMs: 240_000,
     });
@@ -321,8 +322,8 @@ async function generateGeminiReview(
     if (error instanceof SharedRunError) throw new CodexRunError(error.message, error.details);
     throw error;
   }
-  if (!isAiReview(review)) throw new CodexRunError("Gemini returned an incomplete review. Rift Lens will not retry automatically.");
-  const stored: StoredReview = { cacheKey, generatedAt: new Date().toISOString(), model: aiModelLabel("gemini", MODEL, "medium"), review };
+  if (!isAiReview(review)) throw new CodexRunError(`${PROVIDER_NAMES[provider]} returned an incomplete review. Rift Lens will not retry automatically.`);
+  const stored: StoredReview = { cacheKey, generatedAt: new Date().toISOString(), model: aiModelLabel(provider, MODEL, "medium"), review };
   const temporaryPath = `${cachePath}.${process.pid}.tmp`;
   await writeFile(temporaryPath, JSON.stringify(stored, null, 2), "utf8");
   await rename(temporaryPath, cachePath);
@@ -345,7 +346,8 @@ async function generateReview(
   cachePath: string,
   cacheRoot: string,
 ): Promise<StoredReview> {
-  if (await aiProvider() === "gemini") return generateGeminiReview(compact, cacheKey, cachePath, cacheRoot);
+  const provider = await aiProvider();
+  if (provider !== "codex") return generateGoogleReview(provider, compact, cacheKey, cachePath, cacheRoot);
   const executable = await resolveCodexExecutable();
   const codexHome = await prepareCodexHome(cacheRoot);
   await assertChatGptLogin(executable, cacheRoot, codexHome);

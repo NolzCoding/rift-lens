@@ -49,9 +49,19 @@ The response is saved under the memory folder's `ai-cache/review` (see Long-term
 
 Live HELP ME responses are stored separately in `ai-cache/live`. The always-on live dashboard is deterministic and does not call a model. Rift Lens reads only Riot's HTTPS endpoint at `127.0.0.1:2999`; it does not inspect League process memory. Riot's live feed does not expose a reliable damage-received-by-source breakdown, so damage profiles and threat labels are explicitly shown as inferences.
 
+### Using Antigravity CLI instead of Codex
+
+Rift Lens can send every AI call (HELP ME, replay reviews, build research) to Google's Antigravity CLI (`agy`), signed in with a Google account (Google AI Pro/Ultra or the free plan, no API key):
+
+1. Install it (PowerShell): `irm https://antigravity.google/cli/install.ps1 | iex`
+2. Run `agy` once in a terminal and finish the browser sign-in, then exit.
+3. Pick the provider: switch **AI provider** to **Antigravity** in the live coach's settings menu, or add `RIFT_LENS_AI_PROVIDER=antigravity` to `.env.local`.
+
+Rift Lens pipes the prompt to `agy --output-format json --mode plan` (read-only: no file edits, no shell) in an empty folder of its own, removes API keys from the child process, puts the JSON schema in the prompt and checks the reply (one retry when it does not fit). If a CLI version ignores piped input, the prompt is passed with `-p` instead. Reasoning level maps to `--effort`; pin a model with `RIFT_LENS_AGY_MODEL` / `RIFT_LENS_AGY_MODEL_FAST` (see `agy models`), and point `RIFT_LENS_AGY_PATH` at `agy.exe` if it is not on PATH or under `%LOCALAPPDATA%\Antigravity`. Its login lives in the OS credential store, so the settings menu can only confirm it after the first call.
+
 ### Using Gemini CLI instead of Codex
 
-Rift Lens can send every AI call (HELP ME, replay reviews, build research) to Google's Gemini CLI, signed in with a Google account (free tier, no API key):
+Google replaced Gemini CLI with Antigravity CLI for personal accounts (free, Google AI Pro/Ultra) on 2026-06-18; it still serves Gemini Code Assist Standard/Enterprise licenses. With such a license, Rift Lens can send every AI call to it, signed in with Google (no API key):
 
 1. Install it: `npm install -g @google/gemini-cli`
 2. Run `gemini` once in a terminal, choose **Login with Google** and finish the browser sign-in, then exit.

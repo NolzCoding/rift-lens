@@ -4,7 +4,7 @@ import path from "node:path";
 import { NextResponse } from "next/server";
 
 import { ensureResearchLoaded } from "@/lib/build-research";
-import { aiModelLabel, aiProvider, runAiJson, type AiProvider } from "@/lib/ai-runner";
+import { aiModelLabel, aiProvider, PROVIDER_NAMES, runAiJson, type AiProvider } from "@/lib/ai-runner";
 import { CodexRunError } from "@/lib/codex-runner";
 import { profilePromptLines } from "@/lib/enemy-stats";
 import { ensureItemGroups } from "@/lib/item-groups";
@@ -314,7 +314,7 @@ async function generateHelp(snapshot: LiveGameSnapshot, userFocus: string, catal
     provider, cacheRoot, schemaPath: path.join(process.cwd(), "lib", "live-help-schema.json"), prompt: promptFor(compact(snapshot, userFocus, mode, catalog), mode),
     model: profile.model, reasoning: profile.reasoning, timeoutMs: profile.timeoutMs, verbosity: profile.verbosity,
   });
-  if (!validAdvice(raw)) throw new CodexRunError(`${provider === "gemini" ? "Gemini" : "Codex"} returned incomplete live advice. Rift Lens will not retry automatically.`);
+  if (!validAdvice(raw)) throw new CodexRunError(`${PROVIDER_NAMES[provider]} returned incomplete live advice. Rift Lens will not retry automatically.`);
   // The model's gold arithmetic has been wrong ("keep 2,578g"): strip figures from its prose before caching. Item names in
   // buyOptions are untouched, and every number the UI shows comes from resolveBuys / the engine.
   const review = withCleanPath(sanitizeAdvice(raw), catalog);

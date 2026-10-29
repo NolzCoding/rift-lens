@@ -12,7 +12,7 @@ export async function GET() {
   return NextResponse.json(await aiStatus(), { headers });
 }
 
-/** `{ provider: "codex" | "gemini" | null }` — null clears the in-app choice so RIFT_LENS_AI_PROVIDER applies again. */
+/** `{ provider: "codex" | "antigravity" | "gemini" | null }` — null clears the in-app choice so RIFT_LENS_AI_PROVIDER applies again. */
 export async function POST(request: Request) {
   let body: { provider?: unknown };
   try { body = await request.json() as { provider?: unknown }; } catch { return NextResponse.json({ error: "Invalid request." }, { status: 400, headers }); }

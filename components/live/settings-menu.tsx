@@ -13,15 +13,17 @@ const POWER_OPTIONS: Array<{ value: LiveHelpPower; label: string; hint: string }
   { value: "max", label: "Max", hint: "Deepest reasoning everywhere, slowest" },
 ];
 
-type ProviderName = "codex" | "gemini";
+type ProviderName = "codex" | "antigravity" | "gemini";
 type ProviderStatus = {
   provider: ProviderName;
   source: "setting" | "env" | "default";
   providers: Record<ProviderName, { installed: boolean | null; signedIn: boolean; hint: string }>;
 };
-const PROVIDER_OPTIONS: Array<{ value: ProviderName; label: string }> = [{ value: "codex", label: "Codex" }, { value: "gemini", label: "Gemini" }];
+const PROVIDER_OPTIONS: Array<{ value: ProviderName; label: string; name: string }> = [
+  { value: "codex", label: "Codex", name: "Codex" }, { value: "antigravity", label: "Antigravity", name: "Antigravity CLI" }, { value: "gemini", label: "Gemini", name: "Gemini CLI" },
+];
 
-/** Codex (ChatGPT login) or Gemini CLI (Google login): saved server-side, so build research follows it too. */
+/** Codex (ChatGPT login), Antigravity CLI or Gemini CLI (Google login): saved server-side, so build research follows it too. */
 function ProviderRow() {
   const [status, setStatus] = useState<ProviderStatus | null>(null);
   const [error, setError] = useState("");
@@ -39,7 +41,7 @@ function ProviderRow() {
   };
 
   const current = status?.providers[status.provider];
-  const hint = error || (!status ? "Checking…" : current?.signedIn ? `${status.provider === "gemini" ? "Gemini CLI" : "Codex"} signed in` : current?.hint || "Not signed in");
+  const hint = error || (!status ? "Checking…" : current?.signedIn ? `${PROVIDER_OPTIONS.find((option) => option.value === status.provider)?.name} signed in` : current?.hint || "Not signed in");
   return (
     <div className="voice-row">
       <span><b>AI provider</b><small>{hint}</small></span>
