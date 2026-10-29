@@ -25,9 +25,15 @@ export function envProvider(): AiProvider | null {
   return isProvider(value) ? value : null;
 }
 
+/** Settings written since the Antigravity option exists carry this version. */
+const SETTINGS_VERSION = 2;
+
 async function savedProvider(): Promise<AiProvider | null> {
   try {
-    const stored = JSON.parse(await readFile(settingsFile(), "utf8")) as { provider?: unknown };
+    const stored = JSON.parse(await readFile(settingsFile(), "utf8")) as { provider?: unknown; version?: unknown };
+    // "gemini" saved before Antigravity was an option meant "my Google account": Gemini CLI stopped serving personal
+    // accounts, so that choice is now Antigravity. A Gemini choice made since (a Code Assist license) stays.
+    if (stored.provider === "gemini" && stored.version !== SETTINGS_VERSION) return "antigravity";
     return isProvider(stored.provider) ? stored.provider : null;
   } catch { return null; }
 }
@@ -46,7 +52,7 @@ export async function setAiProvider(provider: AiProvider | null) {
   const file = settingsFile();
   await mkdir(path.dirname(file), { recursive: true });
   const temporary = `${file}.${process.pid}.${Date.now()}.tmp`;
-  await writeFile(temporary, JSON.stringify({ provider }, null, 2), "utf8");
+  await writeFile(temporary, JSON.stringify({ provider, version: SETTINGS_VERSION }, null, 2), "utf8");
   await rename(temporary, file);
 }
 

@@ -15,7 +15,8 @@ import { CodexRunError, type CodexJsonOptions } from "@/lib/codex-runner";
 // other local tool, and leave `google_web_search` (+ `web_fetch`) on only for the build-research call.
 
 const MAX_OUTPUT = 2_000_000;
-export const GEMINI_SIGN_IN_HINT = "Run `gemini` once in a terminal and sign in with Google (choose \"Login with Google\"), then try again.";
+export const GEMINI_SIGN_IN_HINT = "Run `gemini` once in a terminal and sign in with Google (choose \"Login with Google\"), then try again. Gemini CLI now only works with a Gemini Code Assist license: with a personal Google account (free or a Google AI subscription) choose Antigravity as the AI provider instead.";
+const GEMINI_INSTALL_HINT = "Gemini CLI only works with a Gemini Code Assist license now. With a personal Google account (free or a Google AI subscription), set AI provider to Antigravity in the live page's settings (gear icon).";
 const SIGN_IN_PROMPT = /Opening authentication page|authorize the application|Enter the authorization code|Do you want to continue\? \[Y\/n\]/i;
 const LOCAL_TOOLS = [
   "run_shell_command", "replace", "write_file", "read_file", "read_many_files", "glob", "grep_search", "list_directory",
@@ -88,7 +89,7 @@ export async function geminiStatus() {
   return {
     installed: Boolean(command),
     signedIn: Boolean(command) && signedIn,
-    hint: !command ? "Install it with `npm install -g @google/gemini-cli`, then run `gemini` once and sign in with Google." : signedIn ? "" : GEMINI_SIGN_IN_HINT,
+    hint: !command ? GEMINI_INSTALL_HINT : signedIn ? "" : GEMINI_SIGN_IN_HINT,
   };
 }
 
@@ -194,7 +195,7 @@ function failureFrom(result: { stdout: string; stderr: string; code: number | nu
 /** One headless `gemini -p` turn: schema in the prompt, JSON pulled from `response`, one retry when it does not fit. */
 export async function runGeminiJson(options: CodexJsonOptions): Promise<unknown> {
   const command = await geminiCommand();
-  if (!command) throw new CodexRunError("Gemini CLI was not found on this computer.", "Install it with `npm install -g @google/gemini-cli`, then run `gemini` once and sign in with Google.");
+  if (!command) throw new CodexRunError("Gemini CLI was not found on this computer.", GEMINI_INSTALL_HINT);
   if (!await geminiSignedIn()) throw new CodexRunError("Gemini CLI is not signed in with Google.", GEMINI_SIGN_IN_HINT);
   const schema = JSON.parse(await readFile(options.schemaPath, "utf8")) as JsonSchema;
   const webSearch = options.webSearch === true;

@@ -70,3 +70,19 @@ test("antigravity: a non-success status or a usage limit is reported, not parsed
   await fakeAgy("quota", `process.stdout.write(JSON.stringify({ status: "ERROR", error: "Weekly usage limit reached for your plan" }) + "\\n"); process.exit(1);`);
   await assert.rejects(run, /usage limit/);
 });
+
+test("provider setting: a Gemini choice saved before Antigravity existed means Antigravity; one saved since stays Gemini", async () => {
+  const { aiProviderChoice, setAiProvider } = await import("@/lib/ai-runner");
+  const savedMemory = process.env.RIFT_LENS_MEMORY_DIR;
+  process.env.RIFT_LENS_MEMORY_DIR = await mkdtemp(path.join(os.tmpdir(), "rift-lens-memory-"));
+  try {
+    await writeFile(path.join(process.env.RIFT_LENS_MEMORY_DIR, "ai-settings.json"), JSON.stringify({ provider: "gemini" }));
+    assert.equal((await aiProviderChoice()).provider, "antigravity");
+    await setAiProvider("gemini");
+    assert.equal((await aiProviderChoice()).provider, "gemini", "chosen on purpose after the update");
+    await setAiProvider("codex");
+    assert.equal((await aiProviderChoice()).provider, "codex");
+  } finally {
+    if (savedMemory === undefined) delete process.env.RIFT_LENS_MEMORY_DIR; else process.env.RIFT_LENS_MEMORY_DIR = savedMemory;
+  }
+});
