@@ -22,7 +22,8 @@ export type BootsItem = {
 };
 export type MoveStats = { moveSpeed: number; attackSpeed: number; armor: number; magicResist: number; magicPenetrationFlat: number; abilityHaste: number; abilityPower: number; attackDamage: number };
 type Sample = { time: number; ms: number; key: string; dead: boolean };
-type GameState = { boots: BootsItem | null; base: number | null; samples: Sample[]; settled: MoveStats | null; seen: number };
+type LastSample = { time: number; gold: number; listedValue: number; stats: MoveStats };
+type GameState = { boots: BootsItem | null; base: number | null; samples: Sample[]; settled: MoveStats | null; seen: number; last: LastSample | null };
 
 const WINDOW_SECONDS = 60;
 const MIN_SAMPLES = 3;
@@ -30,6 +31,10 @@ const MAX_GAMES = 4;
 const MAX_WALKING_SPEED = 550;
 /** How far the measured bonus may be from a boots item's Data Dragon move speed (real boots land on it exactly). */
 const FIT_TOLERANCE = 3;
+/** A gold drop between two samples at most this far apart can be read as one purchase. */
+const PURCHASE_WINDOW_SECONDS = 15;
+/** Passive gold per second that can hide inside a drop (the drop is the price minus the income since the last sample). */
+const INCOME_PER_SECOND = 4;
 
 const holder = globalThis as typeof globalThis & { __riftLensBootsSlotV1?: Map<string, GameState> };
 const games: Map<string, GameState> = holder.__riftLensBootsSlotV1 ??= new Map();
@@ -37,7 +42,7 @@ const games: Map<string, GameState> = holder.__riftLensBootsSlotV1 ??= new Map()
 function stateFor(gameId: string) {
   let state = games.get(gameId);
   if (!state) {
-    state = { boots: null, base: null, samples: [], settled: null, seen: 0 };
+    state = { boots: null, base: null, samples: [], settled: null, seen: 0, last: null };
     games.set(gameId, state);
     while (games.size > MAX_GAMES) games.delete(games.keys().next().value!);
   }
@@ -71,7 +76,11 @@ const SIGNATURES: Array<{ text: RegExp; moved: (before: MoveStats, after: MoveSt
 /** Which upgrade the bonus and the stat jump point to: fitting move speed first, then the stat that moved, then the kit's damage type. */
 function pickUpgrade(candidates: BootsItem[], bonus: number, before: MoveStats | null, after: MoveStats) {
   const close = Math.min(...candidates.map((item) => Math.abs(item.flat - bonus)));
-  const fitting = candidates.filter((item) => Math.abs(item.flat - bonus) <= close + 2);
+  return pickBySignature(candidates.filter((item) => Math.abs(item.flat - bonus) <= close + 2), before, after);
+}
+
+/** Among same-looking boots: the one whose stats moved (Berserker's → attack speed), then the one the kit's damage uses. */
+function pickBySignature(fitting: BootsItem[], before: MoveStats | null, after: MoveStats) {
   const score = (item: BootsItem) => {
     const matched = before ? SIGNATURES.filter((signature) => signature.text.test(item.description || "") && signature.moved(before, after)).length : 0;
     const ap = after.abilityPower > after.attackDamage;
@@ -87,7 +96,7 @@ function pickUpgrade(candidates: BootsItem[], bonus: number, before: MoveStats |
  * `baseMoveSpeed` = the champion's Data Dragon base move speed, which spots boots bought straight into the boots slot
  * (never listed: 325 → 370 on a dead-shop Berserker's) before any listed boots could calibrate it; `roleQuests` = the
  * queue has role quests (Summoner's Rift draft, not Swiftplay), the only place boots enter the slot unlisted, so a jungle
- * pet's move speed elsewhere is never taken for boots.
+ * pet's move speed elsewhere is never taken for boots; `gold` + `listedValue` spot a slot purchase the moment it happens.
  */
 export function slottedBoots(gameId: string, input: {
   time: number;
@@ -98,12 +107,35 @@ export function slottedBoots(gameId: string, input: {
   boots: BootsItem[];
   baseMoveSpeed: number | null;
   roleQuests: boolean;
+  /** Current gold, and the gold value of the listed items apart from boots: gold spent beyond what the list gained went into the slot. */
+  gold: number;
+  listedValue: number;
 }): BootsItem | null {
   const state = stateFor(gameId);
   const { time, stats, visible, percent, dead } = input;
   // A replay or a reloaded game going back in time starts over.
-  if (time < state.seen - 5) { state.boots = null; state.base = null; state.samples = []; state.settled = null; }
+  if (time < state.seen - 5) { state.boots = null; state.base = null; state.samples = []; state.settled = null; state.last = null; }
   state.seen = time;
+  const last = state.last;
+  state.last = { time, gold: input.gold, listedValue: input.listedValue, stats };
+  // Instant: the gold spent beyond what the listed items gained in value (an item's price is what the list gains by it)
+  // matches a boots price (an upgrade's: its price minus the boots it builds from), so it went into the boots slot. Works
+  // in the fountain and on the death screen, with other items bought on the same trip, before any walking. A trip that
+  // lowered the list's value (a sale) is left to the move speed.
+  const gained = last ? input.listedValue - last.listedValue : -1;
+  if (!visible && last && gained >= 0 && time > last.time && time - last.time <= PURCHASE_WINDOW_SECONDS) {
+    const spent = last.gold - input.gold - gained;
+    const from = state.boots;
+    const slack = (time - last.time) * INCOME_PER_SECOND + 5;
+    const cost = (item: BootsItem) => from ? (item.from?.includes(from.id) ? item.price - from.price : 0) : item.price;
+    const candidates = spent >= 250 && (from || input.roleQuests)
+      ? input.boots.filter((item) => cost(item) > 0 && spent <= cost(item) + 5 && spent >= cost(item) - slack) : [];
+    const bought = candidates.length ? pickBySignature(candidates, last.stats, stats) : null;
+    if (bought) {
+      state.boots = bought;
+      return bought;
+    }
+  }
   const boots = visible || state.boots;
   const key = `${boots?.id || 0}:${visible ? "listed" : "hidden"}:${percent.toFixed(3)}`;
   // Fountain speed (~700) is not walking speed, however long the player shops.

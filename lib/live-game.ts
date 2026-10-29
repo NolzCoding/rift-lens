@@ -2480,6 +2480,9 @@ function bootsSlotItem(gameId: string, time: number, active: LiveGameSnapshot["a
     boots: allBoots,
     baseMoveSpeed,
     roleQuests,
+    gold: active.currentGold,
+    // Boots left out: boots moving into the slot is not a purchase.
+    listedValue: listed.filter((item) => !isBootsItem(item)).reduce((sum, item) => sum + item.cost * Math.max(1, active.items.find((entry) => entry.id === item.id)?.count || 1), 0),
   });
   return boots ? { id: boots.id, name: boots.name, count: 1, price: boots.price, description: boots.description || "", bootsSlot: true } : null;
 }

@@ -18,7 +18,7 @@ const stats = (moveSpeed: number, attackSpeed = 1.04): MoveStats => ({ moveSpeed
 /** One sample every 10 game seconds from `from` to `to`, returning the last result. */
 function walk(from: number, to: number, ms: number, visible: BootsItem | null, attackSpeed?: number, alive = true, baseMoveSpeed: number | null = null, roleQuests = true) {
   let result: BootsItem | null = null;
-  for (let time = from; time <= to; time += 10) result = slottedBoots("g1", { time, dead: !alive, stats: stats(ms, attackSpeed), visible, percent: 0, boots: allBoots, baseMoveSpeed, roleQuests });
+  for (let time = from; time <= to; time += 10) result = slottedBoots("g1", { time, dead: !alive, stats: stats(ms, attackSpeed), visible, percent: 0, boots: allBoots, baseMoveSpeed, roleQuests, gold: 500, listedValue: 3000 });
   return result;
 }
 
@@ -70,4 +70,34 @@ test("boots slot: outside role-quest queues a small constant bonus (a jungle pet
 
 test("boots slot: a bonus a few points off every boots item is not boots", () => {
   assert.equal(walk(300, 900, 355, null, 1.04, true, 335), null, "+20 is not Boots' +25");
+});
+
+test("boots slot: a gold drop of an upgrade's price with nothing new listed is that upgrade, at once (fountain speed and all)", () => {
+  walk(480, 780, 350, boots);
+  walk(790, 880, 350, null);
+  const sample = (time: number, gold: number, ms: number, attackSpeed: number) =>
+    slottedBoots("g1", { time, dead: false, stats: stats(ms, attackSpeed), visible: null, percent: 0, boots: allBoots, baseMoveSpeed: null, roleQuests: true, gold, listedValue: 3000 });
+  assert.equal(sample(890, 920, 712, 1.04)?.name, "Boots");
+  // 920 → 146 in 12s: 800g (Berserker's 1100 minus the Boots' 300) less ~25g of passive income; attack speed jumped.
+  assert.equal(sample(902, 146, 712, 1.24)?.name, "Berserker's Greaves");
+  assert.equal(sample(912, 166, 618, 1.24)?.name, "Berserker's Greaves", "stays while leaving the fountain");
+});
+
+test("boots slot: gold that went into listed items is not boots; boots bought on the same trip still are", () => {
+  walk(480, 780, 350, boots);
+  walk(790, 880, 350, null);
+  const sample = (time: number, gold: number, listedValue: number, attackSpeed = 1.04) =>
+    slottedBoots("g1", { time, dead: false, stats: stats(700, attackSpeed), visible: null, percent: 0, boots: allBoots, baseMoveSpeed: null, roleQuests: true, gold, listedValue });
+  sample(890, 1720, 3000);
+  assert.equal(sample(900, 920, 3800)?.name, "Boots", "an 800g item joined the list: nothing went into the slot");
+  assert.equal(sample(910, 120, 3800, 1.24)?.name, "Berserker's Greaves", "800g more left and the list did not grow: the upgrade");
+});
+
+test("boots slot: a sale (the list lost value) is never read as a slot purchase", () => {
+  walk(480, 780, 350, boots);
+  walk(790, 880, 350, null);
+  const sample = (time: number, gold: number, listedValue: number) =>
+    slottedBoots("g1", { time, dead: false, stats: stats(700), visible: null, percent: 0, boots: allBoots, baseMoveSpeed: null, roleQuests: true, gold, listedValue });
+  sample(890, 500, 6000);
+  assert.equal(sample(900, 400, 3000)?.name, "Boots");
 });
