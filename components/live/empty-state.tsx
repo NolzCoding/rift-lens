@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Connection } from "@/components/live/shared";
 
-export function EmptyState({ connection, reason, onRetry, settings }: { connection: Connection; reason: string; onRetry: () => void; settings?: ReactNode }) {
+export function EmptyState({ connection, reason, onRetry, settings, champSelect }: { connection: Connection; reason: string; onRetry: () => void; settings?: ReactNode; champSelect?: ReactNode }) {
   const connecting = connection === "connecting";
   return (
     <section className="live-empty">
@@ -17,6 +17,7 @@ export function EmptyState({ connection, reason, onRetry, settings }: { connecti
       <h1>{connecting ? "Checking League's local live feed…" : "Start or enter a League match."}</h1>
       <p>{reason || "Rift Lens checks only Riot's exposed local API. It does not read game memory."}</p>
       <Button variant="ghost" onClick={onRetry}><RefreshCw size={14} /> Check now</Button>
+      {champSelect}
       <div className="live-empty-notes">
         <span><Activity size={13} /> League must be in an active match</span>
         <span><ShieldAlert size={13} /> Uses Riot&apos;s Live Client API (on automatically in a match, nothing to enable)</span>

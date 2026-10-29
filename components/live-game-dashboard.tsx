@@ -10,6 +10,7 @@ import { AskBox, CoachCard, type AskProps } from "@/components/live/coach-card";
 import { CommandBar, VitalsAndStats } from "@/components/live/command-bar";
 import { DeathView, LastDeathNote } from "@/components/live/death-coach";
 import { DetailsDrawer, useDetailsOpen } from "@/components/live/details-drawer";
+import { ChampSelectPanel } from "@/components/live/champ-select-panel";
 import { EmptyState } from "@/components/live/empty-state";
 import { EventsPanel, EvidencePanel } from "@/components/live/feed-panels";
 import { GameOverView } from "@/components/live/game-over";
@@ -203,7 +204,7 @@ export function LiveGameDashboard({ mock = null }: { mock?: LiveFixtureName | nu
     .sort((left, right) => (right.receivedAt ?? Date.parse(right.envelope!.generatedAt)) - (left.receivedAt ?? Date.parse(left.envelope!.generatedAt)))[0]?.envelope ?? null;
   const { read: aiRead, live: aiLive } = useAiRead(buildHelp, snapshot);
 
-  if (!snapshot) return <EmptyState connection={connection} reason={reason} onRetry={() => void poll()} settings={<SettingsMenu settings={settings} onChange={updateSettings} />} />;
+  if (!snapshot) return <EmptyState connection={connection} reason={reason} onRetry={() => void poll()} settings={<SettingsMenu settings={settings} onChange={updateSettings} />} champSelect={<ChampSelectPanel />} />;
 
   const moment = snapshot.deathMoment;
   const deathKey = moment ? `${snapshot.gameId}:${moment.diedAt}` : null;

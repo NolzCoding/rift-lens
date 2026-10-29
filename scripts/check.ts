@@ -177,18 +177,27 @@ function checkSample(game: ReplayGame, sample: ReplaySample, snap: LiveGameSnaps
     c("death_buy_within_gold", total <= moment.goldNow, () => `buyNow total ${total}g > gold ${moment.goldNow}g: ${moment.buyNow.map((b) => `${b.item} ${b.cost}`).join(", ")}`);
     // Walk the shopping list in order like the shop does: buying an item uses up owned components in its recipe
     // (Infinity Edge consumes the held Cloak, so a Cloak bought afterwards for LDR is a real need, not a duplicate).
+    // A component bought this trip belongs to its goal: a Dagger for Berserker's Greaves does not cover the Dagger
+    // Guinsoo's Rageblade needs.
     const stock = new Map(owned);
-    const consume = (id: number, depth = 0) => {
+    const boughtFor = new Map<string, number>();
+    const take = <K,>(pool: Map<K, number>, id: K) => {
+      const count = pool.get(id) || 0;
+      if (count > 0) pool.set(id, count - 1);
+      return count > 0;
+    };
+    const consume = (id: number, goal: string, depth = 0) => {
       for (const child of catalog.byId.get(id)?.from || []) {
-        if ((stock.get(child) || 0) > 0) stock.set(child, stock.get(child)! - 1);
-        else if (depth < 3) consume(child, depth + 1);
+        if (!take(boughtFor, `${goal}:${child}`) && !take(stock, child) && depth < 3) consume(child, goal, depth + 1);
       }
     };
     for (const buy of moment.buyNow) {
       if (buy.itemId === CONTROL_WARD) continue;
-      const have = stock.get(buy.itemId) || 0;
-      consume(buy.itemId);
-      stock.set(buy.itemId, have + 1);
+      const goal = buy.forItem || buy.item;
+      const have = (stock.get(buy.itemId) || 0) + (boughtFor.get(`${goal}:${buy.itemId}`) || 0);
+      consume(buy.itemId, goal);
+      if (buy.forItem) boughtFor.set(`${goal}:${buy.itemId}`, (boughtFor.get(`${goal}:${buy.itemId}`) || 0) + 1);
+      else stock.set(buy.itemId, (stock.get(buy.itemId) || 0) + 1);
       const forItem = buy.forItem ? findItem(catalog, buy.forItem) : null;
       const need = forItem ? treeCount(catalog, forItem.id, buy.itemId) : 1;
       const bootsDup = isUpgradedBoots(catalog, buy.itemId) && hasBoots;

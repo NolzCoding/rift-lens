@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["champion", "role", "patch", "sample", "overallWinRate", "sources", "matchups", "notes"],
+  "properties": {
+    "champion": { "type": "string" },
+    "role": { "type": "string", "enum": ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] },
+    "patch": { "type": "string" },
+    "sample": { "type": "string" },
+    "overallWinRate": { "type": ["number", "null"] },
+    "sources": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["url", "site", "read"],
+        "properties": {
+          "url": { "type": "string" },
+          "site": { "type": "string" },
+          "read": { "type": "string" }
+        }
+      }
+    },
+    "matchups": {
+      "type": "array",
+      "maxItems": 60,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["opponent", "opponentRole", "winRate", "games"],
+        "properties": {
+          "opponent": { "type": "string" },
+          "opponentRole": { "type": "string", "enum": ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] },
+          "winRate": { "type": "number" },
+          "games": { "type": ["number", "null"] }
+        }
+      }
+    },
+    "notes": { "type": "string" }
+  }
+}

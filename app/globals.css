@@ -308,6 +308,48 @@ footer strong { color: #8d98aa; letter-spacing: .1em; font-size: 11px; }
 .live-dashboard { display: grid; gap: 14px; }
 .live-empty { position: relative; min-height: calc(100vh - 125px); display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
 .live-empty-settings { position: absolute; top: 0; right: 0; text-align: left; }
+/* Champ select pick helper (components/live/champ-select-panel.tsx) */
+.champ-select { width: min(640px, 100%); margin-top: 26px; display: grid; gap: 12px; text-align: left; }
+/* In champ select the pick comes first, above the waiting message (below the settings gear in the corner). */
+.champ-select.is-active { order: -1; margin: 44px 0 22px; border: 1px solid rgba(103,232,249,.25); border-radius: 16px; padding: 16px; background: rgba(10,16,28,.8); }
+.cs-icon { border-radius: 8px; display: block; flex: none; object-fit: cover; }
+.cs-icon-empty { background: rgba(255,255,255,.06); }
+.cs-head { display: flex; justify-content: space-between; align-items: center; color: #9aa6ba; font-size: 12px; }
+.cs-head span { display: flex; align-items: center; gap: 6px; }
+.cs-head b { color: white; }
+.cs-turn { font-style: normal; color: #052e16; background: #4ade80; border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 700; }
+.cs-picks { display: grid; gap: 8px; }
+.cs-best { display: flex; gap: 14px; align-items: flex-start; padding: 12px; border-radius: 12px; background: rgba(74,222,128,.07); border: 1px solid rgba(74,222,128,.25); }
+.cs-best small { display: flex; align-items: center; gap: 4px; color: #86efac; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.cs-best strong { display: block; color: white; font-size: 24px; margin: 2px 0 6px; }
+.cs-best ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; font-size: 12px; }
+.cs-best li { color: #9aa6ba; }
+.cs-best li.up { color: #c7f9d4; }
+.cs-best li.down { color: #fca5a5; }
+.cs-best em, .cs-status, .cs-note { color: #7d899d; font-size: 11px; font-style: normal; }
+.cs-best em { display: block; margin-top: 6px; }
+.cs-note, .cs-status { margin: 0; }
+.cs-alt { display: flex; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.03); }
+.cs-alt strong { display: block; color: #dbe3ee; font-size: 14px; }
+.cs-alt small { color: #7d899d; font-size: 11px; }
+.cs-enemies small { color: #7d899d; font-size: 11px; }
+.cs-enemies > div { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.cs-enemies span { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #c7d1df; }
+.cs-enemies i { color: #7d899d; font-style: normal; }
+.cs-bans { display: flex; align-items: center; gap: 5px; color: #7d899d; opacity: .75; }
+.cs-edit { justify-self: start; background: none; border: 0; color: #67e8f9; font-size: 11px; padding: 0; }
+.cs-pool { display: grid; gap: 8px; border: 1px solid var(--border); border-radius: 14px; padding: 12px; background: rgba(13,18,29,.65); }
+.cs-pool header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.cs-pool header b { color: white; font-size: 13px; }
+.cs-pool header small { color: #7d899d; font-size: 11px; }
+.cs-pool-list { display: grid; gap: 6px; }
+.cs-pool-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cs-pool-row > span { color: #dbe3ee; font-size: 12px; min-width: 90px; }
+.cs-remove { background: none; border: 0; color: #7d899d; padding: 4px; margin-left: auto; }
+.cs-pool-add { display: flex; gap: 6px; flex-wrap: wrap; }
+.cs-pool-add input { flex: 1; min-width: 140px; background: rgba(2,6,12,.55); border: 1px solid var(--border); border-radius: 8px; color: white; padding: 7px 10px; font-size: 12px; }
+.cs-pool-add button { font-size: 12px; padding: 7px 12px; border-radius: 8px; }
+.cs-pool-add button:disabled { opacity: .45; }
 .live-empty h1 { color: white; font-size: clamp(25px, 4vw, 45px); letter-spacing: -.045em; margin: 17px 0 8px; }
 .live-empty > p { color: #7d899d; max-width: 590px; font-size: 13px; line-height: 1.65; margin: 0 0 22px; }
 .live-radar { width: 84px; height: 84px; display: grid; place-items: center; color: #67e8f9; border-radius: 50%; border: 1px solid rgba(103,232,249,.22); background: radial-gradient(circle, rgba(103,232,249,.13), transparent 65%); margin-bottom: 19px; position: relative; }
