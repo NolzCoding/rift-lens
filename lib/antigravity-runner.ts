@@ -104,8 +104,9 @@ function stopTree(pid: number | undefined, kill: () => void) {
 
 function runAgy(binary: AgyCommand, args: string[], cwd: string, input: string | null, timeoutMs: number) {
   return new Promise<{ stdout: string; stderr: string; code: number | null }>((resolve, reject) => {
-    // Detached on Windows: a windowless console still exposes CONIN$, which an interactive sign-in could wait on.
-    const child = spawn(binary.command, [...binary.prefix, ...args], { cwd, env: cleanEnvironment(), windowsHide: true, detached: process.platform === "win32", stdio: ["pipe", "pipe", "pipe"] });
+    // Hidden console, not detached: a detached process has no console on Windows, so agy (or what it starts) opened a
+    // visible window on every call. A sign-in it cannot do headless ends in "authentication required" or the timeout.
+    const child = spawn(binary.command, [...binary.prefix, ...args], { cwd, env: cleanEnvironment(), windowsHide: true, stdio: ["pipe", "pipe", "pipe"] });
     let stdout = "";
     let stderr = "";
     let stopped: "timeout" | "output" | null = null;
