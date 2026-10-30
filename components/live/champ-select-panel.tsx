@@ -161,10 +161,21 @@ export function ChampSelectPanel() {
           {view.note && <p className="cs-note">{view.note}</p>}
           {view.enemies.length > 0 && (
             <div className="cs-enemies">
-              <small>Enemy picks (roles are a guess)</small>
+              <small>Enemy picks (roles are a guess: Riot hides them until the game loads)</small>
               <div>{view.enemies.map((enemy) => (
-                <span key={enemy.champion}><ChampionImage view={view} name={enemy.champion} size={30} /><b>{ROLE_LABEL[enemy.role]}</b><i>{Math.round(enemy.chance * 100)}%</i></span>
+                <span key={enemy.champion}>
+                  <ChampionImage view={view} name={enemy.champion} size={30} />
+                  <b>{ROLE_LABEL[enemy.role]}{enemy.alt && ` or ${ROLE_LABEL[enemy.alt]}`}</b>
+                  {!enemy.alt && <i>{Math.round(enemy.chance * 100)}%</i>}
+                </span>
               ))}</div>
+              {view.laneGuess.length > 0 && view.myRole && (
+                <p className="cs-lane">
+                  Their {view.myRole === "BOTTOM" || view.myRole === "UTILITY" ? "bot lane" : `${ROLE_LABEL[view.myRole].toLowerCase()} laner`}:{" "}
+                  {view.laneGuess.map((lane) => `${lane.champions.join(" + ")} ${Math.round(lane.chance * 100)}%`).join(" · ")}
+                  {view.laneGuess[0].chance < 0.6 && " (unclear: your picks are scored against each of these)"}
+                </p>
+              )}
             </div>
           )}
           {view.bans.length > 0 && (

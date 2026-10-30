@@ -1,15 +1,16 @@
 import path from "node:path";
 
 import { championByNumericKey, championEntry, loadChampionIndex, type ChampionIndex } from "@/lib/champion-data";
-import { championTraits, isTank } from "@/lib/champion-traits";
+import { championTraits, isTank, type CcKind } from "@/lib/champion-traits";
+import { championBase, loadEnemyStatsData, type EnemyStatsData } from "@/lib/enemy-stats";
 import { lcuJson } from "@/lib/lcu";
 import { getItemCatalog } from "@/lib/live-game";
 import { ensureMatchupsLoaded, matchupJobState, requestMatchups, storedMatchups } from "@/lib/matchup-research";
 import { championKey, memoryRoot, readJson, writeJsonAtomic } from "@/lib/memory-store";
 import { isMetaRole, majorMinor, type MetaRole } from "@/lib/meta-builds";
-import { rankPicks, type PickAlly, type PickCandidate, type PickSuggestion } from "@/lib/pick-advisor";
+import { rankPicks, type LaneKit, type PickAlly, type PickCandidate, type PickSuggestion } from "@/lib/pick-advisor";
 import { getProfile } from "@/lib/player-profile";
-import { guessTeamRoles, likeliestRole, loadRoleRates, roleOdds, ROLES } from "@/lib/role-rates";
+import { guessTeamRoles, laneOdds, lanePairs, likeliestRole, loadRoleRates, roleOdds, ROLES } from "@/lib/role-rates";
 
 // Champ select pick helper: the player's champion pool, the League client's live champ select (/lol-champ-select/v1/session:
 // own assigned role, both teams' locked picks, bans; Riot hides enemy roles, so lib/role-rates.ts guesses them), and the
@@ -40,7 +41,10 @@ export type ChampSelectView = {
   /** Locked champion, else the one being hovered. */
   myChampion: string | null;
   allies: Array<{ champion: string | null; role: MetaRole | null; locked: boolean }>;
-  enemies: Array<{ champion: string; role: MetaRole; chance: number }>;
+  /** Each enemy's role from the whole-team guess; `alt` = the next likeliest when it is not clear (below 60%). */
+  enemies: Array<{ champion: string; role: MetaRole; chance: number; alt: MetaRole | null }>;
+  /** The likeliest enemy line-ups of the player's lane (bot lane: the ADC + support pair), best first. */
+  laneGuess: Array<{ champions: string[]; chance: number }>;
   bans: string[];
   pool: PoolEntry[];
   poolSource: "saved" | "history" | "empty";
@@ -132,7 +136,7 @@ export async function champSelectView(options: { withChampions?: boolean; mock?:
     }
   }
   const base: ChampSelectView = {
-    active: false, queue: null, myRole: null, myTurn: false, myChampion: null, allies: [], enemies: [], bans: [],
+    active: false, queue: null, myRole: null, myTurn: false, myChampion: null, allies: [], enemies: [], laneGuess: [], bans: [],
     pool, poolSource, suggestions: [], note: null, patch: majorMinor(catalog.version) || null, version: catalog.version, imageIds: {},
     ...(options.withChampions ? { champions: [...new Set([...index.values()].map((entry) => entry.name))].sort() } : {}),
   };
@@ -159,8 +163,16 @@ export async function champSelectView(options: { withChampions?: boolean; mock?:
   });
   const enemyNames = (session.theirTeam || []).map((member) => name(member.championId)).filter((entry): entry is string => Boolean(entry));
   const rates = await loadRoleRates();
-  const enemyOdds = guessTeamRoles(enemyNames.map((champion) => roleOdds(championEntry(index, champion)!, rates)));
-  const enemies = enemyNames.map((champion, at) => ({ champion, odds: enemyOdds[at], ...likeliestRole(enemyOdds[at]) }));
+  // Each champion's own role odds go to the ranking (it solves the lane pairing itself); the whole-team guess is shown.
+  const priors = enemyNames.map((champion) => roleOdds(championEntry(index, champion)!, rates));
+  const teamOdds = guessTeamRoles(priors);
+  const stats = await Promise.race([loadEnemyStatsData(catalog.version), new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000))]);
+  const enemies = enemyNames.map((champion, at) => ({ champion, odds: priors[at], kit: laneKit(champion, index, stats) }));
+  const shownEnemies = enemyNames.map((champion, at) => {
+    const [first, second] = [...ROLES].sort((a, b) => teamOdds[at][b] - teamOdds[at][a]);
+    const chance = teamOdds[at][first];
+    return { champion, role: first, chance: Math.round(chance * 100) / 100, alt: chance < 0.6 ? second : null };
+  });
 
   const taken = new Set([...bans, ...enemyNames, ...allies.filter((ally) => ally.locked).map((ally) => ally.champion || "")].map(championKey));
   const profile = await getProfile().catch(() => null);
@@ -181,7 +193,7 @@ export async function champSelectView(options: { withChampions?: boolean; mock?:
     if (!options.mock) for (const entry of group) requestMatchups(entry.champion, role, catalog.version);
     const candidates: PickCandidate[] = group.map((entry) => {
       const stored = storedMatchups(entry.champion, role);
-      return { champion: entry.champion, ...traitsOf(entry.champion), overallWinRate: stored?.overallWinRate ?? null, matchups: stored?.matchups ?? null, record: record(entry.champion) };
+      return { champion: entry.champion, ...traitsOf(entry.champion), kit: laneKit(entry.champion, index, stats), overallWinRate: stored?.overallWinRate ?? null, matchups: stored?.matchups ?? null, record: record(entry.champion) };
     });
     for (const suggestion of rankPicks({ role, candidates, enemies, allies: pickAllies })) {
       suggestions.push({ ...suggestion, role, research: matchupJobState(suggestion.champion, role, catalog.version) });
@@ -196,15 +208,31 @@ export async function champSelectView(options: { withChampions?: boolean; mock?:
     : null;
   return withImages({
     ...base, active: true, queue, myRole, myTurn, myChampion: name(me?.championId) || name(me?.championPickIntent), allies,
-    enemies: enemies.map(({ champion, role, chance }) => ({ champion, role, chance: Math.round(chance * 100) / 100 })), bans, suggestions, note,
+    enemies: shownEnemies, bans, suggestions, note,
+    laneGuess: myRole && enemyNames.length ? lanePairs(laneOdds(priors, myRole === "BOTTOM" || myRole === "UTILITY" ? ["BOTTOM", "UTILITY"] : [myRole]))
+      .filter((lane) => lane.members.length && lane.chance >= 0.05).slice(0, 3)
+      .map((lane) => ({ champions: lane.members.map((at) => enemyNames[at]), chance: Math.round(lane.chance * 100) / 100 })) : [],
   }, index);
+}
+
+const HARD_CC: CcKind[] = ["stun", "root", "charm", "taunt", "fear", "sleep", "polymorph", "knockup", "suppress", "pull"];
+
+/** Lane kit from Riot data: attack range (Data Dragon), longest damaging spell, hard crowd control, a dash or high mobility. */
+function laneKit(champion: string, index: ChampionIndex, stats: EnemyStatsData | null): LaneKit {
+  const traits = championTraits(champion, index);
+  return {
+    range: (stats && championBase(stats, champion)?.attackRange) || null,
+    reach: traits.pokeRange || null,
+    hardCc: traits.ccKinds.some((kind) => HARD_CC.includes(kind)),
+    mobile: traits.dashes > 0 || traits.ratings.mobility >= 2,
+  };
 }
 
 /** Image ids for every champion the view names (and the autocomplete list). */
 function withImages(view: ChampSelectView, index: ChampionIndex): ChampSelectView {
   const names = [
     ...view.pool.map((entry) => entry.champion), ...view.suggestions.map((entry) => entry.champion), ...view.enemies.map((entry) => entry.champion),
-    ...view.allies.map((entry) => entry.champion || ""), ...view.bans, ...(view.myChampion ? [view.myChampion] : []), ...(view.champions || []),
+    ...view.allies.map((entry) => entry.champion || ""), ...view.bans, ...view.laneGuess.flatMap((lane) => lane.champions), ...(view.myChampion ? [view.myChampion] : []), ...(view.champions || []),
   ];
   const imageIds: Record<string, string> = {};
   for (const name of names) { const entry = name ? championEntry(index, name) : null; if (entry) imageIds[entry.name] = entry.id; }

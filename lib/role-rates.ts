@@ -107,6 +107,66 @@ export function guessTeamRoles(odds: RoleOdds[]): RoleOdds[] {
   return totals.map((row) => Object.fromEntries(ROLES.map((role) => [role, row[role] / sum])) as RoleOdds);
 }
 
+export type LaneOdds = { members: number[]; roles: MetaRole[]; chance: number };
+
+/**
+ * Who fills a lane, from the same one-to-one assignments as guessTeamRoles: the champions (by index) given `roles` and
+ * which of those roles each gets, with the share of all assignments. Bot lane (["BOTTOM", "UTILITY"]) is a pair, so
+ * "Veigar + Viktor" is one answer with one chance, not two separate 31% guesses. Best first.
+ */
+export function laneOdds(odds: RoleOdds[], roles: MetaRole[]): LaneOdds[] {
+  const totals = new Map<string, LaneOdds>();
+  let sum = 0;
+  const walk = (at: number, used: Set<MetaRole>, weight: number, picks: MetaRole[]) => {
+    if (at === odds.length) {
+      sum += weight;
+      const members = picks.flatMap((role, index) => roles.includes(role) ? [index] : []);
+      const id = members.map((index) => `${index}:${picks[index]}`).join(",");
+      const entry = totals.get(id) || { members, roles: members.map((index) => picks[index]), chance: 0 };
+      entry.chance += weight;
+      totals.set(id, entry);
+      return;
+    }
+    for (const role of ROLES) {
+      if (used.has(role)) continue;
+      used.add(role);
+      walk(at + 1, used, weight * odds[at][role], [...picks, role]);
+      used.delete(role);
+    }
+  };
+  walk(0, new Set(), 1, []);
+  if (!sum) return [];
+  return [...totals.values()].map((entry) => ({ ...entry, chance: entry.chance / sum })).sort((a, b) => b.chance - a.chance);
+}
+
+/** laneOdds merged by who is in the lane, whatever the roles between them (Veigar ADC + Viktor support and the reverse). */
+export function lanePairs(lanes: LaneOdds[]): Array<{ members: number[]; chance: number }> {
+  const merged = new Map<string, { members: number[]; chance: number }>();
+  for (const lane of lanes) {
+    const members = [...lane.members].sort((a, b) => a - b);
+    const entry = merged.get(members.join(",")) || { members, chance: 0 };
+    entry.chance += lane.chance;
+    merged.set(members.join(","), entry);
+  }
+  return [...merged.values()].sort((a, b) => b.chance - a.chance);
+}
+
+/** The single likeliest full assignment (each champion a different role). */
+export function likeliestAssignment(odds: RoleOdds[]): MetaRole[] {
+  let best: { roles: MetaRole[]; weight: number } = { roles: [], weight: -1 };
+  const walk = (at: number, used: Set<MetaRole>, weight: number, picks: MetaRole[]) => {
+    if (at === odds.length) { if (weight > best.weight) best = { roles: picks, weight }; return; }
+    for (const role of ROLES) {
+      if (used.has(role)) continue;
+      used.add(role);
+      walk(at + 1, used, weight * odds[at][role], [...picks, role]);
+      used.delete(role);
+    }
+  };
+  walk(0, new Set(), 1, []);
+  return best.roles;
+}
+
 /** The likeliest role and its probability. */
 export function likeliestRole(odds: RoleOdds): { role: MetaRole; chance: number } {
   const role = ROLES.reduce((best, next) => odds[next] > odds[best] ? next : best, ROLES[0]);

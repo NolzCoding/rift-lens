@@ -118,3 +118,32 @@ test("ranking: an off-role bot lane (each enemy ~31% bot or support) still count
   assert.match(lane[0].text, /62% likely in your lane/);
   assert.ok(lane[0].points < 0);
 });
+
+test("2v2 kit: longer range than their best and an escape beat a short-range, immobile pick against two stuns", () => {
+  const bot = (champion: string, role: "BOTTOM" | "UTILITY", kit: { range: number; reach: number; hardCc: boolean }) => ({ ...enemy(champion, role), kit: { ...kit, mobile: false } });
+  const ranked = rankPicks({
+    role: "BOTTOM",
+    candidates: [
+      { ...candidate("Caitlyn", 50, {}), kit: { range: 650, reach: 1250, hardCc: true, mobile: true } },
+      { ...candidate("Miss Fortune", 50, {}), kit: { range: 550, reach: 1000, hardCc: false, mobile: false } },
+    ],
+    enemies: [bot("Veigar", "BOTTOM", { range: 550, reach: 1000, hardCc: true }), bot("Viktor", "UTILITY", { range: 525, reach: 600, hardCc: true })],
+    allies: [],
+  });
+  assert.equal(ranked[0].champion, "Caitlyn");
+  const range = (name: string) => ranked.find((entry) => entry.champion === name)!.parts.find((part) => part.kind === "kit" && part.text.startsWith("range"))!;
+  assert.ok(range("Caitlyn").points >= 1, `650 vs 550 and 1250 vs 1000 poke: ${range("Caitlyn").points}`);
+  assert.equal(range("Miss Fortune").points, 0, "550 vs 550, 1000 vs 1000");
+  const stuns = ranked.find((entry) => entry.champion === "Miss Fortune")!.parts.find((part) => /stuns or roots/.test(part.text));
+  assert.ok(stuns && stuns.points < 0, "two stunners against no dash");
+  assert.ok(!ranked.find((entry) => entry.champion === "Caitlyn")!.parts.some((part) => /stun/.test(part.text)), "Caitlyn can escape");
+});
+
+test("lane pairs: two usual mid laners with top, jungle and mid taken are read as one bot lane pair", async () => {
+  const { laneOdds, lanePairs } = await import("@/lib/role-rates");
+  const solo = (role: keyof RoleOdds) => Object.fromEntries((["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as const).map((entry) => [entry, entry === role ? 0.96 : 0.01])) as RoleOdds;
+  const midder = { TOP: 0.01, JUNGLE: 0.01, MIDDLE: 0.9, BOTTOM: 0.04, UTILITY: 0.04 } as RoleOdds;
+  const [pair] = lanePairs(laneOdds([solo("TOP"), solo("JUNGLE"), solo("MIDDLE"), midder, midder], ["BOTTOM", "UTILITY"]));
+  assert.deepEqual(pair.members, [3, 4]);
+  assert.ok(pair.chance > 0.5, `the likeliest pair by a clear margin: ${pair.chance}`);
+});

@@ -345,6 +345,7 @@ footer strong { color: #8d98aa; letter-spacing: .1em; font-size: 11px; }
 .cs-enemies > div { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
 .cs-enemies span { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #c7d1df; }
 .cs-enemies i { color: #7d899d; font-style: normal; }
+.cs-lane { margin: 8px 0 0; color: #c7d1df; font-size: 11px; line-height: 1.5; }
 .cs-bans { display: flex; align-items: center; gap: 5px; color: #7d899d; opacity: .75; }
 .cs-edit { justify-self: start; background: none; border: 0; color: #67e8f9; font-size: 11px; padding: 0; }
 .cs-pool { display: grid; gap: 8px; border: 1px solid var(--border); border-radius: 14px; padding: 12px; background: rgba(13,18,29,.65); }
