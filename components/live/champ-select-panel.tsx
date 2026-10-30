@@ -63,9 +63,12 @@ function PoolEditor({ view, onSaved }: { view: ChampSelectView; onSaved: (next: 
   // Image ids for every champion (from the ?champions=1 answer), so newly added ones show their portrait.
   const [ids, setIds] = useState<Record<string, string>>({});
   const images = { ...view, imageIds: { ...ids, ...view.imageIds } };
-  const dirty = JSON.stringify(pool) !== JSON.stringify(view.pool) || view.poolSource === "history";
+  const savedPool = JSON.stringify(view.pool);
+  const dirty = JSON.stringify(pool) !== savedPool || view.poolSource === "history";
 
-  useEffect(() => { setPool(view.pool); }, [view.pool]);
+  // Every 3s poll brings a new (equal) pool array: follow the saved pool only when its content changes (a save, or
+  // another tab), so unsaved additions and role changes are not wiped.
+  useEffect(() => { setPool(JSON.parse(savedPool) as PoolEntry[]); }, [savedPool]);
   useEffect(() => {
     fetch("/api/champ-select?champions=1", { cache: "no-store" }).then((response) => response.json()).then((data: ChampSelectView) => { setChampions(data.champions || []); setIds(data.imageIds || {}); }).catch(() => undefined);
   }, []);
