@@ -105,3 +105,16 @@ test("ranking: like with like — while one champion has no matchup data, patch 
   const counted = caitlyn.parts.filter((part) => part.counted !== false).reduce((sum, part) => sum + part.points, 0);
   assert.equal(caitlyn.score, Math.round(counted * 10) / 10, "the score is only the counted parts");
 });
+
+test("ranking: an off-role bot lane (each enemy ~31% bot or support) still counts, each enemy once", () => {
+  const split = (champion: string): ReturnType<typeof enemy> => ({ champion, odds: { TOP: 0.01, JUNGLE: 0.01, MIDDLE: 0.36, BOTTOM: 0.31, UTILITY: 0.31 } });
+  const [only] = rankPicks({
+    role: "BOTTOM",
+    candidates: [{ ...candidate("Caitlyn", 48, {}), matchups: [{ opponent: "Veigar", opponentRole: "BOTTOM", winRate: 46, games: 800 }] }],
+    enemies: [split("Veigar")], allies: [],
+  });
+  const lane = only.parts.filter((part) => part.kind === "lane");
+  assert.equal(lane.length, 1, "one part per enemy, not one per possible lane");
+  assert.match(lane[0].text, /62% likely in your lane/);
+  assert.ok(lane[0].points < 0);
+});

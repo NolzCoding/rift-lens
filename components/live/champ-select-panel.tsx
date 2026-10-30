@@ -20,16 +20,19 @@ function ChampionImage({ view, name, size = 40 }: { view: ChampSelectView; name:
     : <span className="cs-icon cs-icon-empty" title={name} style={{ width: size, height: size }} />;
 }
 
-/** The parts that move the score most, counted ones first; "no matchup data" lines are left to the one research note. */
-const reasons = (entry: ChampSelectView["suggestions"][number], count = 4) => entry.parts
-  .filter((part) => !/no matchup data/.test(part.text))
-  .sort((a, b) => Number(a.counted === false) - Number(b.counted === false) || Math.abs(b.points) - Math.abs(a.points))
-  .slice(0, count);
+/** The parts that move the score most, counted ones first; "no matchup data vs X" last, but shown: it is why a lane counts 0. */
+const reasons = (entry: ChampSelectView["suggestions"][number], count = 4) => {
+  const missing = (part: { text: string }) => Number(/no matchup data/.test(part.text));
+  return [...entry.parts]
+    .sort((a, b) => missing(a) - missing(b) || Number(a.counted === false) - Number(b.counted === false) || Math.abs(b.points) - Math.abs(a.points))
+    .slice(0, count);
+};
 const tone = (part: { points: number; counted?: false }) => part.counted === false ? "muted" : part.points > 0 ? "up" : part.points < 0 ? "down" : "";
 const points = (value: number) => `${value > 0 ? "+" : ""}${value.toFixed(1)}`;
 
 /** One reason line with what it adds to the score (or that it is not counted yet). */
 function Reason({ part }: { part: ChampSelectView["suggestions"][number]["parts"][number] }) {
+  if (/no matchup data/.test(part.text)) return <li className="muted">{part.text}</li>;
   return <li className={tone(part)}>{part.text} <b>{part.counted === false ? "not counted yet" : points(part.points)}</b></li>;
 }
 

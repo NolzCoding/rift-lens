@@ -12,8 +12,11 @@ import type { RoleOdds } from "@/lib/role-rates";
 export const LANE_WEIGHT: Record<MetaRole, Partial<Record<MetaRole, number>>> = {
   TOP: { TOP: 1 }, JUNGLE: { JUNGLE: 1 }, MIDDLE: { MIDDLE: 1 }, BOTTOM: { BOTTOM: 1, UTILITY: 0.6 }, UTILITY: { UTILITY: 1, BOTTOM: 0.6 },
 };
-/** Enemy role probability below this is not shown as a lane opponent. */
-const LANE_CHANCE = 0.35;
+/**
+ * Enemy role probability below this is not counted as a lane opponent. Each one counts in proportion to its chance, so
+ * an off-role bot lane (Veigar ADC + Viktor support, each ~31% bot or support) still weighs in instead of vanishing.
+ */
+const LANE_CHANCE = 0.15;
 /** The player's record is shrunk toward 50% as if they had this many extra games at 50%. */
 const RECORD_PRIOR_GAMES = 20;
 const RECORD_CAP = 4;
@@ -42,26 +45,32 @@ export type PickSuggestion = { champion: string; score: number; parts: PickPart[
 
 const fmt = (points: number) => `${points >= 0 ? "+" : ""}${points.toFixed(1)}`;
 
+/**
+ * One part per enemy who may be in the lane: weighted by how likely they are there (bot lane: ADC 1, support 0.6 — see
+ * LANE_WEIGHT) and by the sample size. The row for the role they most likely play is used, else any row for them, so a
+ * missing "Viktor support" row never counts the "Viktor ADC" row twice.
+ */
 function lanePart(candidate: PickCandidate, role: MetaRole, enemies: PickEnemy[]): PickPart[] {
-  const weights = LANE_WEIGHT[role];
   const parts: PickPart[] = [];
   for (const enemy of enemies) {
-    for (const [lane, weight] of Object.entries(weights) as Array<[MetaRole, number]>) {
-      const chance = enemy.odds[lane] || 0;
-      if (chance < LANE_CHANCE) continue;
-      const row = candidate.matchups?.find((entry) => entry.opponent === enemy.champion && entry.opponentRole === lane)
-        || candidate.matchups?.find((entry) => entry.opponent === enemy.champion);
-      const where = chance < 0.75 ? ` (${Math.round(chance * 100)}% likely ${lane === "UTILITY" ? "support" : lane.toLowerCase()})` : "";
-      if (!row) {
-        parts.push({ kind: "lane", points: 0, text: `vs ${enemy.champion}${where}: no matchup data` });
-        continue;
-      }
-      // The edge over the champion's own average, so its general strength is not counted twice.
-      const edge = row.winRate - (candidate.overallWinRate ?? 50);
-      const trust = row.games === null ? 0.5 : Math.min(1, row.games / MATCHUP_FULL_GAMES);
-      const points = edge * weight * chance * trust;
-      parts.push({ kind: "lane", points, text: `${row.winRate.toFixed(1)}% vs ${enemy.champion}${where}${row.games ? ` (${row.games.toLocaleString("en-US")} games)` : ""}` });
+    const lanes = (Object.entries(LANE_WEIGHT[role]) as Array<[MetaRole, number]>)
+      .map(([lane, weight]) => ({ lane, weight, chance: enemy.odds[lane] || 0 }))
+      .filter((entry) => entry.chance >= LANE_CHANCE)
+      .sort((a, b) => b.chance * b.weight - a.chance * a.weight);
+    if (!lanes.length) continue;
+    const weight = lanes.reduce((sum, entry) => sum + entry.weight * entry.chance, 0);
+    const inLane = Math.min(1, lanes.reduce((sum, entry) => sum + entry.chance, 0));
+    const where = inLane < 0.75 ? ` (${Math.round(inLane * 100)}% likely in your lane)` : "";
+    const row = lanes.map((entry) => candidate.matchups?.find((match) => match.opponent === enemy.champion && match.opponentRole === entry.lane)).find(Boolean)
+      || candidate.matchups?.find((match) => match.opponent === enemy.champion);
+    if (!row) {
+      parts.push({ kind: "lane", points: 0, text: `vs ${enemy.champion}${where}: no matchup data` });
+      continue;
     }
+    // The edge over the champion's own average, so its general strength is not counted twice.
+    const edge = row.winRate - (candidate.overallWinRate ?? 50);
+    const trust = row.games === null ? 0.5 : Math.min(1, row.games / MATCHUP_FULL_GAMES);
+    parts.push({ kind: "lane", points: edge * weight * trust, text: `${row.winRate.toFixed(1)}% vs ${enemy.champion}${where}${row.games ? ` (${row.games.toLocaleString("en-US")} games)` : ""}` });
   }
   return parts;
 }
