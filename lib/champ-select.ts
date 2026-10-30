@@ -124,6 +124,13 @@ export async function champSelectView(options: { withChampions?: boolean; mock?:
   const saved = await readPool();
   const pool = saved?.champions.length ? saved.champions : await poolFromHistory(index);
   const poolSource: ChampSelectView["poolSource"] = saved?.champions.length ? "saved" : pool.length ? "history" : "empty";
+  // Research ahead of time (once per patch, one at a time; requestMatchups returns at once): a champ select is shorter
+  // than a few researches, so data started there arrived after the pick. A guessed pool: its 4 most played only.
+  if (!options.mock) {
+    for (const entry of pool.slice(0, poolSource === "saved" ? pool.length : 4)) {
+      for (const role of entry.roles) requestMatchups(entry.champion, role, catalog.version);
+    }
+  }
   const base: ChampSelectView = {
     active: false, queue: null, myRole: null, myTurn: false, myChampion: null, allies: [], enemies: [], bans: [],
     pool, poolSource, suggestions: [], note: null, patch: majorMinor(catalog.version) || null, version: catalog.version, imageIds: {},

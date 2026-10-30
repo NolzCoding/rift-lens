@@ -330,8 +330,17 @@ footer strong { color: #8d98aa; letter-spacing: .1em; font-size: 11px; }
 .cs-best em { display: block; margin-top: 6px; }
 .cs-note, .cs-status { margin: 0; }
 .cs-alt { display: flex; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.03); }
+.cs-alt { align-items: flex-start; }
 .cs-alt strong { display: block; color: #dbe3ee; font-size: 14px; }
-.cs-alt small { color: #7d899d; font-size: 11px; }
+.cs-alt strong span { color: #7d899d; font-size: 11px; font-weight: 400; margin-left: 6px; }
+.cs-alt ul { margin: 3px 0 0; padding: 0; list-style: none; display: grid; gap: 2px; font-size: 11px; }
+.cs-alt li, .cs-best li { color: #9aa6ba; }
+.cs-alt li.up { color: #c7f9d4; }
+.cs-alt li.down { color: #fca5a5; }
+.cs-alt em { display: block; margin-top: 4px; color: #7d899d; font-size: 11px; font-style: normal; }
+.cs-best li b, .cs-alt li b { font-weight: 600; opacity: .8; margin-left: 4px; }
+.cs-best li.muted, .cs-alt li.muted { color: #6b7689; }
+.cs-partial { margin: 0; padding: 8px 10px; border-radius: 10px; background: rgba(250,204,21,.07); border: 1px solid rgba(250,204,21,.22); color: #e9d78a; font-size: 11px; line-height: 1.5; }
 .cs-enemies small { color: #7d899d; font-size: 11px; }
 .cs-enemies > div { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
 .cs-enemies span { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #c7d1df; }

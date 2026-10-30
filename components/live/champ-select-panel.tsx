@@ -20,25 +20,39 @@ function ChampionImage({ view, name, size = 40 }: { view: ChampSelectView; name:
     : <span className="cs-icon cs-icon-empty" title={name} style={{ width: size, height: size }} />;
 }
 
-/** The parts that move the score most; "no matchup data" lines are left to the one research note. */
-const reasons = (entry: ChampSelectView["suggestions"][number]) => entry.parts
+/** The parts that move the score most, counted ones first; "no matchup data" lines are left to the one research note. */
+const reasons = (entry: ChampSelectView["suggestions"][number], count = 4) => entry.parts
   .filter((part) => !/no matchup data/.test(part.text))
-  .sort((a, b) => Math.abs(b.points) - Math.abs(a.points))
-  .slice(0, 3);
-const tone = (points: number) => points > 0 ? "up" : points < 0 ? "down" : "";
+  .sort((a, b) => Number(a.counted === false) - Number(b.counted === false) || Math.abs(b.points) - Math.abs(a.points))
+  .slice(0, count);
+const tone = (part: { points: number; counted?: false }) => part.counted === false ? "muted" : part.points > 0 ? "up" : part.points < 0 ? "down" : "";
+const points = (value: number) => `${value > 0 ? "+" : ""}${value.toFixed(1)}`;
+
+/** One reason line with what it adds to the score (or that it is not counted yet). */
+function Reason({ part }: { part: ChampSelectView["suggestions"][number]["parts"][number] }) {
+  return <li className={tone(part)}>{part.text} <b>{part.counted === false ? "not counted yet" : points(part.points)}</b></li>;
+}
 
 function Suggestions({ view }: { view: ChampSelectView }) {
   const [best, ...rest] = view.suggestions;
   if (!best) return null;
   const lead = rest[0] ? best.score - rest[0].score : Infinity;
+  const loading = view.suggestions.filter((entry) => entry.missingData).map((entry) => `${entry.champion} (${RESEARCH_LABEL[entry.research] || "no data"})`);
+  const label = best.partial ? "Your games only" : lead >= 1.5 ? <><Crown size={12} /> Best pick</> : "Close call";
   return (
     <div className="cs-picks">
+      {best.partial && (
+        <p className="cs-partial">
+          Matchup data is missing for {loading.join(", ")}, so this ranking only uses your own games and your team.
+          Champions with matchup data show it below, but it does not count until every champion has some.
+        </p>
+      )}
       <article className="cs-best">
         <ChampionImage view={view} name={best.champion} size={64} />
         <div>
-          <small>{lead >= 1.5 ? <><Crown size={12} /> Best pick</> : "Close call"}{!view.myRole && ` · ${ROLE_LABEL[best.role]}`}</small>
+          <small>{label}{!view.myRole && ` · ${ROLE_LABEL[best.role]}`}</small>
           <strong>{best.champion}</strong>
-          <ul>{reasons(best).map((part) => <li key={part.text} className={tone(part.points)}>{part.text}</li>)}</ul>
+          <ul>{reasons(best).map((part) => <Reason key={part.text} part={part} />)}</ul>
           {RESEARCH_LABEL[best.research] && <em>{RESEARCH_LABEL[best.research]}</em>}
         </div>
       </article>
@@ -46,8 +60,9 @@ function Suggestions({ view }: { view: ChampSelectView }) {
         <article className="cs-alt" key={`${entry.champion}-${entry.role}`}>
           <ChampionImage view={view} name={entry.champion} size={38} />
           <div>
-            <strong>{entry.champion}</strong>
-            <small>{reasons(entry).slice(0, 2).map((part) => part.text).join(" · ") || "no data yet"}</small>
+            <strong>{entry.champion} <span>{points(entry.score - best.score)} vs {best.champion}</span></strong>
+            <ul>{reasons(entry, 3).map((part) => <Reason key={part.text} part={part} />)}</ul>
+            {RESEARCH_LABEL[entry.research] && <em>{RESEARCH_LABEL[entry.research]}</em>}
           </div>
         </article>
       ))}

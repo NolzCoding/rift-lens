@@ -35,8 +35,10 @@ export type PickCandidate = {
 };
 export type PickEnemy = { champion: string; odds: RoleOdds };
 export type PickAlly = { champion: string; damage: DamageType; tank: boolean };
-export type PickPart = { kind: "patch" | "lane" | "record" | "comfort" | "team"; points: number; text: string };
-export type PickSuggestion = { champion: string; score: number; parts: PickPart[]; missingData: boolean };
+/** `counted: false` = shown, but left out of the score because not every candidate has this kind of data yet. */
+export type PickPart = { kind: "patch" | "lane" | "record" | "comfort" | "team"; points: number; text: string; counted?: false };
+/** `partial` = some candidates have no researched data yet, so the ranking uses only the player's games and the team. */
+export type PickSuggestion = { champion: string; score: number; parts: PickPart[]; missingData: boolean; partial: boolean };
 
 const fmt = (points: number) => `${points >= 0 ? "+" : ""}${points.toFixed(1)}`;
 
@@ -76,8 +78,13 @@ function teamPart(candidate: PickCandidate, allies: PickAlly[]): PickPart[] {
   return parts;
 }
 
-/** The pool ranked for this role, best first. Champions already picked or banned must be left out by the caller. */
+/**
+ * The pool ranked for this role, best first. Champions already picked or banned must be left out by the caller.
+ * Like with like: while any candidate still has no researched data, the patch and lane parts are shown but not counted,
+ * so a champion is never ranked up just because its numbers are missing (no data scored 0 against another's known minus).
+ */
 export function rankPicks(input: { role: MetaRole; candidates: PickCandidate[]; enemies: PickEnemy[]; allies: PickAlly[] }): PickSuggestion[] {
+  const partial = input.candidates.some((candidate) => candidate.matchups === null);
   return input.candidates.map((candidate) => {
     const parts: PickPart[] = [];
     if (candidate.overallWinRate !== null) parts.push({ kind: "patch", points: candidate.overallWinRate - 50, text: `${candidate.overallWinRate.toFixed(1)}% win rate this patch` });
@@ -93,8 +100,9 @@ export function rankPicks(input: { role: MetaRole; candidates: PickCandidate[]; 
     if (games < COMFORT_GAMES) parts.push({ kind: "comfort", points: -(COMFORT_GAMES - games) * 0.6, text: games ? `only ${games} game${games === 1 ? "" : "s"} on ${candidate.champion}` : `new to you` });
     else if (games >= MAIN_GAMES) parts.push({ kind: "comfort", points: 1.5, text: `one of your most played (${games} games)` });
     parts.push(...teamPart(candidate, input.allies));
-    const score = parts.reduce((sum, part) => sum + part.points, 0);
-    return { champion: candidate.champion, score: Math.round(score * 10) / 10, parts: parts.map((part) => ({ ...part, points: Math.round(part.points * 10) / 10 })), missingData: candidate.matchups === null };
+    const shown = parts.map((part): PickPart => ({ ...part, points: Math.round(part.points * 10) / 10, ...(partial && (part.kind === "patch" || part.kind === "lane") ? { counted: false as const } : {}) }));
+    const score = shown.reduce((sum, part) => sum + (part.counted === false ? 0 : part.points), 0);
+    return { champion: candidate.champion, score: Math.round(score * 10) / 10, parts: shown, missingData: candidate.matchups === null, partial };
   }).sort((a, b) => b.score - a.score || a.champion.localeCompare(b.champion));
 }
 

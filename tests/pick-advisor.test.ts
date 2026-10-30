@@ -89,3 +89,19 @@ test("ranking: experience counts apart from results; a main with a losing record
   assert.equal(ranked[0].champion, "Caitlyn");
   assert.ok(ranked[1].parts.some((part) => part.kind === "comfort" && part.points < 0));
 });
+
+test("ranking: like with like — while one champion has no matchup data, patch and lane data are shown but not counted", () => {
+  const ranked = rankPicks({
+    role: "BOTTOM",
+    candidates: [
+      { ...candidate("Caitlyn", 48.3, { Ezreal: 50.5 }, { games: 48, wins: 20 }) },
+      { ...candidate("Miss Fortune", 50, {}, { games: 4, wins: 2 }), overallWinRate: null, matchups: null },
+    ],
+    enemies: [enemy("Ezreal", "BOTTOM")], allies: [],
+  });
+  assert.ok(ranked.every((entry) => entry.partial));
+  const caitlyn = ranked.find((entry) => entry.champion === "Caitlyn")!;
+  assert.ok(caitlyn.parts.filter((part) => part.kind === "patch" || part.kind === "lane").every((part) => part.counted === false));
+  const counted = caitlyn.parts.filter((part) => part.counted !== false).reduce((sum, part) => sum + part.points, 0);
+  assert.equal(caitlyn.score, Math.round(counted * 10) / 10, "the score is only the counted parts");
+});
