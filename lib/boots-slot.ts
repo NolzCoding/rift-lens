@@ -110,6 +110,11 @@ export function slottedBoots(gameId: string, input: {
   /** Current gold, and the gold value of the listed items apart from boots: gold spent beyond what the list gained went into the slot. */
   gold: number;
   listedValue: number;
+  /**
+   * Extra move speed the player's runes add to any boots (Magical Footwear: "an additional 10 Move Speed"). Only
+   * matters against the Data Dragon base: a base calibrated on listed boots already holds it.
+   */
+  runeBonus: number;
 }): BootsItem | null {
   const state = stateFor(gameId);
   const { time, stats, visible, percent, dead } = input;
@@ -155,8 +160,17 @@ export function slottedBoots(gameId: string, input: {
   // Calibrated from listed boots beats the Data Dragon base (it already holds runes and other constant bonuses).
   const base = state.base ?? input.baseMoveSpeed;
   if (speed === null || !base) return state.boots;
-  const bonus = speed / (1 + percent) - base;
+  const bonus = speed / (1 + percent) - base - (state.base === null ? input.runeBonus : 0);
   const fits = (item: BootsItem) => Math.abs(item.flat - bonus) <= FIT_TOLERANCE;
+  // A guess the speed no longer fits (Swiftness taken for Mercury's Treads + the rune's 10): the boots that fit, built
+  // from the same plain boots when there are such.
+  if (state.boots && !fits(state.boots) && Math.abs(state.boots.flat - bonus) <= 25) {
+    const plain = state.boots.from?.[0];
+    const fitting = input.boots.filter((item) => item.flat > 0 && fits(item));
+    const related = fitting.filter((item) => plain !== undefined && (item.from?.includes(plain) || item.id === plain));
+    const better = related.length || fitting.length ? pickUpgrade(related.length ? related : fitting, bonus, state.settled, stats) : null;
+    if (better) state.boots = better;
+  }
   if (!state.boots) {
     // No boots known yet: a resting bonus that fits a boots item is boots bought straight into the boots slot.
     const candidates = input.boots.filter((item) => item.flat > 0 && fits(item));

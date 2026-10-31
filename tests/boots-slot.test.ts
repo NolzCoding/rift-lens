@@ -12,13 +12,14 @@ const berserkers: BootsItem = { id: 3006, name: "Berserker's Greaves", price: 11
 const sorcerers: BootsItem = { id: 3020, name: "Sorcerer's Shoes", price: 1100, flat: 45, from: [1001], description: "12 Magic Penetration 45 Move Speed" };
 const swiftness: BootsItem = { id: 3009, name: "Boots of Swiftness", price: 1000, flat: 55, from: [1001] };
 const gunmetal: BootsItem = { id: 3172, name: "Gunmetal Greaves", price: 1600, flat: 45, from: [3006] };
-const allBoots = [boots, berserkers, sorcerers, swiftness, gunmetal];
+const mercury: BootsItem = { id: 3111, name: "Mercury's Treads", price: 1250, flat: 45, from: [1001], description: "20 Magic Resist 45 Move Speed 30% Tenacity" };
+const allBoots = [boots, berserkers, sorcerers, swiftness, gunmetal, mercury];
 const stats = (moveSpeed: number, attackSpeed = 1.04): MoveStats => ({ moveSpeed, attackSpeed, armor: 60, magicResist: 40, magicPenetrationFlat: 0, abilityHaste: 0, abilityPower: 0, attackDamage: 150 });
 
 /** One sample every 10 game seconds from `from` to `to`, returning the last result. */
 function walk(from: number, to: number, ms: number, visible: BootsItem | null, attackSpeed?: number, alive = true, baseMoveSpeed: number | null = null, roleQuests = true) {
   let result: BootsItem | null = null;
-  for (let time = from; time <= to; time += 10) result = slottedBoots("g1", { time, dead: !alive, stats: stats(ms, attackSpeed), visible, percent: 0, boots: allBoots, baseMoveSpeed, roleQuests, gold: 500, listedValue: 3000 });
+  for (let time = from; time <= to; time += 10) result = slottedBoots("g1", { time, dead: !alive, stats: stats(ms, attackSpeed), visible, percent: 0, boots: allBoots, baseMoveSpeed, roleQuests, gold: 500, listedValue: 3000, runeBonus: 0 });
   return result;
 }
 
@@ -76,7 +77,7 @@ test("boots slot: a gold drop of an upgrade's price with nothing new listed is t
   walk(480, 780, 350, boots);
   walk(790, 880, 350, null);
   const sample = (time: number, gold: number, ms: number, attackSpeed: number) =>
-    slottedBoots("g1", { time, dead: false, stats: stats(ms, attackSpeed), visible: null, percent: 0, boots: allBoots, baseMoveSpeed: null, roleQuests: true, gold, listedValue: 3000 });
+    slottedBoots("g1", { time, dead: false, stats: stats(ms, attackSpeed), visible: null, percent: 0, boots: allBoots, baseMoveSpeed: null, roleQuests: true, gold, listedValue: 3000, runeBonus: 0 });
   assert.equal(sample(890, 920, 712, 1.04)?.name, "Boots");
   // 920 → 146 in 12s: 800g (Berserker's 1100 minus the Boots' 300) less ~25g of passive income; attack speed jumped.
   assert.equal(sample(902, 146, 712, 1.24)?.name, "Berserker's Greaves");
@@ -87,7 +88,7 @@ test("boots slot: gold that went into listed items is not boots; boots bought on
   walk(480, 780, 350, boots);
   walk(790, 880, 350, null);
   const sample = (time: number, gold: number, listedValue: number, attackSpeed = 1.04) =>
-    slottedBoots("g1", { time, dead: false, stats: stats(700, attackSpeed), visible: null, percent: 0, boots: allBoots, baseMoveSpeed: null, roleQuests: true, gold, listedValue });
+    slottedBoots("g1", { time, dead: false, stats: stats(700, attackSpeed), visible: null, percent: 0, boots: allBoots, baseMoveSpeed: null, roleQuests: true, gold, listedValue, runeBonus: 0 });
   sample(890, 1720, 3000);
   assert.equal(sample(900, 920, 3800)?.name, "Boots", "an 800g item joined the list: nothing went into the slot");
   assert.equal(sample(910, 120, 3800, 1.24)?.name, "Berserker's Greaves", "800g more left and the list did not grow: the upgrade");
@@ -97,7 +98,33 @@ test("boots slot: a sale (the list lost value) is never read as a slot purchase"
   walk(480, 780, 350, boots);
   walk(790, 880, 350, null);
   const sample = (time: number, gold: number, listedValue: number) =>
-    slottedBoots("g1", { time, dead: false, stats: stats(700), visible: null, percent: 0, boots: allBoots, baseMoveSpeed: null, roleQuests: true, gold, listedValue });
+    slottedBoots("g1", { time, dead: false, stats: stats(700), visible: null, percent: 0, boots: allBoots, baseMoveSpeed: null, roleQuests: true, gold, listedValue, runeBonus: 0 });
   sample(890, 500, 6000);
   assert.equal(sample(900, 400, 3000)?.name, "Boots");
+});
+
+test("boots slot: Magical Footwear's +10 — free boots at 12:00 and a later upgrade are read with the rune's speed", () => {
+  // Xayah-like practice game: base 330, no boots ever listed. 365 = Boots 25 + rune 10; 926g gone with nothing new
+  // listed = Mercury's Treads from Boots (950); 385 = Mercury's 45 + rune 10, not Boots of Swiftness' 55.
+  const sample = (time: number, ms: number, gold: number) =>
+    slottedBoots("g1", { time, dead: false, stats: stats(ms), visible: null, percent: 0, boots: allBoots, baseMoveSpeed: 330, roleQuests: true, gold, listedValue: 3000, runeBonus: 10 });
+  for (let time = 600; time <= 710; time += 10) sample(time, 330, 1500);
+  let result = null;
+  for (let time = 720; time <= 760; time += 10) result = sample(time, 365, 2100);
+  assert.equal(result?.name, "Boots", "+35 with the rune is plain Boots");
+  assert.equal(sample(772, 778, 1174)?.name, "Mercury's Treads", "950g into the slot");
+  for (let time = 782; time <= 860; time += 10) result = sample(time, 385, 1200);
+  assert.equal(result?.name, "Mercury's Treads", "385 stays Mercury's, not Swiftness");
+});
+
+test("boots slot: a guess the move speed stops fitting is corrected", () => {
+  const sample = (time: number, ms: number) =>
+    slottedBoots("g1", { time, dead: false, stats: stats(ms), visible: null, percent: 0, boots: allBoots, baseMoveSpeed: 330, roleQuests: true, gold: 500, listedValue: 3000, runeBonus: 0 });
+  let result = null;
+  for (let time = 700; time <= 760; time += 10) result = sample(time, 385);
+  assert.equal(result?.name, "Boots of Swiftness", "without the rune, +55 is Swiftness");
+  const corrected = (time: number) => slottedBoots("g1", { time, dead: false, stats: stats(385), visible: null, percent: 0, boots: allBoots, baseMoveSpeed: 330, roleQuests: true, gold: 500, listedValue: 3000, runeBonus: 10 });
+  for (let time = 770; time <= 800; time += 10) result = corrected(time);
+  assert.notEqual(result?.name, "Boots of Swiftness", "once the rune's 10 is known, +55 is a 45-speed boots");
+  assert.equal(result?.flat, 45);
 });

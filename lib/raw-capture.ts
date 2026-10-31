@@ -12,7 +12,7 @@ import { memoryRoot } from "@/lib/memory-store";
  *   { v: 1, at: ISO wall clock, eventsFrom: n, raw: RawLiveData }
  * `raw.events.Events` holds only the events with index >= eventsFrom (the delta since the previous line);
  * concatenate them in order to rebuild the full list (see readRawCapture in scripts/replay-data.ts). Fields the engine never
- * reads (raw* localisation keys, skins, general/stat rune lists, rune/ability ids, item slot flags) are stripped
+ * reads (raw* localisation keys, skins, the stat-shard list, rune/ability ids, item slot flags) are stripped
  * and floats are rounded to 2 decimals.
  * A sample is written every ~10s of game time, and immediately when the active player's items, isDead,
  * level or the event count change (every 30s once a file passes 2 MB). Each file is capped at 3 MB (~9 KB/line,
@@ -24,7 +24,7 @@ const MAX_FILE_BYTES = 3 * 1024 * 1024;
 const KEEP_FILES = 30;
 // Never read by lib/live-game.ts (RawLiveData). `id` only appears on runes/abilities; items use itemID, events EventID.
 const DROP_KEYS = new Set([
-  "rawDescription", "rawDisplayName", "rawChampionName", "rawSkinName", "skinName", "skinID", "generalRunes", "statRunes",
+  "rawDescription", "rawDisplayName", "rawChampionName", "rawSkinName", "skinName", "skinID", "statRunes",
   "id", "isBot", "riotIdGameName", "riotIdTagLine", "teamRelativeColors", "canUse", "consumable", "slot",
 ]);
 

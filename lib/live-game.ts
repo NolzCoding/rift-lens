@@ -94,7 +94,7 @@ export type RawLiveData = {
     level?: number;
     championStats?: RawChampionStats;
     abilities?: Partial<Record<"Q" | "W" | "E" | "R" | "Passive", { abilityLevel?: number; displayName?: string }>>;
-    fullRunes?: { keystone?: RawName; primaryRuneTree?: RawName; secondaryRuneTree?: RawName };
+    fullRunes?: { keystone?: RawName; primaryRuneTree?: RawName; secondaryRuneTree?: RawName; generalRunes?: Array<{ id?: number; displayName?: string }> };
   };
   allPlayers?: RawPlayer[];
   events?: { Events?: RawEvent[] };
@@ -2486,7 +2486,34 @@ function startingRecommendation(active: LiveGameSnapshot["activePlayer"], catalo
 }
 
 /** The boots in the role-quest boots slot this sample, as an owned item, or null (lib/boots-slot.ts). */
-function bootsSlotItem(gameId: string, time: number, active: LiveGameSnapshot["activePlayer"], stats: RawChampionStats, catalog: Catalog, baseMoveSpeed: number | null, roleQuests: boolean): LiveItem | null {
+const runeBootsState = globalThis as typeof globalThis & { __riftLensRuneBootsV1?: Map<string, Promise<Map<string, number>>> };
+const runeBootsCache = runeBootsState.__riftLensRuneBootsV1 ??= new Map();
+
+/**
+ * Rune name → move speed it adds to any boots, from Riot's rune text (Data Dragon runesReforged): Magical Footwear's
+ * "Slightly Magical Footwear grants you an additional 10 Move Speed". Empty when the data cannot be loaded.
+ */
+function runeBootsBonuses(version: string) {
+  let pending = runeBootsCache.get(version);
+  if (!pending) {
+    pending = fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/runesReforged.json`, { signal: AbortSignal.timeout(3000) })
+      .then((response) => response.ok ? response.json() as Promise<Array<{ slots?: Array<{ runes?: Array<{ name?: string; longDesc?: string }> }> }>> : [])
+      .then((trees) => {
+        const bonuses = new Map<string, number>();
+        for (const rune of trees.flatMap((tree) => tree.slots || []).flatMap((slot) => slot.runes || [])) {
+          const text = cleanText(rune.longDesc);
+          const extra = /boots|footwear/i.test(text) ? /additional (\d+) Move Speed/i.exec(text) : null;
+          if (rune.name && extra) bonuses.set(key(rune.name), Number(extra[1]));
+        }
+        return bonuses;
+      })
+      .catch(() => { runeBootsCache.delete(version); return new Map<string, number>(); });
+    runeBootsCache.set(version, pending);
+  }
+  return pending;
+}
+
+function bootsSlotItem(gameId: string, time: number, active: LiveGameSnapshot["activePlayer"], stats: RawChampionStats, catalog: Catalog, baseMoveSpeed: number | null, roleQuests: boolean, runeBonus: number): LiveItem | null {
   const asBoots = (item: CatalogItem): BootsItem => ({ id: item.id, name: item.name, price: item.cost, description: item.description, flat: item.moveSpeed?.flat || 0, from: item.from });
   const listed = active.items.flatMap((item) => catalog.byId.get(item.id) || []);
   const visible = listed.find((item) => isBootsItem(item));
@@ -2504,6 +2531,7 @@ function bootsSlotItem(gameId: string, time: number, active: LiveGameSnapshot["a
     boots: allBoots,
     baseMoveSpeed,
     roleQuests,
+    runeBonus,
     gold: active.currentGold,
     // Boots left out: boots moving into the slot is not a purchase.
     listedValue: listed.filter((item) => !isBootsItem(item)).reduce((sum, item) => sum + item.cost * Math.max(1, active.items.find((entry) => entry.id === item.id)?.count || 1), 0),
@@ -2649,7 +2677,9 @@ export async function normalizeLiveData(raw: RawLiveData, options: NormalizeOpti
   // Boots in the role-quest boots slot are not listed (lib/boots-slot.ts): they still count as owned. Before anything reads
   // the inventory (enemy profile's item gold, recommendations, death shop, recorder).
   const baseMoveSpeed = enemyStatsData ? championBase(enemyStatsData, activePlayer.champion)?.moveSpeed ?? null : null;
-  const hiddenBoots = bootsSlotItem(liveGameId(raw), num(raw.gameData?.gameTime), activePlayer, stats, catalog, baseMoveSpeed, rulesetFor(raw.gameData) === "sr");
+  const runeBonuses = catalog.fallback ? new Map<string, number>() : await runeBootsBonuses(catalog.version);
+  const runeBonus = (rawActive.fullRunes?.generalRunes || []).reduce((sum, rune) => sum + (runeBonuses.get(key(rune.displayName || "")) || 0), 0);
+  const hiddenBoots = bootsSlotItem(liveGameId(raw), num(raw.gameData?.gameTime), activePlayer, stats, catalog, baseMoveSpeed, rulesetFor(raw.gameData) === "sr", runeBonus);
   if (hiddenBoots) activePlayer.items.push(hiddenBoots);
   // Estimated enemy stats + team counter-build signals (lib/enemy-stats.ts). Cheap once Data Dragon data is cached.
   const enemyProfile: EnemyProfile | null = enemyStatsData
