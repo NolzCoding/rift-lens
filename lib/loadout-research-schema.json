@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["champion", "role", "patch", "sample", "sources", "pages", "spells", "notes"],
+  "properties": {
+    "champion": { "type": "string" },
+    "role": { "type": "string", "enum": ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] },
+    "patch": { "type": "string" },
+    "sample": { "type": "string" },
+    "sources": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["url", "site", "read"],
+        "properties": {
+          "url": { "type": "string" },
+          "site": { "type": "string" },
+          "read": { "type": "string" }
+        }
+      }
+    },
+    "pages": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["primaryTree", "keystone", "primary", "secondaryTree", "secondary", "shards", "pickRate", "winRate", "when", "note"],
+        "properties": {
+          "primaryTree": { "type": "string" },
+          "keystone": { "type": "string" },
+          "primary": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string" } },
+          "secondaryTree": { "type": "string" },
+          "secondary": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string" } },
+          "shards": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string" } },
+          "pickRate": { "type": ["number", "null"] },
+          "winRate": { "type": ["number", "null"] },
+          "when": { "type": ["string", "null"] },
+          "note": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "spells": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["spells", "pickRate", "winRate", "when", "note"],
+        "properties": {
+          "spells": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string" } },
+          "pickRate": { "type": ["number", "null"] },
+          "winRate": { "type": ["number", "null"] },
+          "when": { "type": ["string", "null"] },
+          "note": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "notes": { "type": "string" }
+  }
+}

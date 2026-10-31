@@ -346,6 +346,23 @@ footer strong { color: #8d98aa; letter-spacing: .1em; font-size: 11px; }
 .cs-enemies span { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #c7d1df; }
 .cs-enemies i { color: #7d899d; font-style: normal; }
 .cs-lane { margin: 8px 0 0; color: #c7d1df; font-size: 11px; line-height: 1.5; }
+.cs-loadout { display: grid; gap: 8px; padding: 12px; border-radius: 12px; background: rgba(103,232,249,.05); border: 1px solid rgba(103,232,249,.2); }
+.cs-loadout header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.cs-loadout header b { color: white; font-size: 13px; }
+.cs-loadout header small { color: #7d899d; font-size: 11px; }
+.cs-loadout img { border-radius: 6px; display: block; flex: none; }
+.cs-spells, .cs-keystone { display: flex; align-items: center; gap: 8px; }
+.cs-spells span, .cs-keystone span { display: grid; gap: 1px; }
+.cs-spells strong, .cs-keystone strong { color: white; font-size: 16px; }
+.cs-spells small, .cs-keystone small { color: #7d899d; font-size: 11px; }
+.cs-runes { display: grid; gap: 6px; }
+.cs-runes ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: #dbe3ee; }
+.cs-runes li { display: flex; align-items: center; gap: 5px; }
+.cs-runes li.secondary { color: #9aa6ba; }
+.cs-shards { margin: 0; color: #9aa6ba; font-size: 11px; }
+.cs-loadout-alts { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; font-size: 11px; color: #9aa6ba; }
+.cs-loadout-alts li { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.cs-loadout-alts b { color: #dbe3ee; font-weight: 600; }
 .cs-bans { display: flex; align-items: center; gap: 5px; color: #7d899d; opacity: .75; }
 .cs-edit { justify-self: start; background: none; border: 0; color: #67e8f9; font-size: 11px; padding: 0; }
 .cs-pool { display: grid; gap: 8px; border: 1px solid var(--border); border-radius: 14px; padding: 12px; background: rgba(13,18,29,.65); }

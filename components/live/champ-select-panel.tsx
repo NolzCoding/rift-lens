@@ -9,6 +9,9 @@ import type { MetaRole } from "@/lib/meta-builds";
 const ROLE_ORDER: MetaRole[] = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"];
 const ROLE_LABEL: Record<MetaRole, string> = { TOP: "Top", JUNGLE: "Jungle", MIDDLE: "Mid", BOTTOM: "Bot", UTILITY: "Support" };
 const POLL_MS = 3000;
+const LOADOUT_LABEL: Record<string, string | null> = {
+  fresh: null, stale: "from an older patch", missing: "not researched yet", researching: "researching runes and spells…", queued: "runes and spells queued", failed: "rune research failed",
+};
 const RESEARCH_LABEL: Record<string, string | null> = {
   fresh: null, stale: "matchups from an older patch", missing: "no matchup data yet", researching: "researching matchups…", queued: "matchups queued", failed: "matchup research failed",
 };
@@ -70,6 +73,63 @@ function Suggestions({ view }: { view: ChampSelectView }) {
         </article>
       ))}
     </div>
+  );
+}
+
+const runeIcon = (icon: string) => `https://ddragon.leagueoflegends.com/cdn/img/${icon}`;
+const RuneIcon = ({ rune, size }: { rune: { name: string; icon: string }; size: number }) => <img src={runeIcon(rune.icon)} alt={rune.name} title={rune.name} width={size} height={size} />;
+/** "Vs heavy crowd control" → " — vs heavy crowd control". */
+const whenText = (when: string | null) => when ? ` — ${when.charAt(0).toLowerCase()}${when.slice(1)}` : "";
+const percentText = (pick: number | null, win: number | null) => [pick !== null && `${pick}% pick`, win !== null && `${win}% win`].filter(Boolean).join(" · ");
+
+/** The rune page and summoner spells to take on your champion: the most played first, the sites' alternatives under it. */
+function Loadout({ view }: { view: ChampSelectView }) {
+  const loadout = view.loadout;
+  if (!loadout) return null;
+  const { entry } = loadout;
+  const status = LOADOUT_LABEL[loadout.research];
+  const spellIcon = (spell: { id: string; name: string }, size = 30) => <img key={spell.id} src={`https://ddragon.leagueoflegends.com/cdn/${view.version}/img/spell/${spell.id}.png`} alt={spell.name} title={spell.name} width={size} height={size} />;
+  const [page, ...otherPages] = entry?.pages || [];
+  const [spells, ...otherSpells] = entry?.spells || [];
+  return (
+    <section className="cs-loadout">
+      <header><b>{loadout.champion} {ROLE_LABEL[loadout.role]}: runes and spells</b>{status && <small>{status}</small>}</header>
+      {!entry && <p className="cs-note">Looked up on stats sites once per patch; shows here when it is ready.</p>}
+      {spells && (
+        <div className="cs-spells">
+          {spells.spells.map((spell) => spellIcon(spell))}
+          <span><strong>{spells.spells.map((spell) => spell.name).join(" + ")}</strong><small>{percentText(spells.pickRate, spells.winRate)}</small></span>
+        </div>
+      )}
+      {page && (
+        <div className="cs-runes">
+          <div className="cs-keystone">
+            <RuneIcon rune={page.keystone} size={44} />
+            <span><strong>{page.keystone.name}</strong><small>{page.primaryTree.name} + {page.secondaryTree.name}{percentText(page.pickRate, page.winRate) && ` · ${percentText(page.pickRate, page.winRate)}`}</small></span>
+          </div>
+          <ul>
+            {page.primary.map((rune) => <li key={rune.id}><RuneIcon rune={rune} size={22} /> {rune.name}</li>)}
+            {page.secondary.map((rune) => <li key={rune.id} className="secondary"><RuneIcon rune={rune} size={22} /> {rune.name}</li>)}
+          </ul>
+          {page.shards.length > 0 && <p className="cs-shards">Shards: {page.shards.map((shard) => shard.name).join(" · ")}</p>}
+        </div>
+      )}
+      {(otherPages.length > 0 || otherSpells.length > 0) && (
+        <ul className="cs-loadout-alts">
+          {otherPages.map((alt) => (
+            <li key={alt.keystone.id + alt.secondary.map((rune) => rune.id).join()}>
+              <span>or</span> <RuneIcon rune={alt.keystone} size={18} /> <span><b>{alt.keystone.name}</b> ({alt.primaryTree.name} + {alt.secondaryTree.name}){whenText(alt.when)}</span>
+            </li>
+          ))}
+          {otherSpells.map((alt) => (
+            <li key={alt.spells.map((spell) => spell.id).join()}>
+              <span>or</span> {alt.spells.map((spell) => spellIcon(spell, 18))} <span><b>{alt.spells.map((spell) => spell.name).join(" + ")}</b>{whenText(alt.when)}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {entry && <p className="cs-note">Patch {entry.patch} · {[...new Set(entry.sources.map((source) => source.site))].join(", ")}</p>}
+    </section>
   );
 }
 
@@ -157,7 +217,7 @@ export function ChampSelectPanel() {
             <span><Swords size={14} /> {view.queue?.label || "Champ select"}{view.myRole && <> · you: <b>{ROLE_LABEL[view.myRole]}</b></>}</span>
             {view.myTurn && <em className="cs-turn">Your pick</em>}
           </header>
-          <Suggestions view={view} />
+          {view.myLocked ? <Loadout view={view} /> : <><Suggestions view={view} /><Loadout view={view} /></>}
           {view.note && <p className="cs-note">{view.note}</p>}
           {view.enemies.length > 0 && (
             <div className="cs-enemies">

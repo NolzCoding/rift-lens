@@ -1,10 +1,12 @@
 import path from "node:path";
 
+import { mainRoleFor } from "@/lib/build-research";
 import { championByNumericKey, championEntry, loadChampionIndex, type ChampionIndex } from "@/lib/champion-data";
 import { championTraits, isTank, type CcKind } from "@/lib/champion-traits";
 import { championBase, loadEnemyStatsData, type EnemyStatsData } from "@/lib/enemy-stats";
 import { lcuJson } from "@/lib/lcu";
 import { getItemCatalog } from "@/lib/live-game";
+import { ensureLoadoutsLoaded, loadoutJobState, requestLoadout, storedLoadout, type StoredLoadout } from "@/lib/loadout-research";
 import { ensureMatchupsLoaded, matchupJobState, requestMatchups, storedMatchups } from "@/lib/matchup-research";
 import { championKey, memoryRoot, readJson, writeJsonAtomic } from "@/lib/memory-store";
 import { isMetaRole, majorMinor, type MetaRole } from "@/lib/meta-builds";
@@ -40,6 +42,7 @@ export type ChampSelectView = {
   myTurn: boolean;
   /** Locked champion, else the one being hovered. */
   myChampion: string | null;
+  myLocked: boolean;
   allies: Array<{ champion: string | null; role: MetaRole | null; locked: boolean }>;
   /** Each enemy's role from the whole-team guess; `alt` = the next likeliest when it is not clear (below 60%). */
   enemies: Array<{ champion: string; role: MetaRole; chance: number; alt: MetaRole | null }>;
@@ -50,6 +53,8 @@ export type ChampSelectView = {
   poolSource: "saved" | "history" | "empty";
   /** For the player's role (every pool role when no role is assigned). */
   suggestions: Array<PickSuggestion & { role: MetaRole; research: ResearchState }>;
+  /** Runes and summoner spells for the champion you locked or hover (lib/loadout-research.ts). */
+  loadout: { champion: string; role: MetaRole; research: ResearchState; entry: StoredLoadout | null } | null;
   note: string | null;
   patch: string | null;
   /** Data Dragon version and champion name → Data Dragon id, for champion images. */
@@ -124,7 +129,7 @@ const MOCK_FLOW: Gameflow = { gameData: { queue: { id: 420 } } };
 export async function champSelectView(options: { withChampions?: boolean; mock?: boolean } = {}): Promise<ChampSelectView> {
   const catalog = await getItemCatalog();
   const index = await loadChampionIndex(catalog.version);
-  await ensureMatchupsLoaded();
+  await Promise.all([ensureMatchupsLoaded(), ensureLoadoutsLoaded()]);
   const saved = await readPool();
   const pool = saved?.champions.length ? saved.champions : await poolFromHistory(index);
   const poolSource: ChampSelectView["poolSource"] = saved?.champions.length ? "saved" : pool.length ? "history" : "empty";
@@ -132,12 +137,12 @@ export async function champSelectView(options: { withChampions?: boolean; mock?:
   // than a few researches, so data started there arrived after the pick. A guessed pool: its 4 most played only.
   if (!options.mock) {
     for (const entry of pool.slice(0, poolSource === "saved" ? pool.length : 4)) {
-      for (const role of entry.roles) requestMatchups(entry.champion, role, catalog.version);
+      for (const role of entry.roles) { requestMatchups(entry.champion, role, catalog.version); requestLoadout(entry.champion, role, catalog.version); }
     }
   }
   const base: ChampSelectView = {
-    active: false, queue: null, myRole: null, myTurn: false, myChampion: null, allies: [], enemies: [], laneGuess: [], bans: [],
-    pool, poolSource, suggestions: [], note: null, patch: majorMinor(catalog.version) || null, version: catalog.version, imageIds: {},
+    active: false, queue: null, myRole: null, myTurn: false, myChampion: null, myLocked: false, allies: [], enemies: [], laneGuess: [], bans: [],
+    pool, poolSource, suggestions: [], loadout: null, note: null, patch: majorMinor(catalog.version) || null, version: catalog.version, imageIds: {},
     ...(options.withChampions ? { champions: [...new Set([...index.values()].map((entry) => entry.name))].sort() } : {}),
   };
   const [session, flow] = options.mock ? [MOCK_SESSION, MOCK_FLOW]
@@ -206,9 +211,17 @@ export async function champSelectView(options: { withChampions?: boolean; mock?:
     : !lineup.length ? `None of your pool champions is set for ${myRole.toLowerCase()}.`
     : !enemies.length ? "No enemy picks yet: ranked by this patch, your games and your team. Updates as they lock in."
     : null;
+  // Runes and spells for the champion you have locked or hover: your assigned role, else its role in your pool, else its usual role.
+  const myChampion = name(me?.championId) || name(me?.championPickIntent);
+  let loadout: ChampSelectView["loadout"] = null;
+  if (myChampion) {
+    const role = myRole || pool.find((entry) => entry.champion === myChampion)?.roles[0] || mainRoleFor(myChampion, championEntry(index, myChampion));
+    if (!options.mock) requestLoadout(myChampion, role, catalog.version, true);
+    loadout = { champion: myChampion, role, research: loadoutJobState(myChampion, role, catalog.version), entry: storedLoadout(myChampion, role) };
+  }
   return withImages({
-    ...base, active: true, queue, myRole, myTurn, myChampion: name(me?.championId) || name(me?.championPickIntent), allies,
-    enemies: shownEnemies, bans, suggestions, note,
+    ...base, active: true, queue, myRole, myTurn, myChampion, myLocked: Boolean(me?.championId), allies,
+    enemies: shownEnemies, bans, suggestions, loadout, note,
     laneGuess: myRole && enemyNames.length ? lanePairs(laneOdds(priors, myRole === "BOTTOM" || myRole === "UTILITY" ? ["BOTTOM", "UTILITY"] : [myRole]))
       .filter((lane) => lane.members.length && lane.chance >= 0.05).slice(0, 3)
       .map((lane) => ({ champions: lane.members.map((at) => enemyNames[at]), chance: Math.round(lane.chance * 100) / 100 })) : [],
