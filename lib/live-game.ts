@@ -2461,6 +2461,30 @@ export function resetGameMemory() {
   resetBootsSlot();
 }
 
+/** Starting items can be bought until about this long into the game (minions arrive after it). */
+const START_WINDOW_SECONDS = 90;
+
+/**
+ * The game-start buy on Summoner's Rift draft/ranked (500g, nothing owned yet): the top build's researched start
+ * (Doran's Bow + Health Potion), not a component of the first item. A Long Sword gives 10 AD for 350g; Doran's Blade
+ * gives the same 10 AD plus 80 HP and omnivamp for 450g, stats made for the lane. Swiftplay starts with 1400g at level 3
+ * and keeps its own first buy.
+ */
+function startingRecommendation(active: LiveGameSnapshot["activePlayer"], catalog: Catalog, plan: BuildPlan, ruleset: Ruleset, time: number): LiveRecommendation | null {
+  if (ruleset !== "sr" || time > START_WINDOW_SECONDS || active.items.some(inSlot) || !plan.meta?.starting?.length) return null;
+  const items = plan.meta.starting.flatMap((name) => catalogChoice(catalog, [name]) || []);
+  if (!items.length) return null;
+  const total = items.reduce((sum, item) => sum + item.cost, 0);
+  const [first] = items;
+  return {
+    itemId: first.id, item: first.name, cost: total, description: first.description || "",
+    priority: "primary", action: "buy", timing: "first-item",
+    reason: `Start with ${items.map((item) => item.name).join(" + ")}: the usual ${plan.meta.champion} start on patch ${plan.meta.patch}, laning stats now instead of a component that does little until the item is finished.`,
+    trigger: "Game start", usageTip: "", nextStep: null, swapPlan: null,
+    starting: items.map((item) => ({ itemId: item.id, item: item.name, cost: item.cost })),
+  };
+}
+
 /** The boots in the role-quest boots slot this sample, as an owned item, or null (lib/boots-slot.ts). */
 function bootsSlotItem(gameId: string, time: number, active: LiveGameSnapshot["activePlayer"], stats: RawChampionStats, catalog: Catalog, baseMoveSpeed: number | null, roleQuests: boolean): LiveItem | null {
   const asBoots = (item: CatalogItem): BootsItem => ({ id: item.id, name: item.name, price: item.cost, description: item.description, flat: item.moveSpeed?.flat || 0, from: item.from });
@@ -2673,6 +2697,8 @@ export async function normalizeLiveData(raw: RawLiveData, options: NormalizeOpti
   });
   const sold = new Set(safeSold(options, gameId));
   const { recommendations, plan, scaling, counterPicks } = buildRecommendations(activePlayer, enemies, catalog, time, index, playerBrief, sold, enemyProfile);
+  const start = startingRecommendation(activePlayer, catalog, plan, ruleset, time);
+  if (start) recommendations.unshift(start);
   const mobilityRecommendation = buildMobilityRecommendation(activePlayer, catalog, time, index, plan, sold, enemyProfile);
   const { objectives, dragonState } = objectiveState(events, time, sideOf, ruleset);
   const death = buildDeathMoment({

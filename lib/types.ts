@@ -408,6 +408,8 @@ export type LiveRecommendation = {
   reason: string;
   /** Set on recommendations[0] when an enemy-stat signal (lib/enemy-stats.ts) changed the next buy, e.g. "Their armor is stacking (Ornn ~185 armor, Sejuani ~160)". */
   counterReason?: string;
+  /** The game-start buy (Summoner's Rift with 500g, nothing owned yet): every starting item; `item` is the first, `cost` the total. */
+  starting?: Array<{ itemId: number; item: string; cost: number }>;
   trigger: string;
   usageTip: string;
   nextStep: {

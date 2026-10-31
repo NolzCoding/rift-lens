@@ -17,6 +17,8 @@ export type BuyPlan = {
   swap: { sellItemId: number; sellItem: string; sellValue: number } | null;
   /** The AI is steering off the build path. */
   deviation: boolean;
+  /** The game start: the other starting items bought with this one (Health Potion). */
+  with?: Array<{ itemId: number; item: string }>;
 };
 
 /**
@@ -39,6 +41,9 @@ export function planNextBuy(snapshot: LiveGameSnapshot, ai: AiRead | null): BuyP
   }
   const rec = snapshot.recommendations[0];
   if (rec) {
+    if (rec.starting) {
+      return { source: "build", itemId: rec.itemId, item: rec.item, cost: rec.cost, goal: null, swap: null, deviation: false, with: rec.starting.slice(1) };
+    }
     if (rec.swapPlan) {
       return { source: "build", itemId: rec.itemId, item: rec.item, cost: rec.swapPlan.buyCost || rec.cost, goal: null, deviation: false,
         swap: { sellItemId: rec.swapPlan.sellItemId, sellItem: rec.swapPlan.sellItem, sellValue: rec.swapPlan.sellValue } };
@@ -87,6 +92,8 @@ export function BuyCard({ snapshot, ai, onEditBuild, compact = false }: { snapsh
               <h2 className="buy-name">{plan.item}</h2>
               {plan.swap ? (
                 <p className="buy-swap"><b>SELL</b> {plan.swap.sellItem} <ArrowRight size={18} /> <b>BUY</b> {plan.item}</p>
+              ) : plan.with?.length ? (
+                <p className="buy-goal">+ {plan.with.map((entry) => <span key={entry.item}><ItemIcon version={version} id={entry.itemId} name={entry.item} size={26} /> <b>{entry.item}</b> </span>)}· starting items</p>
               ) : plan.goal ? (
                 <p className="buy-goal">toward <ItemIcon version={version} id={plan.goal.itemId} name={plan.goal.item} size={26} /> <b>{plan.goal.item}</b></p>
               ) : <p className="buy-goal">{plan.cost > 0 ? `${formatGold(plan.cost)}g` : ""}</p>}

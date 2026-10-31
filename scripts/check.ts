@@ -103,7 +103,8 @@ function checkSample(game: ReplayGame, sample: ReplaySample, snap: LiveGameSnaps
       () => `rec0 ${r0.item} nextStep ${next.item}: own ${owned.get(next.itemId) || 0}, recipe needs ${need}; inv=[${ownedNames}]`);
   }
   const pathNext = steps.find((step) => step.status === "next");
-  if (r0 && pathNext) c("rec0_is_path_next", r0.itemId === pathNext.itemId, () => `rec0=${r0.item} (${r0.action}) but path next=${pathNext.item}; path=${pathText()}; inv=[${ownedNames}]`);
+  // The game-start buy (Doran's + potion) comes before the path.
+  if (r0 && pathNext && !r0.starting) c("rec0_is_path_next", r0.itemId === pathNext.itemId, () => `rec0=${r0.item} (${r0.action}) but path next=${pathNext.item}; path=${pathText()}; inv=[${ownedNames}]`);
   for (const step of unowned) {
     const isOwned = owned.has(step.itemId) || (hasBoots && isUpgradedBoots(catalog, step.itemId));
     c("path_next_not_owned", !isOwned, () => `step ${step.item} marked ${step.status} but owned; path=${pathText()}`);
