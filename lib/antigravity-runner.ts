@@ -5,6 +5,7 @@ import path from "node:path";
 
 import { conformToSchema, extractJson, parseCliEnvelope, type JsonSchema } from "@/lib/ai-json";
 import { CodexRunError, type CodexJsonOptions } from "@/lib/codex-runner";
+import { HIDDEN_START_FAILED, spawnHidden } from "@/lib/hidden-desktop";
 
 // Spawns Google's Antigravity CLI (`agy`, signed in with a Google account — Google AI Pro/Ultra or the free plan — never
 // an API key) for one JSON answer. Google replaced Gemini CLI with it for personal accounts on 2026-06-18.
@@ -104,9 +105,10 @@ function stopTree(pid: number | undefined, kill: () => void) {
 
 function runAgy(binary: AgyCommand, args: string[], cwd: string, input: string | null, timeoutMs: number) {
   return new Promise<{ stdout: string; stderr: string; code: number | null }>((resolve, reject) => {
-    // Hidden console, not detached: a detached process has no console on Windows, so agy (or what it starts) opened a
-    // visible window on every call. A sign-in it cannot do headless ends in "authentication required" or the timeout.
-    const child = spawn(binary.command, [...binary.prefix, ...args], { cwd, env: cleanEnvironment(), windowsHide: true, stdio: ["pipe", "pipe", "pipe"] });
+    // On a hidden desktop (lib/hidden-desktop.ts): agy starts PowerShell/cmd helpers in new console windows, which
+    // flashed on screen during every call even with a hidden console. A sign-in it cannot do headless ends in
+    // "authentication required" or the timeout.
+    const child = spawnHidden(binary.command, [...binary.prefix, ...args], { cwd, env: cleanEnvironment() });
     let stdout = "";
     let stderr = "";
     let stopped: "timeout" | "output" | null = null;
@@ -124,6 +126,7 @@ function runAgy(binary: AgyCommand, args: string[], cwd: string, input: string |
       clearTimeout(timer);
       if (stopped === "timeout") reject(new CodexRunError(`Antigravity took longer than ${Math.round(timeoutMs / 1000)} seconds and was stopped.`));
       else if (stopped === "output") reject(new CodexRunError("Antigravity returned too much output and was stopped."));
+      else if (code === HIDDEN_START_FAILED && !stdout) reject(new CodexRunError("Antigravity CLI could not be started.", stderr.slice(-300)));
       else resolve({ stdout, stderr, code });
     });
     child.stdin.end(input ?? "");
