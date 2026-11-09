@@ -461,6 +461,11 @@ export type LiveGameSnapshot = {
     time: number;
     phase: "opening" | "early" | "mid" | "late";
     queuePrecision: "exact" | "limited";
+    /**
+     * Which shop prices the game uses: "swiftplay" when the mode is Swiftplay or any player owns one of Swiftplay's own
+     * items (32xxxx ids, which only Swiftplay reports), else "normal" (lib/live-game.ts catalogFor).
+     */
+    itemPrices?: "swiftplay" | "normal";
   };
   matchup: {
     basis: "riot-position" | "team-gap" | "champion-role" | "highest-threat";

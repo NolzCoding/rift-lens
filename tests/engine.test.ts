@@ -304,3 +304,12 @@ test("a component's price counts the pieces already owned (Sheen with a Glowing 
   assert.equal(step?.cost, 650);
   assert.equal(step?.affordable, true);
 });
+
+test("item prices follow the game: Swiftplay by its mode or by its own item ids; normal games and the Practice Tool keep normal prices", { skip }, async () => {
+  const game = (mode: string, items: number[] = []) => { const input = raw([], 700, 600); input.gameData!.gameMode = mode; (input.allPlayers![5] as { items: unknown }).items = items.map((id) => ({ itemID: id, displayName: "Frozen Heart", price: 800, count: 1 })); return run(input); };
+  assert.equal((await game("SWIFTPLAY")).game.itemPrices, "swiftplay");
+  assert.equal((await game("CLASSIC")).game.itemPrices, "normal");
+  assert.equal((await game("PRACTICETOOL")).game.itemPrices, "normal");
+  assert.equal((await game("SOMENEWNAME", [323110])).game.itemPrices, "swiftplay", "a Swiftplay item copy in the game means Swiftplay prices, whatever the mode is called");
+  assert.equal((await getItemCatalog({ mode: "CLASSIC", itemPrices: "swiftplay" })).byId.get(3110)?.cost, 2700, "the AI help prices like the live screen");
+});

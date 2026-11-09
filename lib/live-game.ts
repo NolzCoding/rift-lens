@@ -511,6 +511,8 @@ async function fetchCatalog(): Promise<Catalog> {
 }
 
 const modeCatalogs = new WeakMap<Catalog, Catalog>();
+/** Swiftplay's item copies: 32 + the Summoner's Rift id (323110 Frozen Heart). */
+const SWIFTPLAY_COPY = /^32\d{4}$/;
 
 /**
  * The catalog with the game's own prices: Swiftplay sells some items at other prices than Summoner's Rift (a support or
@@ -635,10 +637,11 @@ function purchaseStep(target: CatalogItem, active: LiveGameSnapshot["activePlaye
 // Shared catalog helpers for other server modules (HELP ME route validates AI-named items with these).
 export type ItemInfo = CatalogItem;
 export type ItemCatalog = Catalog;
-/** The item catalog; with a game mode, that mode's prices (Swiftplay: catalogFor). */
-export const getItemCatalog = async (gameMode?: string) => {
+/** The item catalog; with a game (its snapshot.game), the prices that game uses (Swiftplay: catalogFor). */
+export const getItemCatalog = async (game?: { mode?: string; itemPrices?: "swiftplay" | "normal" } | string) => {
   const catalog = await loadCatalog();
-  return gameMode && /SWIFT/i.test(gameMode) ? catalogFor(catalog, "swiftplay") : catalog;
+  const swiftplay = typeof game === "string" ? /SWIFT/i.test(game) : game?.itemPrices ? game.itemPrices === "swiftplay" : /SWIFT/i.test(game?.mode || "");
+  return swiftplay ? catalogFor(catalog, "swiftplay") : catalog;
 };
 export const nextPurchaseToward = (target: ItemInfo, active: LiveGameSnapshot["activePlayer"], catalog: ItemCatalog) => purchaseStep(target, active, catalog);
 
@@ -2721,8 +2724,11 @@ export async function normalizeLiveData(raw: RawLiveData, options: NormalizeOpti
   // Riot's Live Client sometimes answers a player's items with `{ "error": "Unable to find player" }` instead of a list
   // (seen in a 2026-11-09 game): that player is treated as owning nothing rather than the whole sample failing.
   for (const player of rawPlayers) if (!Array.isArray(player.items)) player.items = [];
-  // This game's prices (Swiftplay sells some items at its own prices).
-  const catalog = catalogFor(await loadCatalog(), rulesetFor(raw.gameData));
+  // This game's prices (Swiftplay sells some items at its own prices and recipes). The mode name, and as a check that
+  // does not depend on it, the game's own item ids: only Swiftplay reports its 32xxxx item copies.
+  const swiftplayItems = rawPlayers.some((player) => (player.items || []).some((item) => SWIFTPLAY_COPY.test(String(item.itemID))));
+  const priceRuleset = rulesetFor(raw.gameData) === "swiftplay" || (rulesetFor(raw.gameData) && swiftplayItems) ? "swiftplay" : rulesetFor(raw.gameData);
+  const catalog = catalogFor(await loadCatalog(), priceRuleset);
   // Game modes report some items under mode-copy ids (Swiftplay Thornmail = 323075 for 3075). Map them back to the
   // catalog item so ownership, path steps, sell values and "never sell your own build" checks see the real item.
   for (const player of rawPlayers) {
@@ -2874,6 +2880,7 @@ export async function normalizeLiveData(raw: RawLiveData, options: NormalizeOpti
       time,
       phase: gamePhase(time, ruleset),
       queuePrecision: mode.toUpperCase() === "CLASSIC" ? "limited" : "exact",
+      itemPrices: catalog.mode === "swiftplay" ? "swiftplay" : "normal",
     },
     matchup,
     activePlayer,

@@ -345,7 +345,7 @@ export async function POST(request: Request) {
   const cachePath = path.join(cacheRoot, `${cacheKey}.json`);
   await mkdir(cacheRoot, { recursive: true });
   // The game's own prices (Swiftplay sells some items at other prices than Summoner's Rift).
-  const [cached, catalog] = await Promise.all([readCached(cachePath), getItemCatalog(snapshot.game?.mode), ensureResearchLoaded()]);
+  const [cached, catalog] = await Promise.all([readCached(cachePath), getItemCatalog(snapshot.game), ensureResearchLoaded()]);
   // This route can run in its own module instance: load this patch's item groups from the disk cache first (no network wait).
   if (!catalog.fallback) await ensureItemGroups(catalog.version, (id) => catalog.byId.has(id));
   // Re-resolve cached buys against this snapshot so affordability tracks current gold.
