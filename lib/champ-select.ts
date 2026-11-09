@@ -1,17 +1,18 @@
 import path from "node:path";
 
-import { mainRoleFor } from "@/lib/build-research";
+import { ensureResearchLoaded, mainRoleFor } from "@/lib/build-research";
+import { ensureRouteChoicesLoaded, rankRoutes, routeChoice, routeFeatures, type RankedRoute } from "@/lib/build-routes";
 import { championByNumericKey, championEntry, loadChampionIndex, type ChampionIndex } from "@/lib/champion-data";
 import { championTraits, isTank, type CcKind } from "@/lib/champion-traits";
 import { championBase, loadEnemyStatsData, type EnemyStatsData } from "@/lib/enemy-stats";
 import { lcuJson } from "@/lib/lcu";
-import { getItemCatalog } from "@/lib/live-game";
+import { getItemCatalog, routeChampion, routeItem } from "@/lib/live-game";
 import { ensureLoadoutsLoaded, loadoutJobState, requestLoadout, storedLoadout, type StoredLoadout } from "@/lib/loadout-research";
 import { ensureMatchupsLoaded, matchupJobState, requestMatchups, storedMatchups } from "@/lib/matchup-research";
 import { championKey, memoryRoot, readJson, writeJsonAtomic } from "@/lib/memory-store";
-import { isMetaRole, majorMinor, type MetaRole } from "@/lib/meta-builds";
+import { isMetaRole, majorMinor, metaBuildFor, type MetaRole } from "@/lib/meta-builds";
 import { rankPicks, type LaneKit, type PickAlly, type PickCandidate, type PickSuggestion } from "@/lib/pick-advisor";
-import { getProfile } from "@/lib/player-profile";
+import { getPlayerBrief, getProfile } from "@/lib/player-profile";
 import { guessTeamRoles, laneOdds, lanePairs, likeliestRole, loadRoleRates, roleOdds, ROLES } from "@/lib/role-rates";
 
 // Champ select pick helper: the player's champion pool, the League client's live champ select (/lol-champ-select/v1/session:
@@ -55,6 +56,11 @@ export type ChampSelectView = {
   suggestions: Array<PickSuggestion & { role: MetaRole; research: ResearchState }>;
   /** Runes and summoner spells for the champion you locked or hover (lib/loadout-research.ts). */
   loadout: { champion: string; role: MetaRole; research: ResearchState; entry: StoredLoadout | null } | null;
+  /**
+   * The ways to build your champion when it has more than one (lib/build-routes.ts), scored for this champ select, and
+   * the one you picked (null: the recommended one is used). Null for a champion with one route.
+   */
+  routes: { champion: string; options: RankedRoute[]; chosen: string | null } | null;
   note: string | null;
   patch: string | null;
   /** Data Dragon version and champion name → Data Dragon id, for champion images. */
@@ -126,7 +132,8 @@ const MOCK_SESSION: Session = {
 };
 const MOCK_FLOW: Gameflow = { gameData: { queue: { id: 420 } } };
 
-export async function champSelectView(options: { withChampions?: boolean; mock?: boolean } = {}): Promise<ChampSelectView> {
+/** `mockChampion`: the champion you hover in the made-up champ select (in its usual role), instead of Caitlyn bot. */
+export async function champSelectView(options: { withChampions?: boolean; mock?: boolean; mockChampion?: string | null } = {}): Promise<ChampSelectView> {
   const catalog = await getItemCatalog();
   const index = await loadChampionIndex(catalog.version);
   await Promise.all([ensureMatchupsLoaded(), ensureLoadoutsLoaded()]);
@@ -142,10 +149,17 @@ export async function champSelectView(options: { withChampions?: boolean; mock?:
   }
   const base: ChampSelectView = {
     active: false, queue: null, myRole: null, myTurn: false, myChampion: null, myLocked: false, allies: [], enemies: [], laneGuess: [], bans: [],
-    pool, poolSource, suggestions: [], loadout: null, note: null, patch: majorMinor(catalog.version) || null, version: catalog.version, imageIds: {},
+    pool, poolSource, suggestions: [], loadout: null, routes: null, note: null, patch: majorMinor(catalog.version) || null, version: catalog.version, imageIds: {},
     ...(options.withChampions ? { champions: [...new Set([...index.values()].map((entry) => entry.name))].sort() } : {}),
   };
-  const [session, flow] = options.mock ? [MOCK_SESSION, MOCK_FLOW]
+  const mockEntry = options.mock && options.mockChampion ? championEntry(index, options.mockChampion) : null;
+  const mockSession: Session = mockEntry ? {
+    ...MOCK_SESSION,
+    myTeam: MOCK_SESSION.myTeam!.map((member) => member.cellId === MOCK_SESSION.localPlayerCellId
+      ? { ...member, championPickIntent: Number(mockEntry.key), assignedPosition: mainRoleFor(mockEntry.name, mockEntry).toLowerCase() }
+      : member.assignedPosition === mainRoleFor(mockEntry.name, mockEntry).toLowerCase() ? { ...member, assignedPosition: "bottom" } : member),
+  } : MOCK_SESSION;
+  const [session, flow] = options.mock ? [mockSession, MOCK_FLOW]
     : await Promise.all([lcuJson<Session>("/lol-champ-select/v1/session", 1500), lcuJson<Gameflow>("/lol-gameflow/v1/session", 1500)]);
   if (!session?.myTeam?.length) return withImages(base, index);
 
@@ -219,9 +233,22 @@ export async function champSelectView(options: { withChampions?: boolean; mock?:
     if (!options.mock) requestLoadout(myChampion, role, catalog.version, true);
     loadout = { champion: myChampion, role, research: loadoutJobState(myChampion, role, catalog.version), entry: storedLoadout(myChampion, role) };
   }
+  // Build routes for your champion, scored against the picks so far (enemy roles do not matter here: the whole team).
+  let routes: ChampSelectView["routes"] = null;
+  const top = myChampion && loadout ? (await ensureResearchLoaded(), metaBuildFor(myChampion, loadout.role, catalog.version)) : null;
+  if (myChampion && top?.routes?.length) {
+    await ensureRouteChoicesLoaded();
+    const brief = await getPlayerBrief(myChampion, enemyNames, null).catch(() => null);
+    const options = rankRoutes({
+      routes: routeFeatures(top, (item) => routeItem(catalog, item)), enemies: enemyNames.map((champion) => routeChampion(champion, index)),
+      allies: allies.flatMap((ally) => ally.champion ? [routeChampion(ally.champion, index)] : []), usualBuild: brief?.usualBuild || null,
+    });
+    const chosen = routeChoice(myChampion);
+    routes = { champion: myChampion, options, chosen: chosen && options.some((option) => option.id === chosen) ? chosen : null };
+  }
   return withImages({
     ...base, active: true, queue, myRole, myTurn, myChampion, myLocked: Boolean(me?.championId), allies,
-    enemies: shownEnemies, bans, suggestions, loadout, note,
+    enemies: shownEnemies, bans, suggestions, loadout, routes, note,
     laneGuess: myRole && enemyNames.length ? lanePairs(laneOdds(priors, myRole === "BOTTOM" || myRole === "UTILITY" ? ["BOTTOM", "UTILITY"] : [myRole]))
       .filter((lane) => lane.members.length && lane.chance >= 0.05).slice(0, 3)
       .map((lane) => ({ champions: lane.members.map((at) => enemyNames[at]), chance: Math.round(lane.chance * 100) / 100 })) : [],

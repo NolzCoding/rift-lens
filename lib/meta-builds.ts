@@ -35,6 +35,25 @@ export type MetaSlot = {
   options: MetaOption[];
 };
 
+/**
+ * One way to build the champion in this role (AP burst vs on-hit Katarina). The build's own slots are its most played
+ * route ("main"); `MetaBuild.routes` lists the others the sites show, each a full build of its own.
+ */
+export type BuildRoute = {
+  /** "main" for the build's own slots, else a slug of the name. */
+  id: string;
+  /** Short name, e.g. "AP burst", "On-hit". */
+  name: string;
+  /** % of this champion/role's games that play the route, when a site shows it. */
+  share: number | null;
+  winRate: number | null;
+  games: number | null;
+  /** The sites' one-line description of the route (display only). */
+  summary: string;
+  slots: MetaSlot[];
+  starting?: string[];
+};
+
 export type MetaBuild = {
   champion: string;
   role: MetaRole;
@@ -69,6 +88,15 @@ export type MetaBuild = {
    * role the build was made for.
    */
   servedFor?: MetaRole;
+  /** Name and numbers of the build's own (most played) route; researched entries that checked for routes. */
+  mainRoute?: Omit<BuildRoute, "id" | "slots" | "starting">;
+  /**
+   * The other routes the sites show (empty: only one way to build it). Absent on entries researched before routes
+   * existed, which are researched again.
+   */
+  routes?: BuildRoute[];
+  /** Set by the lookup when a route was asked for: the route these slots are. */
+  route?: { id: string; name: string };
 };
 
 /**
@@ -157,14 +185,43 @@ export function selectMetaBuild(champion: string, position: string | null | unde
  * The top build for a champion in a role (server: includes researched entries; client: curated only unless the caller
  * uses selectMetaBuild with the researched list). `version` = current Data Dragon version (defaults to the registered one).
  */
-export function metaBuildFor(champion: string, position?: string | null, version?: string | null): MetaBuild | null {
-  return selectMetaBuild(champion, position, { researched: registry.entries, version: version ?? registry.version });
+export function metaBuildFor(champion: string, position?: string | null, version?: string | null, route?: string | null): MetaBuild | null {
+  const entry = selectMetaBuild(champion, position, { researched: registry.entries, version: version ?? registry.version });
+  return entry && route ? withRoute(entry, route) : entry;
+}
+
+/** Every route of a build, its own slots first ("main"). */
+export function buildRoutes(entry: MetaBuild): BuildRoute[] {
+  const main: BuildRoute = {
+    id: "main", name: entry.mainRoute?.name || "Most played", share: entry.mainRoute?.share ?? null, winRate: entry.mainRoute?.winRate ?? null,
+    games: entry.mainRoute?.games ?? null, summary: entry.mainRoute?.summary || "", slots: entry.slots, starting: entry.starting,
+  };
+  return [main, ...(entry.routes || [])];
+}
+
+/**
+ * The build with another route's slots and starting items. Off-meta items the route builds are no longer off-meta for it.
+ * An unknown route id gives the build unchanged (its main route).
+ */
+export function withRoute(entry: MetaBuild, routeId: string): MetaBuild {
+  const route = buildRoutes(entry).find((candidate) => candidate.id === routeId);
+  if (!route) return entry;
+  if (route.id === "main") return { ...entry, route: { id: "main", name: route.name } };
+  const inRoute = new Set(route.slots.flatMap((slot) => slot.options.map((option) => norm(option.item))));
+  return {
+    ...entry, slots: route.slots, starting: route.starting?.length ? route.starting : entry.starting,
+    offMeta: entry.offMeta.filter((item) => !inRoute.has(norm(item.item))),
+    // The 3-item cores the sites list are the main route's.
+    cores: entry.cores.filter((core) => core.items.every((item) => inRoute.has(norm(item)))),
+    route: { id: route.id, name: route.name },
+  };
 }
 
 /** True when a current-patch entry exists: a researched one, or a curated one stamped with the current patch. */
 export function hasFreshMetaBuild(champion: string, role: MetaRole, version: string, researched: readonly MetaBuild[] = registry.entries, curated: readonly MetaBuild[] = META_BUILDS) {
   const same = (entry: MetaBuild) => norm(entry.champion) === norm(champion) && entry.role === role;
-  return researched.some((entry) => same(entry) && isCurrentResearch(entry, version))
+  // Research from before routes existed is researched again (once) to learn the champion's other routes.
+  return researched.some((entry) => same(entry) && isCurrentResearch(entry, version) && entry.routes !== undefined)
     || curated.some((entry) => same(entry) && majorMinor(entry.patch) === majorMinor(version));
 }
 

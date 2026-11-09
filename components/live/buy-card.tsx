@@ -2,6 +2,7 @@
 
 import { ArrowRight, Check, GitBranch, Pencil, Shield, ShoppingBag, Sparkles } from "lucide-react";
 
+import { RoutePicker } from "@/components/live/route-picker";
 import { ItemIcon } from "@/components/live/shared";
 import type { AiRead } from "@/components/live/use-ai-read";
 import { formatGold } from "@/lib/live-coach";
@@ -119,6 +120,11 @@ export function BuyCard({ snapshot, ai, onEditBuild, compact = false }: { snapsh
       )}
 
       <BuildPathRow path={snapshot.buildPath} version={version} onEdit={onEditBuild} />
+      {/* A champion built more than one way: pick the route until the items bought settle it, then just name it. */}
+      {snapshot.buildRoute && snapshot.buildPath?.source === "meta" && (snapshot.buildRoute.source === "items"
+        ? <p className="route-line">Build route: <b>{snapshot.buildRoute.name}</b> · set by the items you bought</p>
+        : <RoutePicker champion={snapshot.buildRoute.champion} options={snapshot.buildRoute.options} chosen={snapshot.buildRoute.source === "choice" ? snapshot.buildRoute.chosen : null}
+            playing={snapshot.buildRoute.chosen} source={snapshot.buildRoute.source} version={version} />)}
     </article>
   );
 }

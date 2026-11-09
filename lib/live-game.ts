@@ -22,7 +22,8 @@ import {
 } from "@/lib/champion-traits";
 import { resetBootsSlot, slottedBoots, type BootsItem } from "@/lib/boots-slot";
 import { aliveSampleAt, historyKey, recordSample, type HistorySample } from "@/lib/live-history";
-import { evidencePick, isMetaItem, metaBuildFor, metaOption, metaOriginLabel, metaPatchNote, optionEvidence, roleName, type MetaBuild } from "@/lib/meta-builds";
+import { evidencePick, isMetaItem, metaBuildFor, metaOption, metaOriginLabel, metaPatchNote, optionEvidence, roleName, withRoute, type MetaBuild } from "@/lib/meta-builds";
+import { ensureRouteChoicesLoaded, gameRoute, rankRoutes, routeFeatures, type RouteChampion, type RouteItem } from "@/lib/build-routes";
 import {
   championBase, counterLevel, counterSignalFor, enemyThreatProfile, loadEnemyStatsData, parseItemStats, signalHeavy, signalReason, summarizeProfile, THREAT_THRESHOLDS,
   type CounterSignal, type EnemyProfile,
@@ -1364,7 +1365,8 @@ function buildRecommendations(
   brief: PlayerBrief | null,
   sold: Set<number> = new Set(),
   profile: EnemyProfile | null = null,
-): { recommendations: LiveRecommendation[]; plan: BuildPlan; scaling: ChampionScaling; counterPicks: NonNullable<LiveGameSnapshot["counterPicks"]> } {
+  game: { id: string; allies: LivePlayer[] } | null = null,
+): { recommendations: LiveRecommendation[]; plan: BuildPlan; scaling: ChampionScaling; counterPicks: NonNullable<LiveGameSnapshot["counterPicks"]>; buildRoute: LiveGameSnapshot["buildRoute"] } {
   // New on this champion (lib/player-profile.ts, < NEW_CHAMPION_GAMES complete games): the history was built while
   // learning and never shapes the build; pinned > imported > top build > defaults.
   if (brief?.newOnChampion && brief.usualBuild) brief = { ...brief, usualBuild: null, usualBuildGames: 0 };
@@ -1384,7 +1386,20 @@ function buildRecommendations(
   const ownedCompleted = active.items.map((item) => catalog.byId.get(item.id)).filter((item): item is CatalogItem => Boolean(item && isCompletedItem(item)));
   // Top build for this champion/role (lib/meta-builds.ts: researched for this patch > curated > older research; another
   // role's build when the player's role has none): outranks history, below pinned/imported builds. In-memory; never reads disk.
-  const metaEntry = metaBuildFor(active.champion, active.position, catalog.fallback ? null : catalog.version);
+  const topBuild = metaBuildFor(active.champion, active.position, catalog.fallback ? null : catalog.version);
+  // A champion built more than one way (AP or on-hit Katarina; lib/build-routes.ts): the route for this game, decided once.
+  let buildRoute: LiveGameSnapshot["buildRoute"] = null;
+  let metaEntry = topBuild;
+  if (topBuild?.routes?.length && game) {
+    const itemOf = (name: string) => routeItem(catalog, name);
+    const ranked = rankRoutes({
+      routes: routeFeatures(topBuild, itemOf), enemies: enemies.map((enemy) => routeChampion(enemy.champion, index)),
+      allies: game.allies.map((ally) => routeChampion(ally.champion, index)), usualBuild: brief?.usualBuild || null,
+    });
+    const pick = gameRoute(game.id, active.champion, topBuild, ranked, ownedCompleted.map((item) => item.name));
+    metaEntry = withRoute(topBuild, pick.route);
+    buildRoute = { champion: active.champion, chosen: pick.route, name: metaEntry.route?.name || pick.route, source: pick.source, options: ranked };
+  }
   const metaCore = (metaEntry?.slots || []).filter((slot) => slot.kind === "core").flatMap((slot) => slot.options.filter((option) => !option.when))
     .map((option) => catalogChoice(catalog, [option.item])).filter((item): item is CatalogItem => Boolean(item));
   // What the champion's damage scales with: items that do not fit it never become a path step or a card (unless the
@@ -1839,7 +1854,7 @@ function buildRecommendations(
     const usable = item && !owned.has(key(item.name)) && !sold.has(item.id) ? item : null;
     counterPicks.push({ signal, level: profile[signal].level, itemId: usable?.id ?? null, item: usable?.name ?? null });
   }
-  return { recommendations: recommendations.slice(0, 6), plan, scaling, counterPicks };
+  return { recommendations: recommendations.slice(0, 6), plan, scaling, counterPicks, buildRoute };
 }
 
 /**
@@ -2461,6 +2476,25 @@ export function resetGameMemory() {
   resetBootsSlot();
 }
 
+/** What a build route's item is for route scoring (lib/build-routes.ts), from Riot's item data. */
+export function routeItem(catalog: Catalog, name: string): RouteItem | null {
+  const item = catalogChoice(catalog, [name]);
+  if (!item) return null;
+  const tags = item.tags || [];
+  return {
+    id: item.id, name: item.name, scaling: item.scaling || "neutral", lethality: Boolean(item.carry && !tags.includes("CriticalStrike")),
+    // Percent penetration, or on-hit damage on an attack-speed item (Kraken Slayer); Lich Bane's spellblade is tagged
+    // on-hit too but is burst, not damage that grows with the target's health.
+    antiTank: Boolean(item.pen?.armorPercent || item.pen?.magicPercent || (tags.includes("OnHit") && tags.includes("AttackSpeed"))),
+  };
+}
+
+/** A champion's damage type and whether it is a tank, for route scoring (Riot data through the champion traits). */
+export function routeChampion(champion: string, index: ChampionIndex | null): RouteChampion {
+  const of = traits(champion, index);
+  return { champion, damage: of.profile, tank: of.tank };
+}
+
 /** Starting items can be bought until about this long into the game (minions arrive after it). */
 const START_WINDOW_SECONDS = 90;
 
@@ -2611,6 +2645,9 @@ export async function normalizeLiveData(raw: RawLiveData, options: NormalizeOpti
     || rawPlayers.find((player) => sameName(player.riotId?.split("#")[0], raw.activePlayer?.summonerName));
   if (!activeRaw) throw new Error("The live API responded, but Rift Lens could not identify the active player.");
 
+  // Riot's Live Client sometimes answers a player's items with `{ "error": "Unable to find player" }` instead of a list
+  // (seen in a 2026-11-09 game): that player is treated as owning nothing rather than the whole sample failing.
+  for (const player of rawPlayers) if (!Array.isArray(player.items)) player.items = [];
   const catalog = await loadCatalog();
   // Game modes report some items under mode-copy ids (Swiftplay Thornmail = 323075 for 3075). Map them back to the
   // catalog item so ownership, path steps, sell values and "never sell your own build" checks see the real item.
@@ -2726,7 +2763,8 @@ export async function normalizeLiveData(raw: RawLiveData, options: NormalizeOpti
     players: Object.fromEntries(everyone.map((player) => [historyKey(player), { level: player.level, itemGold: itemGold(player) }])),
   });
   const sold = new Set(safeSold(options, gameId));
-  const { recommendations, plan, scaling, counterPicks } = buildRecommendations(activePlayer, enemies, catalog, time, index, playerBrief, sold, enemyProfile);
+  await ensureRouteChoicesLoaded();
+  const { recommendations, plan, scaling, counterPicks, buildRoute } = buildRecommendations(activePlayer, enemies, catalog, time, index, playerBrief, sold, enemyProfile, { id: gameId, allies });
   const start = startingRecommendation(activePlayer, catalog, plan, ruleset, time);
   if (start) recommendations.unshift(start);
   const mobilityRecommendation = buildMobilityRecommendation(activePlayer, catalog, time, index, plan, sold, enemyProfile);
@@ -2784,6 +2822,7 @@ export async function normalizeLiveData(raw: RawLiveData, options: NormalizeOpti
     patchStatus,
     ...(enemyProfile ? { enemyProfile: summarizeProfile(enemyProfile) } : {}),
     ...(counterPicks.length ? { counterPicks } : {}),
+    ...(buildRoute ? { buildRoute } : {}),
     caveats: [
       `Build source: ${buildPath.label} — from ${sourceNote[buildPath.source]}. The first recommendation is the next step of this path; threat-driven cards are labelled deviations.`,
       "Threat scores and damage profiles are inferred from champion, items, level, CS, and KDA; they are not Riot-measured damage received.",

@@ -9,7 +9,7 @@ import { appliesGrievousWounds, findItem, getItemCatalog, type ItemCatalog, type
 import { championKey, isUpgradedBoots, memoryRoot, readJson, safeId, writeJsonAtomic } from "@/lib/memory-store";
 import {
   hasFreshMetaBuild, isMetaRole, majorMinor, META_BUILDS, registerResearchedBuilds, setCurrentMetaVersion,
-  type MetaBuild, type MetaOption, type MetaRole, type MetaSlot,
+  type BuildRoute, type MetaBuild, type MetaOption, type MetaRole, type MetaSlot,
 } from "@/lib/meta-builds";
 import type { LiveGameSnapshot } from "@/lib/types";
 
@@ -50,7 +50,10 @@ export type RawResearch = {
   cores: Array<{ items: string[]; games: number | null; winRate: number | null }>;
   offMeta: Array<{ item: string; pickRate: number | null; note: string }>;
   notes: string;
+  mainRoute?: RawRouteInfo;
+  routes?: Array<RawRouteInfo & { slots: RawResearch["slots"]; boots: RawOption[]; bootsAfterItem: number; starting: string[] }>;
 };
+type RawRouteInfo = { name: string; share: number | null; winRate: number | null; games: number | null; summary: string };
 export type DroppedItem = { item: string; where: string; reason: string };
 export type PatchFreshness = "current" | "previous" | "stale";
 export type ValidationResult =
@@ -239,23 +242,28 @@ export function validateResearch(raw: unknown, ctx: ValidateContext): Validation
     return [fallback, ...rest];
   };
 
-  const itemSlots: MetaSlot[] = [];
-  (Array.isArray(input.slots) ? input.slots : []).forEach((slot, index) => {
-    const label = clean(slot?.label, 24) || `Item ${index + 1}`;
-    const kind: MetaSlot["kind"] = slot?.kind === "core" || slot?.kind === "situational" ? slot.kind : "flex";
-    const list = withDefault(options(slot?.options, label, "completed"), label);
-    if (!list.length) { warnings.push(`Dropped slot "${label}": no option resolved to a current completed item.`); return; }
-    itemSlots.push({ id: `slot${index + 1}`, label, kind, options: list });
-  });
-  const cores = itemSlots.filter((slot) => slot.kind === "core").length;
-  if (cores < 3) return reject(`Only ${cores} core slot${cores === 1 ? "" : "s"} survived validation (need 3).`);
-
-  const slots = [...itemSlots];
-  const boots = withDefault(options(input.boots, "Boots", "boots"), "Boots");
-  if (boots.length) {
-    const after = Number.isInteger(input.bootsAfterItem) ? Math.min(Math.max(Number(input.bootsAfterItem), 0), itemSlots.length) : 1;
-    slots.splice(after, 0, { id: "boots", label: "Boots", kind: "boots", options: boots });
-  } else warnings.push("No boots option resolved; the engine's default boots apply.");
+  /** Item slots in buy order with boots put in; `cores` = core slots that survived (a build needs 3). `prefix` labels a route. */
+  const buildSlots = (source: Partial<Pick<RawResearch, "slots" | "boots" | "bootsAfterItem">>, prefix = "") => {
+    const itemSlots: MetaSlot[] = [];
+    (Array.isArray(source.slots) ? source.slots : []).forEach((slot, index) => {
+      const label = clean(slot?.label, 24) || `Item ${index + 1}`;
+      const kind: MetaSlot["kind"] = slot?.kind === "core" || slot?.kind === "situational" ? slot.kind : "flex";
+      const list = withDefault(options(slot?.options, `${prefix}${label}`, "completed"), `${prefix}${label}`);
+      if (!list.length) { warnings.push(`Dropped slot "${prefix}${label}": no option resolved to a current completed item.`); return; }
+      itemSlots.push({ id: `slot${index + 1}`, label, kind, options: list });
+    });
+    const cores = itemSlots.filter((slot) => slot.kind === "core").length;
+    const built = [...itemSlots];
+    const boots = withDefault(options(source.boots, `${prefix}Boots`, "boots"), `${prefix}Boots`);
+    if (boots.length) {
+      const after = Number.isInteger(source.bootsAfterItem) ? Math.min(Math.max(Number(source.bootsAfterItem), 0), itemSlots.length) : 1;
+      built.splice(after, 0, { id: "boots", label: "Boots", kind: "boots", options: boots });
+    } else if (!prefix && cores >= 3) warnings.push("No boots option resolved; the engine's default boots apply.");
+    return { slots: built, cores };
+  };
+  const main = buildSlots(input);
+  if (main.cores < 3) return reject(`Only ${main.cores} core slot${main.cores === 1 ? "" : "s"} survived validation (need 3).`);
+  const slots = main.slots;
 
   const inBuild = new Set(slots.flatMap((slot) => slot.options.map((option) => championKey(option.item))));
   const starting = [...new Set((Array.isArray(input.starting) ? input.starting : []).map((name) => resolve(name, "Starting items", "any")?.name).filter((name): name is string => Boolean(name)))].slice(0, 4);
@@ -271,6 +279,31 @@ export function validateResearch(raw: unknown, ctx: ValidateContext): Validation
     if (inBuild.has(championKey(item.name))) { warnings.push(`${item.name} is listed as off-meta but is in the build; ignored.`); return []; }
     return [{ item: item.name, pickRate: percent(entry.pickRate) ?? null, note: clean(entry.note, 100) || "rarely built" }];
   }).slice(0, 6);
+
+  // Other routes: each a full build of its own, kept only when its core really differs from the main one and from each
+  // other (two of the three core items), so a reordering of the same items is never offered as a choice.
+  const coreOf = (list: MetaSlot[]) => list.filter((slot) => slot.kind === "core").slice(0, 3).map((slot) => championKey(slot.options.find((option) => !option.when)?.item || ""));
+  const routeInfo = (raw: Partial<RawRouteInfo> | undefined) => ({
+    name: clean(raw?.name, 30), share: percent(raw?.share) ?? null, winRate: percent(raw?.winRate) ?? null,
+    games: typeof raw?.games === "number" && Number.isInteger(raw.games) && raw.games >= 0 ? raw.games : null, summary: clean(raw?.summary, 140),
+  });
+  const routes: BuildRoute[] = [];
+  for (const raw of (Array.isArray(input.routes) ? input.routes : []).slice(0, 2)) {
+    const info = routeInfo(raw);
+    if (!info.name) { warnings.push("Dropped a route without a name."); continue; }
+    const route = buildSlots(raw, `${info.name}: `);
+    if (route.cores < 3) { warnings.push(`Dropped route "${info.name}": fewer than 3 core items are current completed items.`); continue; }
+    const core = coreOf(route.slots);
+    if ([coreOf(slots), ...routes.map((other) => coreOf(other.slots))].some((other) => core.filter((item) => !other.includes(item)).length < 2)) {
+      warnings.push(`Dropped route "${info.name}": its core is mostly the same items as another route.`);
+      continue;
+    }
+    const routeStarting = [...new Set((Array.isArray(raw.starting) ? raw.starting : []).map((name) => resolve(name, `${info.name}: Starting items`, "any")?.name).filter((name): name is string => Boolean(name)))].slice(0, 4);
+    const slug = info.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const id = !slug || slug === "main" || routes.some((other) => other.id === slug) ? `route${routes.length + 2}` : slug;
+    routes.push({ id, ...info, slots: route.slots, ...(routeStarting.length ? { starting: routeStarting } : {}) });
+  }
+  const mainInfo = routeInfo(input.mainRoute);
 
   const dataPatch = majorMinor(typeof input.patch === "string" ? input.patch : "");
   const freshness = patchFreshness(dataPatch, ctx.version);
@@ -290,6 +323,8 @@ export function validateResearch(raw: unknown, ctx: ValidateContext): Validation
     researchedOn: ctx.version,
     stale: freshness === "stale",
     starting,
+    mainRoute: { ...mainInfo, name: mainInfo.name || "Most played" },
+    routes,
   };
   const normalized = normalizeResearchedBuild(build, ctx.catalog);
   warnings.push(...normalized.changes);
@@ -326,6 +361,8 @@ export function researchPrompt(champion: string, role: MetaRole, version: string
     "- \"starting\": the most common starting items.",
     "- \"cores\": up to 4 most-played 3-item cores with games and win rate as shown.",
     `- "offMeta": up to 6 items players sometimes build on ${champion} ${ROLE_WORDS[role]} that are not in the build above, with pick rate when shown and a short note.`,
+    `- "mainRoute": the build above as a route: a short "name" for how it plays (e.g. "AP burst", "Crit", "Lethality", "Bruiser"), its share of ${champion} ${ROLE_WORDS[role]} games ("share", %), win rate and games when shown, and a one-line "summary" of what it does.`,
+    `- "routes": other ways ${champion} ${ROLE_WORDS[role]} is built that the sites show, each played in at least 5% of games, whose core is clearly different from the build above: another damage type (AP vs AD / on-hit) or another core identity (lethality vs bruiser, crit vs on-hit). Up to 2, most played first; empty when there is only one way. Each has the same fields as mainRoute plus its own "slots" (core 1st-3rd, then flex), "boots", "bootsAfterItem" and "starting", read from the sites like the build above. Never make one up from items alone.`,
     "- \"notes\": one or two sentences of caveats (which site showed which patch, disagreements between sites).",
     "",
     "Output only the JSON object.",
@@ -489,7 +526,7 @@ export function createResearchScheduler(state: SchedulerState, deps: SchedulerDe
     if (!input.force) {
       const list = researched();
       if (hasFreshMetaBuild(input.champion, input.role, input.version, list, curated)) return { status: "fresh", message: `A patch ${patch} build for ${input.champion} ${input.role} is already known.`, job: null };
-      if (list.some((entry) => championKey(entry.champion) === championKey(input.champion) && entry.role === input.role && majorMinor(entry.researchedOn) === patch)) {
+      if (list.some((entry) => championKey(entry.champion) === championKey(input.champion) && entry.role === input.role && majorMinor(entry.researchedOn) === patch && entry.routes !== undefined)) {
         return { status: "attempted", message: `${input.champion} ${input.role} was already researched on patch ${patch}.`, job: null };
       }
       const failure = state.failures.get(key);

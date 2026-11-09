@@ -1,3 +1,4 @@
+import type { RankedRoute, RouteSource } from "@/lib/build-routes";
 import type { EnemyProfileSummary, EstimatedStats } from "@/lib/enemy-stats";
 
 export type SpellInputs = { Q: number; W: number; E: number; R: number };
@@ -509,6 +510,12 @@ export type LiveGameSnapshot = {
    * champion, not group-locked, a top-build option first). Read by the resist alerts (lib/live-alerts.ts).
    */
   counterPicks?: Array<{ signal: "armorStack" | "mrStack"; level: "none" | "some" | "heavy"; itemId: number | null; item: string | null }>;
+  /**
+   * A champion built more than one way (lib/build-routes.ts): the route this game follows, why (the items bought, the
+   * player's choice, or the recommendation made when the game started) and every route with its points and reasons.
+   * Null when the champion has one route.
+   */
+  buildRoute?: { champion: string; chosen: string; name: string; source: RouteSource; options: RankedRoute[] } | null;
   /** Item-data health: which Data Dragon patch is in use and whether saved/imported builds still resolve. */
   patchStatus?: { version: string; fallback: boolean; unknownBuildItems: string[]; note: string | null };
   caveats: string[];

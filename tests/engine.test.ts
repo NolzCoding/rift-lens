@@ -269,3 +269,11 @@ test("mode-copy ids: Swiftplay item ids (323075-style) count as the owned catalo
     assert.ok(!snap.recommendations.some((rec) => rec.swapPlan?.sellItemId === id && snap.buildPath.steps.some((entry) => entry.itemId === id)), `${name(id)} is not sold off the path`);
   }
 });
+
+test("a player whose items Riot answers with an error object owns nothing; the sample still works", { skip }, async () => {
+  const input = raw([ID.collector], 800, 900);
+  (input.allPlayers![6] as { items: unknown }).items = { error: "Unable to find player" };
+  const snap = await run(input);
+  assert.equal(snap.enemies.find((enemy) => enemy.champion === "Soraka")?.items.length, 0);
+  assert.ok(snap.recommendations.length > 0);
+});

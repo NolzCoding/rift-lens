@@ -323,7 +323,8 @@ function checkSample(game: ReplayGame, sample: ReplaySample, snap: LiveGameSnaps
   }
 
   // --- top build (researched; any champion) ---
-  const topBuild = metaBuildFor(snap.activePlayer.champion, snap.activePlayer.position, snap.dataDragonVersion);
+  // The route this game follows (lib/build-routes.ts): another route's items are not off-meta for it.
+  const topBuild = metaBuildFor(snap.activePlayer.champion, snap.activePlayer.position, snap.dataDragonVersion, snap.buildRoute?.chosen);
   if (topBuild && !brief?.pinnedBuild?.length && !brief?.importedBuild?.items.length) {
     const offMetaNames = new Set(topBuild.offMeta.map((entry) => key(entry.item)).filter((name) => !isMetaItem(topBuild, name)));
     const offMeta = steps.filter((step) => offMetaNames.has(key(step.item)) && !owned.has(step.itemId));

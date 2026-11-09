@@ -3,6 +3,7 @@
 import { Ban, Crown, Plus, Swords, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
+import { RoutePicker } from "@/components/live/route-picker";
 import type { ChampSelectView, PoolEntry } from "@/lib/champ-select";
 import type { MetaRole } from "@/lib/meta-builds";
 
@@ -202,8 +203,10 @@ export function ChampSelectPanel() {
   const [editing, setEditing] = useState(false);
   const poll = useCallback(() => {
     // /live?champselect=mock: a made-up champ select through the real pipeline (lib/champ-select.ts MOCK_SESSION).
-    const mock = new URLSearchParams(window.location.search).get("champselect") === "mock";
-    fetch(`/api/champ-select${mock ? "?mock=1" : ""}`, { cache: "no-store" }).then((response) => response.ok ? response.json() : null).then((data: ChampSelectView | null) => { if (data) setView(data); }).catch(() => undefined);
+    const params = new URLSearchParams(window.location.search);
+    const mock = params.get("champselect") === "mock";
+    const champion = mock ? params.get("champion") : null;
+    fetch(`/api/champ-select${mock ? `?mock=1${champion ? `&champion=${encodeURIComponent(champion)}` : ""}` : ""}`, { cache: "no-store" }).then((response) => response.ok ? response.json() : null).then((data: ChampSelectView | null) => { if (data) setView(data); }).catch(() => undefined);
   }, []);
   useEffect(() => { poll(); const timer = window.setInterval(poll, POLL_MS); return () => window.clearInterval(timer); }, [poll]);
   if (!view) return null;
@@ -217,7 +220,9 @@ export function ChampSelectPanel() {
             <span><Swords size={14} /> {view.queue?.label || "Champ select"}{view.myRole && <> · you: <b>{ROLE_LABEL[view.myRole]}</b></>}</span>
             {view.myTurn && <em className="cs-turn">Your pick</em>}
           </header>
-          {view.myLocked ? <Loadout view={view} /> : <><Suggestions view={view} /><Loadout view={view} /></>}
+          {!view.myLocked && <Suggestions view={view} />}
+          {view.routes && <RoutePicker champion={view.routes.champion} options={view.routes.options} chosen={view.routes.chosen} version={view.version} onChanged={poll} />}
+          <Loadout view={view} />
           {view.note && <p className="cs-note">{view.note}</p>}
           {view.enemies.length > 0 && (
             <div className="cs-enemies">

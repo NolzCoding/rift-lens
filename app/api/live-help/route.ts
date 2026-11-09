@@ -114,7 +114,7 @@ function compact(snapshot: LiveGameSnapshot, userFocus: string, mode: LiveHelpMo
   const abilities = active.abilityLevels ? Object.entries(active.abilityLevels).map(([key, level]) => `${key}${level}`).join(" ") : undefined;
   // The top build (lib/meta-builds.ts: researched for this patch > curated > older research) for this champion/role;
   // sent even when a pinned/imported build leads. Web search stays disabled for HELP ME itself.
-  const meta = metaBuildFor(active.champion, active.position, snapshot.patchStatus?.fallback ? null : snapshot.dataDragonVersion);
+  const meta = metaBuildFor(active.champion, active.position, snapshot.patchStatus?.fallback ? null : snapshot.dataDragonVersion, snapshot.buildRoute?.chosen);
   const value = {
     mode,
     game: {

@@ -11,7 +11,7 @@ const headers = { "Cache-Control": "no-store" };
 export async function GET(request: Request) {
   try {
     const params = new URL(request.url).searchParams;
-    return NextResponse.json(await champSelectView({ withChampions: params.get("champions") === "1", mock: params.get("mock") === "1" }), { headers });
+    return NextResponse.json(await champSelectView({ withChampions: params.get("champions") === "1", mock: params.get("mock") === "1", mockChampion: params.get("champion") }), { headers });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Champ select is unavailable." }, { status: 503, headers });
   }
