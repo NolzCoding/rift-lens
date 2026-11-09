@@ -277,3 +277,30 @@ test("a player whose items Riot answers with an error object owns nothing; the s
   assert.equal(snap.enemies.find((enemy) => enemy.champion === "Soraka")?.items.length, 0);
   assert.ok(snap.recommendations.length > 0);
 });
+
+test("Swiftplay uses Riot's Swiftplay prices and recipes (Data Dragon's 32xxxx copies); other games keep Summoner's Rift's", { skip }, async () => {
+  const swift = await getItemCatalog("SWIFTPLAY");
+  const frozen = 3110;
+  assert.equal(catalog.byId.get(frozen)?.cost, 2500, "Summoner's Rift price");
+  assert.equal(swift.byId.get(frozen)?.cost, 2700, "Swiftplay price");
+  assert.deepEqual(swift.byId.get(3222)?.from, [3067, 1028, 3114], "Swiftplay Mikael's Blessing needs a Ruby Crystal too");
+  assert.ok(swift.byId.get(1028)?.into?.includes(3222), "recipes rebuilt both ways");
+  // A Swiftplay game: the card's cost for Frozen Heart with both components owned is Swiftplay's 800, not 600.
+  const input = raw([3082, 3024], 700, 900);
+  input.gameData!.gameMode = "SWIFTPLAY";
+  input.allPlayers![0].championName = "Leona";
+  const snap = await run(input);
+  const card = [...snap.recommendations].find((rec) => rec.itemId === frozen);
+  if (card) assert.equal(card.nextStep?.cost, 800);
+});
+
+test("a component's price counts the pieces already owned (Sheen with a Glowing Mote owned: 650, not 900)", { skip }, async () => {
+  const { nextPurchaseToward } = await import("@/lib/live-game");
+  const lich = catalog.byId.get(3100)!;
+  const active = { ...(await run(raw([], 0, 600))).activePlayer, currentGold: 700 };
+  const mote = 2022;
+  const step = nextPurchaseToward(lich, { ...active, items: [{ id: mote, name: "Glowing Mote", count: 1, slot: 0, price: 250 } as never] }, catalog);
+  assert.equal(step?.item, "Sheen");
+  assert.equal(step?.cost, 650);
+  assert.equal(step?.affordable, true);
+});

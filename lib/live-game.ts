@@ -132,9 +132,15 @@ type CatalogItem = {
 };
 /**
  * `fallback` = Data Dragon was unreachable and the small hard-coded FALLBACK_ITEMS list is in use. `aliases` = item id →
- * the catalog item it counts as (free rune boots → Boots).
+ * the catalog item it counts as (free rune boots → Boots). `swiftplayPrices` = Riot's Swiftplay price and recipe for the
+ * items Swiftplay sells differently (Data Dragon's 32xxxx copies: Frozen Heart 2700 instead of 2500, Mikael's Blessing
+ * needs a Ruby Crystal more), by the Summoner's Rift id; `mode` = "swiftplay" on a catalog with them in place (catalogFor).
  */
-type Catalog = { version: string; byName: Map<string, CatalogItem>; byId: Map<number, CatalogItem>; fallback?: boolean; aliases?: Map<number, number> };
+type Catalog = {
+  version: string; byName: Map<string, CatalogItem>; byId: Map<number, CatalogItem>; fallback?: boolean; aliases?: Map<number, number>;
+  swiftplayPrices?: Map<number, { cost: number; baseCost: number; sellValue: number; from: number[] }>;
+  mode?: "swiftplay";
+};
 
 /**
  * Patch the FALLBACK_ITEMS prices were last checked against. Only used when Data Dragon is unreachable; it is NOT the
@@ -485,9 +491,48 @@ async function fetchCatalog(): Promise<Catalog> {
     const base = byId.get(Number(item.into[0]))?.from?.find((from) => byId.get(from)?.tags?.includes("Boots"));
     if (base) aliases.set(Number(id), base);
   }
+  // Swiftplay's own prices: Data Dragon lists every item Swiftplay sells at another price as a copy with id 32 + the
+  // Summoner's Rift id (323110 Frozen Heart: 800 to combine instead of 600). The live game reports those copy ids too.
+  const swiftplayPrices = new Map<number, { cost: number; baseCost: number; sellValue: number; from: number[] }>();
+  // A recipe piece that is itself a copy (323070 Tear of the Goddess) is the Summoner's Rift item.
+  const pieceId = (id: string) => Number(/^32\d{4}$/.test(id) ? id.slice(2) : id);
+  for (const [rawId, item] of Object.entries(payload.data || {})) {
+    const match = /^32(\d{4})$/.exec(rawId);
+    const base = match ? byId.get(Number(match[1])) : undefined;
+    if (!base || base.name !== item.name || !item.gold?.purchasable || !item.maps?.["11"]) continue;
+    swiftplayPrices.set(base.id, {
+      cost: num(item.gold.total), baseCost: num(item.gold.base), sellValue: num(item.gold.sell),
+      from: item.from ? item.from.map(pieceId).filter((id) => byId.has(id)) : base.from || [],
+    });
+  }
   // This patch's item tips for every getItemUsageTip caller on the server (lib/item-synergy.ts).
   registerItemTips(version, [...byName.values()]);
-  return { version, byName, byId, fallback: false, aliases };
+  return { version, byName, byId, fallback: false, aliases, swiftplayPrices };
+}
+
+const modeCatalogs = new WeakMap<Catalog, Catalog>();
+
+/**
+ * The catalog with the game's own prices: Swiftplay sells some items at other prices than Summoner's Rift (a support or
+ * tank item's last step costs 200-400 more), so every cost, "buy now" and gold-left figure in a Swiftplay game uses them.
+ * Other games get the catalog unchanged. Cached per catalog.
+ */
+export function catalogFor(catalog: Catalog, ruleset: Ruleset): Catalog {
+  if (ruleset !== "swiftplay" || !catalog.swiftplayPrices?.size) return catalog;
+  const cached = modeCatalogs.get(catalog);
+  if (cached) return cached;
+  // New objects for every item: the recipes change, so every `into` is rebuilt.
+  const byId = new Map([...catalog.byId].map(([id, item]) => [id, { ...item, ...catalog.swiftplayPrices!.get(id), into: undefined } as CatalogItem]));
+  for (const item of byId.values()) {
+    for (const childId of item.from || []) {
+      const child = byId.get(childId);
+      if (child && !(child.into ||= []).includes(item.id)) child.into.push(item.id);
+    }
+  }
+  const byName = new Map([...catalog.byName].map(([name, item]) => [name, byId.get(item.id) || item]));
+  const priced: Catalog = { ...catalog, byId, byName, mode: "swiftplay" };
+  modeCatalogs.set(catalog, priced);
+  return priced;
 }
 
 async function loadChampionContext(version: string, champion: string, index: ChampionIndex): Promise<LiveGameSnapshot["championContext"]> {
@@ -527,6 +572,23 @@ async function loadChampionContext(version: string, champion: string, index: Cha
   return pending;
 }
 
+/**
+ * What the shop charges for `item` given the pieces owned (`owned`: id → count): every owned piece of its recipe tree is
+ * used once, as League does (Sheen with a Glowing Mote owned costs 650, not 900).
+ */
+function shopPrice(item: CatalogItem, owned: Map<number, number>, catalog: Catalog): number {
+  const pool = new Map(owned);
+  const price = (piece: CatalogItem, top: boolean): number => {
+    const count = top ? 0 : pool.get(piece.id) || 0;
+    if (count > 0) { pool.set(piece.id, count - 1); return 0; }
+    const from = (piece.from || []).map((id) => catalog.byId.get(id)).filter((entry): entry is CatalogItem => Boolean(entry));
+    if (!from.length) return piece.cost;
+    const combine = piece.baseCost ?? Math.max(0, piece.cost - from.reduce((sum, component) => sum + component.cost, 0));
+    return combine + from.reduce((sum, component) => sum + price(component, false), 0);
+  };
+  return price(item, true);
+}
+
 function purchaseStep(target: CatalogItem, active: LiveGameSnapshot["activePlayer"], catalog: Catalog): LiveRecommendation["nextStep"] {
   const currentGold = Math.max(0, Math.floor(active.currentGold));
   const ownedCounts = new Map<number, number>();
@@ -558,15 +620,26 @@ function purchaseStep(target: CatalogItem, active: LiveGameSnapshot["activePlaye
   const stock = active.items.map((item) => ({ id: item.id, count: item.count }));
   const available = [...candidates.values()].filter((item) => !(active.items.some((owned) => owned.id === item.id) && remainingDirect.some((directItem) => directItem.id !== item.id))
     && (item.id === target.id || !conflict(item.id, stock, [], recipeOf(catalog))));
-  const affordable = available.filter((item) => item.cost <= currentGold).sort((a, b) => b.cost - a.cost)[0];
-  const next = affordable || available.sort((a, b) => a.cost - b.cost)[0] || target;
-  return { itemId: next.id, item: next.name, cost: next.cost, affordable: currentGold >= next.cost, goldNeeded: Math.max(0, next.cost - currentGold) };
+  // Priced as the shop prices them: pieces already owned inside a candidate's recipe are not paid again.
+  // The target itself from the whole inventory (ownedCounts above has its owned direct components taken out).
+  const inventory = new Map<number, number>();
+  for (const item of active.items) inventory.set(item.id, (inventory.get(item.id) || 0) + Math.max(1, item.count));
+  const priceOf = new Map(available.map((item) => [item.id, shopPrice(item, ownedCounts, catalog)]));
+  priceOf.set(target.id, shopPrice(target, inventory, catalog));
+  const cost = (item: CatalogItem) => priceOf.get(item.id) ?? item.cost;
+  const affordable = available.filter((item) => cost(item) <= currentGold).sort((a, b) => cost(b) - cost(a))[0];
+  const next = affordable || available.sort((a, b) => cost(a) - cost(b))[0] || target;
+  return { itemId: next.id, item: next.name, cost: cost(next), affordable: currentGold >= cost(next), goldNeeded: Math.max(0, cost(next) - currentGold) };
 }
 
 // Shared catalog helpers for other server modules (HELP ME route validates AI-named items with these).
 export type ItemInfo = CatalogItem;
 export type ItemCatalog = Catalog;
-export const getItemCatalog = () => loadCatalog();
+/** The item catalog; with a game mode, that mode's prices (Swiftplay: catalogFor). */
+export const getItemCatalog = async (gameMode?: string) => {
+  const catalog = await loadCatalog();
+  return gameMode && /SWIFT/i.test(gameMode) ? catalogFor(catalog, "swiftplay") : catalog;
+};
 export const nextPurchaseToward = (target: ItemInfo, active: LiveGameSnapshot["activePlayer"], catalog: ItemCatalog) => purchaseStep(target, active, catalog);
 
 /** Exact name, then id-mapped fallback, then a unique prefix/substring match ("Collector" → The Collector). */
@@ -2648,7 +2721,8 @@ export async function normalizeLiveData(raw: RawLiveData, options: NormalizeOpti
   // Riot's Live Client sometimes answers a player's items with `{ "error": "Unable to find player" }` instead of a list
   // (seen in a 2026-11-09 game): that player is treated as owning nothing rather than the whole sample failing.
   for (const player of rawPlayers) if (!Array.isArray(player.items)) player.items = [];
-  const catalog = await loadCatalog();
+  // This game's prices (Swiftplay sells some items at its own prices).
+  const catalog = catalogFor(await loadCatalog(), rulesetFor(raw.gameData));
   // Game modes report some items under mode-copy ids (Swiftplay Thornmail = 323075 for 3075). Map them back to the
   // catalog item so ownership, path steps, sell values and "never sell your own build" checks see the real item.
   for (const player of rawPlayers) {
